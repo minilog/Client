@@ -150,6 +150,7 @@
     <ClInclude Include="GameLog.h" />
     <ClInclude Include="GameMap.h" />
     <ClInclude Include="GameTime.h" />
+    <ClInclude Include="GameY.h" />
     <ClInclude Include="Item.h" />
     <ClInclude Include="Label.h" />
     <ClInclude Include="MapReader\base64.h" />
@@ -186,6 +187,8 @@
     <ClInclude Include="RoomScene.h" />
     <ClInclude Include="Scene.h" />
     <ClInclude Include="SceneManager.h" />
+    <ClInclude Include="SceneManagerY.h" />
+    <ClInclude Include="SceneY.h" />
     <ClInclude Include="SocketAddress.h" />
     <ClInclude Include="SocketUtil.h" />
     <ClInclude Include="Sprite.h" />
@@ -196,6 +199,7 @@
     <ClInclude Include="UpgradeItem.h" />
     <ClInclude Include="WaitRoomScene.h" />
     <ClInclude Include="Water.h" />
+    <ClInclude Include="Yato.h" />
   </ItemGroup>
   <ItemGroup>
     <None Include="MapReader\Tmx.h.in" />
@@ -217,9 +221,11 @@
     <ClCompile Include="GameLog.cpp" />
     <ClCompile Include="GameMap.cpp" />
     <ClCompile Include="GameTime.cpp" />
+    <ClCompile Include="GameY.cpp" />
     <ClCompile Include="Item.cpp" />
     <ClCompile Include="Label.cpp" />
     <ClCompile Include="main.cpp" />
+    <ClCompile Include="MainY.cpp" />
     <ClCompile Include="MapReader\base64.cpp" />
     <ClCompile Include="MapReader\miniz.c" />
     <ClCompile Include="MapReader\tinyxml2.cpp" />
@@ -251,6 +257,7 @@
     <ClCompile Include="RoomScene.cpp" />
     <ClCompile Include="Scene.cpp" />
     <ClCompile Include="SceneManager.cpp" />
+    <ClCompile Include="SceneManagerY.cpp" />
     <ClCompile Include="Sprite.cpp" />
     <ClCompile Include="TestScene.cpp" />
     <ClCompile Include="TestTiepScene.cpp" />
