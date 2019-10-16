@@ -192,6 +192,7 @@
     <ClInclude Include="TCPSocket.h" />
     <ClInclude Include="TestScene.h" />
     <ClInclude Include="TestTiepScene.h" />
+    <ClInclude Include="TimeSceneY.h" />
     <ClInclude Include="UpgradeItem.h" />
     <ClInclude Include="WaitRoomScene.h" />
     <ClInclude Include="Water.h" />
@@ -253,6 +254,7 @@
     <ClCompile Include="Sprite.cpp" />
     <ClCompile Include="TestScene.cpp" />
     <ClCompile Include="TestTiepScene.cpp" />
+    <ClCompile Include="TimeSceneY.cpp" />
     <ClCompile Include="UpgradeItem.cpp" />
     <ClCompile Include="WaitRoomScene.cpp" />
     <ClCompile Include="Water.cpp" />

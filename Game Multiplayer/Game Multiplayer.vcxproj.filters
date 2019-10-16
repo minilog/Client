@@ -26,6 +26,9 @@
     <Filter Include="Game Objects\Item">
       <UniqueIdentifier>{85d9fa4a-bdf3-4d73-b954-0ebdd4beb025}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Yato">
+      <UniqueIdentifier>{22fc85bd-177a-440d-801a-5768de0eed78}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="MapReader\tinyxml2.h">
@@ -214,6 +217,9 @@
     <ClInclude Include="TestTiepScene.h">
       <Filter>Scene</Filter>
     </ClInclude>
+    <ClInclude Include="TimeSceneY.h">
+      <Filter>Yato</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include="MapReader\Tmx.h.in">
@@ -388,6 +394,9 @@
     </ClCompile>
     <ClCompile Include="GameDebugDraw.cpp">
       <Filter>Framework</Filter>
+    </ClCompile>
+    <ClCompile Include="TimeSceneY.cpp">
+      <Filter>Yato</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>
