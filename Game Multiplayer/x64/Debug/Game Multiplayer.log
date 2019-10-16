@@ -1,0 +1,20 @@
+﻿GameDebugDraw.obj : error LNK2019: unresolved external symbol D3DXCreateLine referenced in function "public: __cdecl GameDebugDraw::GameDebugDraw(void)" (??0GameDebugDraw@@QEAA@XZ)
+GameGlobal.obj : error LNK2019: unresolved external symbol D3DXCreateTextureFromFileExA referenced in function "public: __cdecl GameGlobal::GameGlobal(void)" (??0GameGlobal@@QEAA@XZ)
+Sprite.obj : error LNK2001: unresolved external symbol D3DXCreateTextureFromFileExA
+Label.obj : error LNK2019: unresolved external symbol D3DXCreateFontW referenced in function "public: __cdecl Label::Label(class std::basic_string<char,struct std::char_traits<char>,class std::allocator<char> >,int,int,struct D3DXVECTOR2,unsigned long)" (??0Label@@QEAA@V?$basic_string@DU?$char_traits@D@std@@V?$allocator@D@2@@std@@HHUD3DXVECTOR2@@K@Z)
+WaitRoomScene.obj : error LNK2001: unresolved external symbol D3DXCreateFontW
+main.obj : error LNK2019: unresolved external symbol Direct3DCreate9 referenced in function "int __cdecl InitDevice(void)" (?InitDevice@@YAHXZ)
+main.obj : error LNK2019: unresolved external symbol D3DXCreateSprite referenced in function "int __cdecl InitDevice(void)" (?InitDevice@@YAHXZ)
+TmxTileLayer.obj : error LNK2019: unresolved external symbol uncompress referenced in function "private: void __cdecl Tmx::TileLayer::ParseBase64(class std::basic_string<char,struct std::char_traits<char>,class std::allocator<char> > const &)" (?ParseBase64@TileLayer@Tmx@@AEAAXAEBV?$basic_string@DU?$char_traits@D@std@@V?$allocator@D@2@@std@@@Z)
+TmxUtil.obj : error LNK2019: unresolved external symbol inflate referenced in function "public: static char * __cdecl Tmx::Util::DecompressGZIP(char const *,int,int)" (?DecompressGZIP@Util@Tmx@@SAPEADPEBDHH@Z)
+TmxUtil.obj : error LNK2019: unresolved external symbol inflateEnd referenced in function "public: static char * __cdecl Tmx::Util::DecompressGZIP(char const *,int,int)" (?DecompressGZIP@Util@Tmx@@SAPEADPEBDHH@Z)
+TmxUtil.obj : error LNK2019: unresolved external symbol inflateInit2_ referenced in function "public: static char * __cdecl Tmx::Util::DecompressGZIP(char const *,int,int)" (?DecompressGZIP@Util@Tmx@@SAPEADPEBDHH@Z)
+Sprite.obj : error LNK2019: unresolved external symbol D3DXVec3Transform referenced in function "public: void __cdecl Sprite::Draw(struct D3DXVECTOR3,struct tagRECT,struct D3DXVECTOR2,struct D3DXVECTOR2,float,struct D3DXVECTOR2,struct D3DXCOLOR)" (?Draw@Sprite@@QEAAXUD3DXVECTOR3@@UtagRECT@@UD3DXVECTOR2@@2M2UD3DXCOLOR@@@Z)
+Sprite.obj : error LNK2019: unresolved external symbol D3DXMatrixTransformation2D referenced in function "public: void __cdecl Sprite::Draw(struct D3DXVECTOR3,struct tagRECT,struct D3DXVECTOR2,struct D3DXVECTOR2,float,struct D3DXVECTOR2,struct D3DXCOLOR)" (?Draw@Sprite@@QEAAXUD3DXVECTOR3@@UtagRECT@@UD3DXVECTOR2@@2M2UD3DXCOLOR@@@Z)
+Sprite.obj : error LNK2019: unresolved external symbol D3DXGetImageInfoFromFileA referenced in function "public: void __cdecl Sprite::InitWithSprite(char const *,struct tagRECT,int,int,unsigned long)" (?InitWithSprite@Sprite@@QEAAXPEBDUtagRECT@@HHK@Z)
+C:\Program Files (x86)\Microsoft DirectX SDK (June 2010)\Lib\x86\d3dx9.lib : warning LNK4272: library machine type 'x86' conflicts with target machine type 'x64'
+C:\Program Files (x86)\Microsoft DirectX SDK (June 2010)\Lib\x86\d3d9.lib : warning LNK4272: library machine type 'x86' conflicts with target machine type 'x64'
+C:\Program Files (x86)\Microsoft DirectX SDK (June 2010)\Lib\x86\dxguid.lib : warning LNK4272: library machine type 'x86' conflicts with target machine type 'x64'
+C:\Program Files (x86)\Microsoft DirectX SDK (June 2010)\Lib\x86\dinput8.lib : warning LNK4272: library machine type 'x86' conflicts with target machine type 'x64'
+zlib.lib : warning LNK4272: library machine type 'x86' conflicts with target machine type 'x64'
+C:\Users\Minh\Desktop\Client\x64\Debug\Game Multiplayer.exe : fatal error LNK1120: 12 unresolved externals
