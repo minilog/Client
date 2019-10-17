@@ -77,7 +77,7 @@ void Room::Read(InputMemoryBitStream& is)
 	int room1 = 0;
 	bool isStart = false;
 	string  name = "";
-	is.Read(room1, Define::bitofTypePacket);
+	is.Read(room1, Define::bitOfTypePacket);
 	is.Read(name);
 	is.Read(isStart);
 	SetName(name);

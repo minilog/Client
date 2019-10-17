@@ -4,6 +4,7 @@
 #include "SceneManagerY.h"
 #include <thread>
 #include "TimeSceneY.h"
+#include "GameLog.h"
 
 
 GameY::GameY(int fps)

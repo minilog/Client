@@ -2,13 +2,23 @@
 
 #include "SocketUtil.h"
 #include "MemoryBitStream.h"
-#include "Yato.h"
+#include "GameDefine.h"
 
 TimeSceneY::TimeSceneY()
 {
 	InitSpritesAndLabels();
 
 	CreateSocketAndTryConnectToServer();
+}
+
+void TimeSceneY::Update(float _dt)
+{
+	sendSyncCount -= _dt;
+	if (sendSyncCount <= 0.f)
+	{
+		sendSyncCount = timeBetweenSendSync;
+		SendSyncTimePacket();
+	}
 }
 
 void TimeSceneY::Draw()
@@ -18,15 +28,15 @@ void TimeSceneY::Draw()
 	sendTime_Label.Draw();
 	receiveTime_Label.Draw();
 	timeDistanceWithServer_Label.Draw();
-	serverTime_Label.Draw();
+	serverTime_Label.Draw("Server time: " + to_string(serverTime));
 }
 
-void TimeSceneY::SendPacket()
+void TimeSceneY::SendSyncTimePacket()
 {
 	OutputMemoryBitStream os;
-	os.Write(PT_TickCount, 2); // gửi PacketType với 2 bit
-	os.Write(GetTickCount());
-
+	os.Write(Define::SyncTime, Define::bitOfTypePacket); // gửi PacketType với 2 bit
+	os.Write((int)GetTickCount(), 32);
+	TCPSocket->Send(os.GetBufferPtr(), os.GetByteLength());
 }
 
 void TimeSceneY::ReceivePacket()
@@ -39,8 +49,15 @@ void TimeSceneY::ReceivePacket()
 		InputMemoryBitStream is(buff,
 			static_cast<uint32_t> (receivedByteCount));
 
-		int typeofPacket = 0;
-		is.Read(typeofPacket, Define::bitofTypePacket); // read loại Packet
+		// nếu là loại packet SyncTime thì đọc time của server
+		{
+			int typeOfPacket = 0;
+			is.Read(typeOfPacket, Define::bitOfTypePacket);
+			if (typeOfPacket == Define::SyncTime)
+			{
+				is.Read(serverTime, 32);
+			}
+		}
 	}
 	free(buff);
 }
@@ -80,3 +97,5 @@ void TimeSceneY::CreateSocketAndTryConnectToServer()
 	// GameGlobal save the socket successfully connect to Server
 	GameGlobal::socket = TCPSocket;
 }
+
+

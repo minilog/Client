@@ -79,7 +79,7 @@ GameGlobal::~GameGlobal()
 void GameGlobal::SendExitGame()
 {
 	OutputMemoryBitStream os;
-	os.Write(Define::ExitGame, Define::bitofTypePacket);
+	os.Write(Define::ExitGame, Define::bitOfTypePacket);
 	socket->Send(os.GetBufferPtr(), os.GetByteLength());
 }
 

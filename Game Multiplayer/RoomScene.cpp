@@ -84,7 +84,7 @@ void RoomScene::Update(float dt)
 		if (isCreating) //Send create room for Server
 		{
 			OutputMemoryBitStream os;
-			os.Write(Define::CreateRoom, Define::bitofTypePacket);
+			os.Write(Define::CreateRoom, Define::bitOfTypePacket);
 			socket->Send(os.GetBufferPtr(), os.GetByteLength());
 			SceneManager::GetInstance()->ReplaceScene(new WaitRoomScene());
 			return;
@@ -98,8 +98,8 @@ void RoomScene::Update(float dt)
 			else
 			{
 				OutputMemoryBitStream os;
-				os.Write(Define::ChooseRoom, Define::bitofTypePacket);
-				os.Write(pointerX + 1, Define::bitofTypePacket);
+				os.Write(Define::ChooseRoom, Define::bitOfTypePacket);
+				os.Write(pointerX + 1, Define::bitOfTypePacket);
 				socket->Send(os.GetBufferPtr(), os.GetByteLength());
 				SceneManager::GetInstance()->ReplaceScene(new WaitRoomScene());
 				return;
@@ -123,7 +123,7 @@ void RoomScene::Update(float dt)
 
 
 	OutputMemoryBitStream os;
-	os.Write(Define::UpdateCountPlayer, Define::bitofTypePacket);
+	os.Write(Define::UpdateCountPlayer, Define::bitOfTypePacket);
 	socket->Send(os.GetBufferPtr(), os.GetByteLength());
 
 
@@ -160,11 +160,11 @@ void RoomScene::ReceivePakcet()
 		InputMemoryBitStream is(buff,
 			static_cast<uint32_t> (receivedByteCount));
 		int typeofPacket = 0;
-		is.Read(typeofPacket, Define::bitofTypePacket);
+		is.Read(typeofPacket, Define::bitOfTypePacket);
 		if (typeofPacket == Define::UpdateCountPlayer)
 		{
 			int size = 0;
-			is.Read(size, Define::bitofTypePacket);
+			is.Read(size, Define::bitOfTypePacket);
 			while (roomVec.size() < size)
 			{
 				Room* room = new Room(roomVec[roomVec.size() - 1]->position + D3DXVECTOR3(200, 0, 0));

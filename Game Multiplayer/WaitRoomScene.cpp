@@ -64,14 +64,14 @@ void WaitRoomScene::ReceivePakcet()
 		InputMemoryBitStream is(buff,
 			static_cast<uint32_t> (receivedByteCount));
 		int typeofPacket = 0;
-		is.Read(typeofPacket, Define::bitofTypePacket);
+		is.Read(typeofPacket, Define::bitOfTypePacket);
 		if (typeofPacket == Define::LetStart && timetoStart == 0)
 		{
 			//Sau khi nhan duoc goi tin start thi nhan thong tin Position de start game
 			UpdateBox(4);
 			timetoStart = GetTickCount();
 			int size = 0;
-			is.Read(size, Define::bitofTypePacket);
+			is.Read(size, Define::bitOfTypePacket);
 			for (int i = 0; i < size; i++)
 			{
 				int tag = 0; is.Read(tag, Define::bitofID);
@@ -144,11 +144,11 @@ void WaitRoomScene::Update(float dt)
 		lastAdd = GetTickCount();
 	}
 	OutputMemoryBitStream os;
-	os.Write(Define::UpdateCountPlayer, Define::bitofTypePacket);
+	os.Write(Define::UpdateCountPlayer, Define::bitOfTypePacket);
 	socket->Send(os.GetBufferPtr(), os.GetByteLength());
 
 	OutputMemoryBitStream os1;
-	os1.Write(Define::RequestName, Define::bitofTypePacket);
+	os1.Write(Define::RequestName, Define::bitOfTypePacket);
 	os1.Write(m_name);
 	socket->Send(os1.GetBufferPtr(), os1.GetByteLength());
 

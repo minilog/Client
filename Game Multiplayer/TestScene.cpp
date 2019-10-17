@@ -255,7 +255,7 @@ void TestScene::ReceivePakcet()
 		InputMemoryBitStream is(buff,
 			static_cast<uint32_t> (receivedByteCount));
 		int typeofPacket = 0;
-		is.Read(typeofPacket, Define::bitofTypePacket);
+		is.Read(typeofPacket, Define::bitOfTypePacket);
 		if (typeofPacket == Define::WorldStatePacket)
 		{
 			int ObjectCount = 0;
@@ -274,7 +274,7 @@ void TestScene::ReceivePakcet()
 			isOver = true;
 			last_time_over = GetTickCount();
 			OutputMemoryBitStream os;
-			os.Write(Define::OutRoom, Define::bitofTypePacket);
+			os.Write(Define::OutRoom, Define::bitOfTypePacket);
 			socket->Send(os.GetBufferPtr(), os.GetByteLength());
 		}
 

@@ -1,39 +1,3 @@
 ﻿C:\Program Files (x86)\Microsoft Visual Studio\2017\Enterprise\Common7\IDE\VC\VCTargets\Microsoft.CppBuild.targets(391,5): warning MSB8028: The intermediate directory (Debug\) contains files shared from another project (Game Multiplayer.vcxproj).  This can lead to incorrect clean and rebuild behavior.
-  Game.cpp
-  c:\program files (x86)\microsoft directx sdk (june 2010)\include\dinput.h: DIRECTINPUT_VERSION undefined. Defaulting to version 0x0800
-c:\users\minh\desktop\client\game multiplayer\game.cpp(13): warning C4244: '=': conversion from 'int' to 'float', possible loss of data
-c:\users\minh\desktop\client\game multiplayer\game.cpp(87): warning C4244: 'initializing': conversion from 'float' to 'int', possible loss of data
-  RoomScene.cpp
-c:\users\minh\desktop\client\game multiplayer\roomscene.cpp(11): warning C4244: 'argument': conversion from 'int' to 'float', possible loss of data
-c:\users\minh\desktop\client\game multiplayer\roomscene.cpp(12): warning C4244: 'argument': conversion from 'int' to 'FLOAT', possible loss of data
-c:\users\minh\desktop\client\game multiplayer\roomscene.cpp(42): warning C4244: 'argument': conversion from 'int' to 'FLOAT', possible loss of data
-c:\users\minh\desktop\client\game multiplayer\roomscene.cpp(50): warning C4244: 'argument': conversion from 'int' to 'float', possible loss of data
-c:\users\minh\desktop\client\game multiplayer\roomscene.cpp(51): warning C4244: 'argument': conversion from 'int' to 'FLOAT', possible loss of data
-c:\users\minh\desktop\client\game multiplayer\roomscene.cpp(60): warning C4244: 'argument': conversion from 'int' to 'FLOAT', possible loss of data
-c:\users\minh\desktop\client\game multiplayer\roomscene.cpp(77): warning C4018: '<': signed/unsigned mismatch
-c:\users\minh\desktop\client\game multiplayer\roomscene.cpp(130): warning C4018: '<': signed/unsigned mismatch
-c:\users\minh\desktop\client\game multiplayer\roomscene.cpp(145): warning C4018: '<': signed/unsigned mismatch
-c:\users\minh\desktop\client\game multiplayer\roomscene.cpp(168): warning C4018: '<': signed/unsigned mismatch
-c:\users\minh\desktop\client\game multiplayer\roomscene.cpp(173): warning C4018: '>': signed/unsigned mismatch
-  SceneManager.cpp
-  TestScene.cpp
-c:\users\minh\desktop\client\game multiplayer\testscene.cpp(86): warning C4244: 'argument': conversion from 'int' to 'FLOAT', possible loss of data
-c:\users\minh\desktop\client\game multiplayer\testscene.cpp(87): warning C4244: 'argument': conversion from 'int' to 'FLOAT', possible loss of data
-c:\users\minh\desktop\client\game multiplayer\testscene.cpp(89): warning C4244: 'argument': conversion from 'int' to 'FLOAT', possible loss of data
-c:\users\minh\desktop\client\game multiplayer\testscene.cpp(90): warning C4244: 'argument': conversion from 'int' to 'FLOAT', possible loss of data
-c:\users\minh\desktop\client\game multiplayer\testscene.cpp(91): warning C4244: 'argument': conversion from 'int' to 'FLOAT', possible loss of data
-c:\users\minh\desktop\client\game multiplayer\testscene.cpp(92): warning C4244: 'argument': conversion from 'int' to 'FLOAT', possible loss of data
-c:\users\minh\desktop\client\game multiplayer\testscene.cpp(93): warning C4244: 'argument': conversion from 'int' to 'FLOAT', possible loss of data
-c:\users\minh\desktop\client\game multiplayer\testscene.cpp(94): warning C4244: 'argument': conversion from 'int' to 'FLOAT', possible loss of data
-c:\users\minh\desktop\client\game multiplayer\testscene.cpp(95): warning C4244: 'argument': conversion from 'int' to 'FLOAT', possible loss of data
-c:\users\minh\desktop\client\game multiplayer\testscene.cpp(159): warning C4018: '<': signed/unsigned mismatch
-c:\users\minh\desktop\client\game multiplayer\testscene.cpp(195): warning C4018: '<': signed/unsigned mismatch
-c:\users\minh\desktop\client\game multiplayer\testscene.cpp(206): warning C4018: '<': signed/unsigned mismatch
-c:\users\minh\desktop\client\game multiplayer\testscene.cpp(422): warning C4244: 'argument': conversion from 'int' to 'FLOAT', possible loss of data
-c:\users\minh\desktop\client\game multiplayer\testscene.cpp(486): warning C4018: '<': signed/unsigned mismatch
   TimeSceneY.cpp
-  WaitRoomScene.cpp
-c:\users\minh\desktop\client\game multiplayer\waitroomscene.cpp(28): warning C4244: 'argument': conversion from 'int' to 'float', possible loss of data
-c:\users\minh\desktop\client\game multiplayer\waitroomscene.cpp(45): warning C4244: 'argument': conversion from 'int' to 'FLOAT', possible loss of data
-  Generating Code...
   Game Multiplayer.vcxproj -> C:\Users\Minh\Desktop\Client\Debug\Client.exe

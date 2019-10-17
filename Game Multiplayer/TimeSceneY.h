@@ -2,8 +2,6 @@
 
 #include "SceneY.h"
 
-
-
 class TimeSceneY : public SceneY
 {
 public:
@@ -12,15 +10,16 @@ public:
 
 	TCPSocketPtr TCPSocket;	// socket dùng để gửi, nhận dữ liệu từ server 
 
-	void Update(float _dt) {}
+	void Update(float _dt);
 	void Draw();
 
-	void SendPacket();
 	void ReceivePacket() override;
 
 private:
 	void InitSpritesAndLabels();
 	void CreateSocketAndTryConnectToServer();
+
+	void SendSyncTimePacket();
 
 protected:
 	Label ping_Label;
@@ -29,4 +28,11 @@ protected:
 	Label receiveTime_Label;
 	Label timeDistanceWithServer_Label;
 	Label serverTime_Label; // = host time + timeDistance
+
+
+	float timeBetweenSendSync = 3.0f;
+	float sendSyncCount = 3.0f;
+
+	int serverTime = 0;
+
 };

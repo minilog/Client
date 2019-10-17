@@ -62,7 +62,7 @@ void NPC::Read(InputMemoryBitStream& is)
 	dir = (Direction)a;
 	OnsetDir();
 	last_mHeal = mHeal;
-	is.Read(mHeal, Define::bitofTypePacket);
+	is.Read(mHeal, Define::bitOfTypePacket);
 	if (mHeal == 0) isDelete = true;
 	else isDelete = false;
 }

@@ -199,7 +199,6 @@
     <ClInclude Include="UpgradeItem.h" />
     <ClInclude Include="WaitRoomScene.h" />
     <ClInclude Include="Water.h" />
-    <ClInclude Include="Yato.h" />
   </ItemGroup>
   <ItemGroup>
     <None Include="MapReader\Tmx.h.in" />

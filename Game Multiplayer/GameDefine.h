@@ -19,8 +19,9 @@ namespace Define {
 	const int CreateRoom = 10;
 	const int GameOver = 11;
 	const int OutRoom = 12;
+	const int SyncTime = 13;
 
-	const int bitofTypePacket = 4;
+	const int bitOfTypePacket = 4;
 	const int bitofID = 11;
 	const int bitofLocation = 12;
 }

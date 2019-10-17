@@ -225,9 +225,6 @@
     <ClInclude Include="SceneY.h">
       <Filter>Yato</Filter>
     </ClInclude>
-    <ClInclude Include="Yato.h">
-      <Filter>Yato</Filter>
-    </ClInclude>
     <ClInclude Include="SceneManagerY.h">
       <Filter>Yato\Framework</Filter>
     </ClInclude>

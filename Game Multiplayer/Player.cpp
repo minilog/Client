@@ -159,7 +159,7 @@ void Player::Read(InputMemoryBitStream& is)
 	is.Read(action, Define::bitofID);
 
 	int level = 0;
-	is.Read(level, Define::bitofTypePacket);
+	is.Read(level, Define::bitOfTypePacket);
 	if (level != mLevel)
 	{
 		mLevel = level;
@@ -168,7 +168,7 @@ void Player::Read(InputMemoryBitStream& is)
 	mAction = (Action)action;
 	is.Read(is_protect);
 	last_mHeal = mHeal;
-	is.Read(mHeal, Define::bitofTypePacket);
+	is.Read(mHeal, Define::bitOfTypePacket);
 
 	is.Read(last_move_time);
 	//is.Read(mScore, Define::bitofID);
@@ -276,7 +276,7 @@ void Player::HandleKeyboard(std::map<int, bool> keys)
 	{
 
 		OutputMemoryBitStream os;
-		os.Write(Define::InputPacket, Define::bitofTypePacket);
+		os.Write(Define::InputPacket, Define::bitOfTypePacket);
 		os.Write(ID, Define::bitofID);
 		os.Write((int)mAction, Define::bitofID);
 		os.Write(last_id_packet++, Define::bitofID);

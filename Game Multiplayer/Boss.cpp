@@ -38,7 +38,7 @@ void Boss::Draw()
 
 void Boss::Read(InputMemoryBitStream& is)
 {
-	is.Read(mHP, Define::bitofTypePacket);
+	is.Read(mHP, Define::bitOfTypePacket);
 	if (mHP == 0)
 		isDelete = true;
 }
