@@ -31,6 +31,9 @@
     <Filter Include="Yato\Framework">
       <UniqueIdentifier>{82adbc66-bf2c-43b6-9f64-1d5f14585b6e}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Yato\Network">
+      <UniqueIdentifier>{be4c0697-cf15-4d55-aa0c-9965882c3531}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="MapReader\tinyxml2.h">
@@ -103,9 +106,6 @@
       <Filter>Old\Framework\Map Reader</Filter>
     </ClInclude>
     <ClInclude Include="GameGlobal.h">
-      <Filter>Old\Framework</Filter>
-    </ClInclude>
-    <ClInclude Include="GameDefine.h">
       <Filter>Old\Framework</Filter>
     </ClInclude>
     <ClInclude Include="Animation.h">
@@ -230,6 +230,9 @@
     </ClInclude>
     <ClInclude Include="GameY.h">
       <Filter>Yato\Framework</Filter>
+    </ClInclude>
+    <ClInclude Include="GameDefine.h">
+      <Filter>Yato</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

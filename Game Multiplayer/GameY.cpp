@@ -20,6 +20,7 @@ GameY::GameY(int fps)
 void GameY::Update(float dt)
 {
 	SceneManagerY::GetInstance()->GetCurrentScene()->Update(dt);
+	SceneManagerY::GetInstance()->GetCurrentScene()->ReceivePacket();
 	Render();
 }
 void GameY::Render()
@@ -56,8 +57,6 @@ void GameY::InitLoop()
 
 	while (GameGlobal::isGameRunning)
 	{
-		SceneManagerY::GetInstance()->GetCurrentScene()->ReceivePacket();
-	
 		GameTime::GetInstance()->StartCounter();
 
 		if (PeekMessage(&msg, NULL, 0, 0, PM_REMOVE))
@@ -72,6 +71,7 @@ void GameY::InitLoop()
 		{
 			GameGlobal::fps = 1 / delta;
 			Update(1.0f / 60);
+
 			delta = 0;
 		}
 		else
