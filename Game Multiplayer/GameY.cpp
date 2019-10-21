@@ -1,17 +1,20 @@
-#include "GameY.h"
+﻿#include "GameY.h"
 
 #include "GameGlobal.h"
 #include "SceneManagerY.h"
 #include <thread>
 #include "TimeSceneY.h"
 #include "GameLog.h"
-
+#include "LobbyScene.h"
+#include "RoomSceneY.h"
 
 GameY::GameY(int fps)
 {
 	mFPS = fps;
 
-	SceneManagerY::GetInstance()->ReplaceScene(new TimeSceneY());
+	timeScene = new TimeSceneY();
+
+	SceneManagerY::GetInstance()->ReplaceScene(new LobbyScene());
 
 	InitLoop();
 }
@@ -19,15 +22,22 @@ GameY::GameY(int fps)
 
 void GameY::Update(float dt)
 {
+	// nhận packet
+	timeScene->ReceivePacket();
+	//SceneManagerY::GetInstance()->GetCurrentScene()->ReceivePacket();
+
+	// cập nhật Màn theo dt
+	timeScene->Update(dt);
 	SceneManagerY::GetInstance()->GetCurrentScene()->Update(dt);
-	SceneManagerY::GetInstance()->GetCurrentScene()->ReceivePacket();
+
+
 	Render();
 }
 void GameY::Render()
 {
 	auto device = GameGlobal::GetCurrentDevice();
 	auto scene = SceneManagerY::GetInstance()->GetCurrentScene();
-	device->Clear(0, NULL, D3DCLEAR_TARGET, scene->GetBackcolor(), 0.0f, 0);
+	device->Clear(0, NULL, D3DCLEAR_TARGET, timeScene->GetBackcolor(), 0.0f, 0);
 
 	{
 		device->BeginScene();
@@ -37,6 +47,7 @@ void GameY::Render()
 
 		//draw here
 		scene->Draw();
+		timeScene->Draw();
 
 		//ket thuc ve
 		GameGlobal::GetCurrentSpriteHandler()->End();
@@ -51,8 +62,6 @@ void GameY::InitLoop()
 {
 	MSG msg;
 
-	//std::thread task_receive_packet(ReceivePacket);
-	//task_receive_packet.detach();
 	float tickPerFrame = 1.0f / 60, delta = 0;
 
 	while (GameGlobal::isGameRunning)

@@ -7,7 +7,7 @@ class InputMemoryBitStream;
 class Room
 {
 public:
-	Room(D3DXVECTOR3);
+	Room(D3DXVECTOR3 _pos = D3DXVECTOR3(0, 0, 0));
 	~Room();
 
 	void Update();		

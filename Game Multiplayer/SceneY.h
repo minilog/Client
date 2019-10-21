@@ -6,6 +6,8 @@
 #include <map>
 #include "Label.h"
 
+#include "MemoryBitStream.h"
+
 class SceneY
 {
 public:
@@ -36,6 +38,8 @@ public:
 	}
 
 protected:
+
+
 	D3DCOLOR                mBackColor;
 	std::map<int, bool> keyboard;
 };

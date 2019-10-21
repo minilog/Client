@@ -34,6 +34,9 @@
     <Filter Include="Yato\Network">
       <UniqueIdentifier>{be4c0697-cf15-4d55-aa0c-9965882c3531}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Yato\Scenes">
+      <UniqueIdentifier>{75de916b-b23b-4698-a33e-04d9b50211af}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="MapReader\tinyxml2.h">
@@ -219,12 +222,6 @@
     <ClInclude Include="TestTiepScene.h">
       <Filter>Old\Scene</Filter>
     </ClInclude>
-    <ClInclude Include="TimeSceneY.h">
-      <Filter>Yato</Filter>
-    </ClInclude>
-    <ClInclude Include="SceneY.h">
-      <Filter>Yato</Filter>
-    </ClInclude>
     <ClInclude Include="SceneManagerY.h">
       <Filter>Yato\Framework</Filter>
     </ClInclude>
@@ -233,6 +230,18 @@
     </ClInclude>
     <ClInclude Include="GameDefine.h">
       <Filter>Yato</Filter>
+    </ClInclude>
+    <ClInclude Include="SceneY.h">
+      <Filter>Yato\Scenes</Filter>
+    </ClInclude>
+    <ClInclude Include="TimeSceneY.h">
+      <Filter>Yato\Scenes</Filter>
+    </ClInclude>
+    <ClInclude Include="LobbyScene.h">
+      <Filter>Yato\Scenes</Filter>
+    </ClInclude>
+    <ClInclude Include="RoomSceneY.h">
+      <Filter>Yato\Scenes</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -406,9 +415,6 @@
     <ClCompile Include="GameDebugDraw.cpp">
       <Filter>Old\Framework</Filter>
     </ClCompile>
-    <ClCompile Include="TimeSceneY.cpp">
-      <Filter>Yato</Filter>
-    </ClCompile>
     <ClCompile Include="main.cpp">
       <Filter>Old</Filter>
     </ClCompile>
@@ -420,6 +426,15 @@
     </ClCompile>
     <ClCompile Include="MainY.cpp">
       <Filter>Yato</Filter>
+    </ClCompile>
+    <ClCompile Include="TimeSceneY.cpp">
+      <Filter>Yato\Scenes</Filter>
+    </ClCompile>
+    <ClCompile Include="LobbyScene.cpp">
+      <Filter>Yato\Scenes</Filter>
+    </ClCompile>
+    <ClCompile Include="RoomSceneY.cpp">
+      <Filter>Yato\Scenes</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

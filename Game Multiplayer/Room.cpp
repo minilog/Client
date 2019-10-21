@@ -51,6 +51,8 @@ D3DXVECTOR3 Room::getPosition()
 }
 void Room::setPosition(D3DXVECTOR3 pos)
 {
+	label_player_count.SetPosition(D3DXVECTOR2(pos.x - 50, GameGlobal::GetHeight() - pos.y + 10));
+	label_name.SetPosition(D3DXVECTOR2(pos.x - 50, GameGlobal::GetHeight() - pos.y - 50));
 	position = pos;
 }
 

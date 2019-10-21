@@ -178,8 +178,6 @@ void RoomScene::ReceivePakcet()
 			{
 				room->Read(is);
 			}
-
-
 		}
 
 

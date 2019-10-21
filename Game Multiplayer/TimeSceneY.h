@@ -1,7 +1,6 @@
 ﻿#pragma once
 
 #include "SceneY.h"
-#include "MemoryBitStream.h"
 
 class TimeSceneY : public SceneY
 {

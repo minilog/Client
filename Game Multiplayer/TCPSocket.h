@@ -1,20 +1,24 @@
 #pragma once
 #include "SocketAddress.h"
 #include <wincon.h>
-
+#include "MemoryBitStream.h"
 
 class TCPSocket {
 
 public:
 	~TCPSocket();
 	SOCKET mSocket;
-	int ID = 0;
+	int ID = -1;
 	int ChangetoDontWait(int flag);
 	int Connect(const SocketAddress& inAddress);
 	int Bind(const SocketAddress& inToAddress);
 	int Listen(int inBackLog = 32);
 	std::shared_ptr< TCPSocket > Accept(SocketAddress& inFromAddress);
 	int Send(const void* inData, int inLen);
+	int Send(const OutputMemoryBitStream &os)
+	{
+		return Send(os.GetBufferPtr(), os.GetByteLength());
+	}
 	int Receive(void* inBuffer, int inLen);
 	int ReceiveBit(void* inBuffer, int inLen);
 	void Close();

@@ -6,6 +6,8 @@
 
 #include "GameTime.h"
 
+#include "TimeSceneY.h"
+
 #define KEYBOARD_BUFFERD_SIZE 1024
 
 class GameY
@@ -29,5 +31,8 @@ public:
 
 	//ham update cua game
 	void Update(float dt);
+
+private:
+	TimeSceneY* timeScene;
 };
 

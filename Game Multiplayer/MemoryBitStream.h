@@ -1,3 +1,5 @@
+#pragma once
+
 #include <cstdint>
 #include <cstdlib>
 #include <string>
@@ -98,9 +100,9 @@ class InputMemoryBitStream
 {
 public:
 
-	InputMemoryBitStream(char* inBuffer, uint32_t inBitCount) :
+	InputMemoryBitStream(char* inBuffer, uint32_t inByteCount) :
 		mBuffer(inBuffer),
-		mBitCapacity(inBitCount),
+		mBitCapacity(inByteCount << 3),
 		mBitHead(0),
 		mIsBufferOwner(false) {}
 

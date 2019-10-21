@@ -6,7 +6,7 @@
 
 TimeSceneY::TimeSceneY()
 {
-	// khởi tạo các hình ảnh và dòng chữ Label
+	// khởi tạo các hình ảnh và các dòng chữ Label
 	InitSpritesAndLabels();
 
 	// khởi tạo Socket và cố gắng kết nối với Server
@@ -32,6 +32,8 @@ void TimeSceneY::Draw()
 	sendTime_Label.Draw("Send time: " + to_string(sendTime));
 	receiveTime_Label.Draw("Receive time: " + to_string(receiveTime));
 	delayTimeAverage_Label.Draw("Delay time Average: " + to_string(delayTimeAverage));
+
+	// tính serverTime = time hiện tại + Distance
 	int serverTime = (int)GetTickCount() + timeDistanceWithServer;
 	serverTime_Label.Draw("Server time: " + to_string(serverTime));
 }
@@ -69,7 +71,7 @@ void TimeSceneY::Send_SyncTimePacket()
 	OutputMemoryBitStream os;
 	os.Write(Define::SyncTime, Define::bitOfTypePacket);
 	os.Write(NSend, 32);
-	TCPSocket->Send(os.GetBufferPtr(), os.GetByteLength());
+	TCPSocket->Send(os);
 
 	sendTime = (int)GetTickCount();
 }

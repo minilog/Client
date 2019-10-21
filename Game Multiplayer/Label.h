@@ -14,5 +14,6 @@ public:
 	D3DCOLOR my_color;
 	void Update(float dt);
 	void Draw(string s = "");
+	void SetPosition(D3DXVECTOR2 _pos);
 };
 

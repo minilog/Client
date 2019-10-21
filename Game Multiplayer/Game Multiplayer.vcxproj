@@ -153,6 +153,7 @@
     <ClInclude Include="GameY.h" />
     <ClInclude Include="Item.h" />
     <ClInclude Include="Label.h" />
+    <ClInclude Include="LobbyScene.h" />
     <ClInclude Include="MapReader\base64.h" />
     <ClInclude Include="MapReader\tinyxml2.h" />
     <ClInclude Include="MapReader\TmxEllipse.h" />
@@ -185,6 +186,7 @@
     <ClInclude Include="QuadTree.h" />
     <ClInclude Include="Room.h" />
     <ClInclude Include="RoomScene.h" />
+    <ClInclude Include="RoomSceneY.h" />
     <ClInclude Include="Scene.h" />
     <ClInclude Include="SceneManager.h" />
     <ClInclude Include="SceneManagerY.h" />
@@ -223,6 +225,7 @@
     <ClCompile Include="GameY.cpp" />
     <ClCompile Include="Item.cpp" />
     <ClCompile Include="Label.cpp" />
+    <ClCompile Include="LobbyScene.cpp" />
     <ClCompile Include="main.cpp" />
     <ClCompile Include="MainY.cpp" />
     <ClCompile Include="MapReader\base64.cpp" />
@@ -254,6 +257,7 @@
     <ClCompile Include="QuadTree.cpp" />
     <ClCompile Include="Room.cpp" />
     <ClCompile Include="RoomScene.cpp" />
+    <ClCompile Include="RoomSceneY.cpp" />
     <ClCompile Include="Scene.cpp" />
     <ClCompile Include="SceneManager.cpp" />
     <ClCompile Include="SceneManagerY.cpp" />

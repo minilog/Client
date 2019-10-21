@@ -42,3 +42,11 @@ void Label::Draw(string s)
 		else 	my_font->DrawTextA(GameGlobal::GetCurrentSpriteHandler(), s.c_str(), -1, &my_rect, DT_LEFT, my_color);
 	}
 }
+
+void Label::SetPosition(D3DXVECTOR2 _pos)
+{
+	my_rect.left = _pos.x;
+	my_rect.top = _pos.y;
+	my_rect.bottom = my_rect.top + 500;
+	my_rect.right = my_rect.left + 1000;
+}
