@@ -1,37 +1,28 @@
 #include "SceneManager.h"
 
-SceneManager* SceneManager::mInstace = NULL;
+SceneManager* SceneManager::instance = nullptr;
 
 SceneManager::SceneManager()
 {
-	mCurrentScene = nullptr;
+	currentScene = nullptr;
 }
 
-SceneManager::~SceneManager()
+SceneManager* SceneManager::Instance()
 {
-}
+	if (instance == nullptr)
+		instance = new SceneManager();
 
-SceneManager* SceneManager::GetInstance()
-{
-	if (!mInstace)
-		mInstace = new SceneManager();
-
-	return mInstace;
+	return instance;
 }
 
 Scene* SceneManager::GetCurrentScene()
 {
-	return mCurrentScene;
-}
-
-void SceneManager::Update(float dt)
-{
-	mCurrentScene->Update(dt);
+	return currentScene;
 }
 
 void SceneManager::ReplaceScene(Scene *scene)
 {
-	delete mCurrentScene;
+	delete currentScene;
 
-	mCurrentScene = scene;
+	currentScene = scene;
 }

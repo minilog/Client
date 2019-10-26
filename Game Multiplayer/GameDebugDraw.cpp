@@ -3,7 +3,7 @@
 
 GameDebugDraw::GameDebugDraw()
 {
-	mSpriteHandler = GameGlobal::GetCurrentSpriteHandler();
+	mSpriteHandler = GameGlobal::XSprite;
 	mSpriteHandler->GetDevice(&mddv);
 	D3DXCreateLine(mddv, &LineDraw);
 
@@ -46,11 +46,11 @@ void GameDebugDraw::DrawRect(RECT rect, Camera *camera)
 	D3DXVECTOR3 trans = D3DXVECTOR3(0, 0, 0);
 
 
-	D3DXVECTOR2 lines[] = { D3DXVECTOR2(rect.left,GameGlobal::GetHeight() - rect.top),
-		D3DXVECTOR2(rect.right ,GameGlobal::GetHeight() - rect.top),
-		D3DXVECTOR2(rect.right,GameGlobal::GetHeight() - rect.bottom),
-		D3DXVECTOR2(rect.left ,GameGlobal::GetHeight() - rect.bottom),
-		D3DXVECTOR2(rect.left,GameGlobal::GetHeight() - rect.top) };
+	D3DXVECTOR2 lines[] = { D3DXVECTOR2((float)rect.left, (float)GameGlobal::Height - rect.top),
+		D3DXVECTOR2((float)rect.right, (float)GameGlobal::Height - rect.top),
+		D3DXVECTOR2((float)rect.right, (float)GameGlobal::Height - rect.bottom),
+		D3DXVECTOR2((float)rect.left, (float)GameGlobal::Height - rect.bottom),
+		D3DXVECTOR2((float)rect.left, (float)GameGlobal::Height - rect.top) };
 
 	DrawLine(lines, 5);
 }

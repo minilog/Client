@@ -1,138 +1,127 @@
-#include "NPC.h"
+﻿#include "NPC.h"
 
+#include "SpriteList.h"
 
-
-NPC::NPC(int id)
+NPC::NPC(int _networkID)
 {
-	ID = id;
-	mUpSprite = new Sprite("Resource files/AI_tank.png", RECT{ 2,4,2 + 32,4 + 32 }, 0, 0, D3DXCOLOR(255, 0, 255, 255));
-	mLeftSprite = new Sprite("Resource files/AI_tank.png", RECT{ 82,2,82 + 32,2 + 32 }, 0, 0, D3DXCOLOR(255, 0, 255, 255));
-	mDownSprite = new Sprite("Resource files/AI_tank.png", RECT{ 156,2,156 + 32,2 + 32 }, 0, 0, D3DXCOLOR(255, 0, 255, 255));
-	mRightSprite = new Sprite("Resource files/AI_tank.png", RECT{ 233,2,233 + 32,2 + 32 }, 0, 0, D3DXCOLOR(255, 0, 255, 255));
+	// gán địa chỉ ID network
+	NetworkID = _networkID;
 
+	Type = ET_NPC;
 
-	this->vx = 0;
-	this->vy = 0;
+	// khởi tạo các animation
+	leftAnimation = new Animation();
+	leftAnimation->AddFrameInfo(FrameInfo(SpriteList::Instance()->TankAI, 82, 82 + 32, 2, 2 + 32,
+		D3DXVECTOR2(16.f, 16.f)));
+	rightAnimation = new Animation();
+	rightAnimation->AddFrameInfo(FrameInfo(SpriteList::Instance()->TankAI, 233, 233 + 32, 2, 2 + 32,
+		D3DXVECTOR2(16.f, 16.f)));
+	upAnimation = new Animation();
+	upAnimation->AddFrameInfo(FrameInfo(SpriteList::Instance()->TankAI, 2, 2 + 32, 4, 4 + 32,
+		D3DXVECTOR2(16.f, 16.f)));
+	downAnimation = new Animation();
+	downAnimation->AddFrameInfo(FrameInfo(SpriteList::Instance()->TankAI, 156, 156 + 32, 2, 2 + 32,
+		D3DXVECTOR2(16.f, 16.f)));
 
-	Tag = Entity::npc;
-	mCurrentSprite = mUpSprite;
+	// mặc định animation ban đầu
+	currentAnimation = leftAnimation;
+
+	// chiều rộng, chiều cao xét va chạm
+	width = 32.f;
+	height = 32.f;
 }
 
 
 NPC::~NPC()
 {
+	// xóa các animation đã khởi tạo new
+	delete leftAnimation;
+	delete rightAnimation;
+	delete upAnimation;
+	delete downAnimation;
 }
 
-void NPC::Draw(D3DXVECTOR3 position, RECT sourceRect, D3DXVECTOR2 scale, D3DXVECTOR2 transform, float angle,
-	D3DXVECTOR2 rotationCenter, D3DXCOLOR colorKey)
+
+void NPC::Update(float _dt)
 {
-	mCurrentSprite->SetPosition(this->GetPosition());
-	mCurrentSprite->Draw(D3DXVECTOR3(posX, posY, 0));
+	// nếu đã bị tiêu diệt => không cập nhật
+	if (IsDelete)
+		return;
+
+	x += vx * _dt;
+	y += vy * _dt;
 }
 
-void NPC::CollideWith_World()
+void NPC::Draw()
 {
-	vx = 0;
-	vy = 0;
+	currentAnimation->Draw(GetPosition());
 }
 
-void NPC::CollisionWith(Entity* en)
+void NPC::Read(InputMemoryBitStream& _is)
 {
-	if (en->Tag == EntityTypes::player || en->Tag == EntityTypes::npc)
+	Entity::Read(_is);
+
+	int _direction = 0;
+	_is.Read(_direction, 3); // direction dao động từ 0 - 5 =>  3 bit
+
+	lastHealth = health;
+
+	_is.Read(health, 2); // máu dao động từ 0 - 2 => 2 bit
+
+	SetDirection((Direction)_direction);
+
+	if (health == 0)
+	{
+		IsDelete = true;
+		SetPosition(D3DXVECTOR2(-30.f, -30.f)); // tọa độ ở ngoài map
+	}
+	else
+	{
+		IsDelete = false;
+	}
+}
+
+void NPC::CollisionWith(Entity* _en)
+{
+	if (_en->Type == ET_Player || 
+		_en->Type == ET_NPC)
 	{
 		vx = 0;
 		vy = 0;
 	}
 }
 
-bool NPC::Check_to_create_anim()
+bool NPC::CheckCreateAnim()
 {
-	if (mHeal == 0 && last_mHeal != 0)
-		return true;
-	return false;
+	return (health == 0) && (lastHealth != 0);
 }
 
-void NPC::Read(InputMemoryBitStream& is)
+void NPC::SetDirection(Direction _dir)
 {
-	last_position = GetPosition();
-
-	Entity::Read(is);
-	int a = 0;
-	is.Read(a, Define::bitofID);
-	dir = (Direction)a;
-	OnsetDir();
-	last_mHeal = mHeal;
-	is.Read(mHeal, Define::bitOfTypePacket);
-	if (mHeal == 0) isDelete = true;
-	else isDelete = false;
-}
-
-void NPC::Update(float dt)
-{
-	if (isDelete)
+	// thay đổi vận tốc và animation đựa theo hướng di chuyển
+	direction = _dir;
+	switch (direction)
 	{
-		SetPosition(-30, -30);
-		return;
+	case D_Left:
+		vx = -200.f;
+		vy = 0.f;
+		currentAnimation = leftAnimation;
+		break;
+	case D_Right:
+		vx = 200.f;
+		vy = 0.f;
+		currentAnimation = rightAnimation;
+		break;
+	case D_Up:
+		vx = 0.f;
+		vy = -200.f;
+		currentAnimation = upAnimation;
+		break;
+	case D_Down:
+		vx = 0.f;
+		vy = 200.f;
+		break;
+	default:
+		break;
 	}
-	//OnsetDir();
-	Entity::Update(dt);
-}
-
-RECT NPC::GetBound()
-{
-	RECT rect;
-	rect.left = this->posX - 32 / 2;
-	rect.right = rect.left + 23;
-	rect.top = this->posY - 32 / 2;
-	rect.bottom = rect.top + 32;
-	return rect;
-}
-
-void NPC::Write(OutputMemoryBitStream& os)
-{
-}
-
-void NPC::OnsetDir()
-{
-	switch (dir)
-	{
-	case left:MoveLeft(); mCurrentSprite = mLeftSprite; break;
-	case right:MoveRight(); mCurrentSprite = mRightSprite; break;
-	case up:MoveUp(); mCurrentSprite = mUpSprite; break;
-	case down:MoveDown(); mCurrentSprite = mDownSprite; break;
-	}
-}
-void NPC::MoveLeft()
-{
-	dir = left;
-	this->SetVx(-200.0f);
-	this->SetVy(0);
-}
-
-void NPC::MoveRight()
-{
-	dir = right;
-	this->SetVx(200.0f);
-	this->SetVy(0);
-}
-
-void NPC::MoveUp()
-{
-	dir = up;
-	this->SetVx(0);
-	this->SetVy(200.0f);
-
-}
-
-void NPC::MoveDown()
-{
-	dir = down;
-	this->SetVx(0);
-	this->SetVy(-200.0f);
-}
-
-void NPC::IDLE()
-{
-	this->SetVx(0);
-	this->SetVy(0);
 }

@@ -1,27 +1,19 @@
 #pragma once
+
 #include <d3dx9.h>
 #include <d3d9.h>
 
 class Camera
 {
+	D3DXVECTOR2 position = D3DXVECTOR2(0.f, 0.f);
+	int width = 0, height = 0;
+
 public:
-	Camera(int width, int height);
+	Camera(int _width, int _height);
 
-	//center of camera
-	void SetPosition(float x, float y);
-	void SetPosition(D3DXVECTOR3 pos);
-
+	void SetPosition(D3DXVECTOR2 _pos);
+	D3DXVECTOR2 GetPosition();
 	int GetWidth();
 	int GetHeight();
-
-	D3DXVECTOR3 GetPosition();
 	RECT GetBound();
-
-	~Camera();
-
-private:
-	int             mWidth,
-		mHeight;
-
-	D3DXVECTOR3     mPosition;
 };

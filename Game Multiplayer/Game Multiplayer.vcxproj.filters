@@ -37,6 +37,12 @@
     <Filter Include="Yato\Scenes">
       <UniqueIdentifier>{75de916b-b23b-4698-a33e-04d9b50211af}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Framework">
+      <UniqueIdentifier>{8919de5f-9398-4214-be10-d3ff3ace7379}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Framework\Animation">
+      <UniqueIdentifier>{ab461f81-fd80-409b-864e-79ffd82f8751}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="MapReader\tinyxml2.h">
@@ -111,9 +117,6 @@
     <ClInclude Include="GameGlobal.h">
       <Filter>Old\Framework</Filter>
     </ClInclude>
-    <ClInclude Include="Animation.h">
-      <Filter>Old\Framework</Filter>
-    </ClInclude>
     <ClInclude Include="Camera.h">
       <Filter>Old\Framework</Filter>
     </ClInclude>
@@ -132,9 +135,6 @@
     <ClInclude Include="MemoryBitStream.h">
       <Filter>Old\Network TCP/IP</Filter>
     </ClInclude>
-    <ClInclude Include="Game.h">
-      <Filter>Old\Framework</Filter>
-    </ClInclude>
     <ClInclude Include="GameCollision.h">
       <Filter>Old\Framework</Filter>
     </ClInclude>
@@ -150,22 +150,7 @@
     <ClInclude Include="QuadTree.h">
       <Filter>Old\Framework</Filter>
     </ClInclude>
-    <ClInclude Include="Room.h">
-      <Filter>Old\Framework</Filter>
-    </ClInclude>
-    <ClInclude Include="SceneManager.h">
-      <Filter>Old\Framework</Filter>
-    </ClInclude>
-    <ClInclude Include="Sprite.h">
-      <Filter>Old\Framework</Filter>
-    </ClInclude>
-    <ClInclude Include="Boss.h">
-      <Filter>Old\Game Objects</Filter>
-    </ClInclude>
     <ClInclude Include="Entity.h">
-      <Filter>Old\Game Objects</Filter>
-    </ClInclude>
-    <ClInclude Include="Brick.h">
       <Filter>Old\Game Objects</Filter>
     </ClInclude>
     <ClInclude Include="Boundary.h">
@@ -192,25 +177,10 @@
     <ClInclude Include="Bullet.h">
       <Filter>Old\Game Objects</Filter>
     </ClInclude>
-    <ClInclude Include="RoomScene.h">
-      <Filter>Old\Scene</Filter>
-    </ClInclude>
-    <ClInclude Include="Scene.h">
-      <Filter>Old\Scene</Filter>
-    </ClInclude>
-    <ClInclude Include="WaitRoomScene.h">
-      <Filter>Old\Scene</Filter>
-    </ClInclude>
     <ClInclude Include="SocketUtil.h">
       <Filter>Old\Network TCP/IP</Filter>
     </ClInclude>
-    <ClInclude Include="TestScene.h">
-      <Filter>Old\Scene</Filter>
-    </ClInclude>
     <ClInclude Include="Item.h">
-      <Filter>Old\Game Objects\Item</Filter>
-    </ClInclude>
-    <ClInclude Include="ProtectPlayer.h">
       <Filter>Old\Game Objects\Item</Filter>
     </ClInclude>
     <ClInclude Include="UpgradeItem.h">
@@ -219,28 +189,46 @@
     <ClInclude Include="Explosion.h">
       <Filter>Old\Game Objects</Filter>
     </ClInclude>
-    <ClInclude Include="TestTiepScene.h">
-      <Filter>Old\Scene</Filter>
-    </ClInclude>
-    <ClInclude Include="SceneManagerY.h">
-      <Filter>Yato\Framework</Filter>
-    </ClInclude>
-    <ClInclude Include="GameY.h">
-      <Filter>Yato\Framework</Filter>
-    </ClInclude>
     <ClInclude Include="GameDefine.h">
       <Filter>Yato</Filter>
-    </ClInclude>
-    <ClInclude Include="SceneY.h">
-      <Filter>Yato\Scenes</Filter>
-    </ClInclude>
-    <ClInclude Include="TimeSceneY.h">
-      <Filter>Yato\Scenes</Filter>
     </ClInclude>
     <ClInclude Include="LobbyScene.h">
       <Filter>Yato\Scenes</Filter>
     </ClInclude>
-    <ClInclude Include="RoomSceneY.h">
+    <ClInclude Include="Brick.h">
+      <Filter>Old\Game Objects\Bricks</Filter>
+    </ClInclude>
+    <ClInclude Include="Animation.h">
+      <Filter>Framework\Animation</Filter>
+    </ClInclude>
+    <ClInclude Include="Sprite.h">
+      <Filter>Framework\Animation</Filter>
+    </ClInclude>
+    <ClInclude Include="SpriteList.h">
+      <Filter>Framework\Animation</Filter>
+    </ClInclude>
+    <ClInclude Include="RoomView.h">
+      <Filter>Old\Framework</Filter>
+    </ClInclude>
+    <ClInclude Include="ProtectItem.h">
+      <Filter>Old\Game Objects\Item</Filter>
+    </ClInclude>
+    <ClInclude Include="Eagle.h">
+      <Filter>Old\Game Objects</Filter>
+    </ClInclude>
+    <ClInclude Include="Game.h">
+      <Filter>Yato\Framework</Filter>
+    </ClInclude>
+    <ClInclude Include="SceneManager.h">
+      <Filter>Yato\Framework</Filter>
+    </ClInclude>
+    <ClInclude Include="RoomScene.h">
+      <Filter>Yato\Scenes</Filter>
+    </ClInclude>
+    <ClInclude Include="TimingScene.h">
+      <Filter>Yato\Scenes</Filter>
+    </ClInclude>
+    <ClInclude Include="Scene.h">
       <Filter>Yato\Scenes</Filter>
     </ClInclude>
   </ItemGroup>
@@ -313,12 +301,6 @@
     <ClCompile Include="GameGlobal.cpp">
       <Filter>Old\Framework</Filter>
     </ClCompile>
-    <ClCompile Include="Sprite.cpp">
-      <Filter>Old\Framework</Filter>
-    </ClCompile>
-    <ClCompile Include="Animation.cpp">
-      <Filter>Old\Framework</Filter>
-    </ClCompile>
     <ClCompile Include="Camera.cpp">
       <Filter>Old\Framework</Filter>
     </ClCompile>
@@ -327,9 +309,6 @@
     </ClCompile>
     <ClCompile Include="MemoryBitStream.cpp">
       <Filter>Old\Network TCP/IP</Filter>
-    </ClCompile>
-    <ClCompile Include="Game.cpp">
-      <Filter>Old\Framework</Filter>
     </ClCompile>
     <ClCompile Include="GameCollision.cpp">
       <Filter>Old\Framework</Filter>
@@ -346,32 +325,8 @@
     <ClCompile Include="QuadTree.cpp">
       <Filter>Old\Framework</Filter>
     </ClCompile>
-    <ClCompile Include="Room.cpp">
-      <Filter>Old\Framework</Filter>
-    </ClCompile>
-    <ClCompile Include="SceneManager.cpp">
-      <Filter>Old\Framework</Filter>
-    </ClCompile>
-    <ClCompile Include="Boss.cpp">
-      <Filter>Old\Game Objects</Filter>
-    </ClCompile>
     <ClCompile Include="Entity.cpp">
       <Filter>Old\Game Objects</Filter>
-    </ClCompile>
-    <ClCompile Include="Brick.cpp">
-      <Filter>Old\Game Objects</Filter>
-    </ClCompile>
-    <ClCompile Include="Boundary.cpp">
-      <Filter>Old\Game Objects\Bricks</Filter>
-    </ClCompile>
-    <ClCompile Include="BrickNormal.cpp">
-      <Filter>Old\Game Objects\Bricks</Filter>
-    </ClCompile>
-    <ClCompile Include="MetalBrick.cpp">
-      <Filter>Old\Game Objects\Bricks</Filter>
-    </ClCompile>
-    <ClCompile Include="Water.cpp">
-      <Filter>Old\Game Objects\Bricks</Filter>
     </ClCompile>
     <ClCompile Include="NPC.cpp">
       <Filter>Old\Game Objects</Filter>
@@ -382,59 +337,38 @@
     <ClCompile Include="Player.cpp">
       <Filter>Old\Game Objects</Filter>
     </ClCompile>
-    <ClCompile Include="Bullet.cpp">
-      <Filter>Old\Game Objects</Filter>
-    </ClCompile>
-    <ClCompile Include="RoomScene.cpp">
-      <Filter>Old\Scene</Filter>
-    </ClCompile>
-    <ClCompile Include="Scene.cpp">
-      <Filter>Old\Scene</Filter>
-    </ClCompile>
-    <ClCompile Include="WaitRoomScene.cpp">
-      <Filter>Old\Scene</Filter>
-    </ClCompile>
-    <ClCompile Include="TestScene.cpp">
-      <Filter>Old\Scene</Filter>
-    </ClCompile>
-    <ClCompile Include="Item.cpp">
-      <Filter>Old\Game Objects\Item</Filter>
-    </ClCompile>
-    <ClCompile Include="ProtectPlayer.cpp">
-      <Filter>Old\Game Objects\Item</Filter>
-    </ClCompile>
-    <ClCompile Include="UpgradeItem.cpp">
-      <Filter>Old\Game Objects\Item</Filter>
-    </ClCompile>
-    <ClCompile Include="Explosion.cpp">
-      <Filter>Old\Game Objects</Filter>
-    </ClCompile>
-    <ClCompile Include="TestTiepScene.cpp">
-      <Filter>Old\Scene</Filter>
-    </ClCompile>
     <ClCompile Include="GameDebugDraw.cpp">
       <Filter>Old\Framework</Filter>
-    </ClCompile>
-    <ClCompile Include="main.cpp">
-      <Filter>Old</Filter>
-    </ClCompile>
-    <ClCompile Include="SceneManagerY.cpp">
-      <Filter>Yato\Framework</Filter>
-    </ClCompile>
-    <ClCompile Include="GameY.cpp">
-      <Filter>Yato\Framework</Filter>
-    </ClCompile>
-    <ClCompile Include="MainY.cpp">
-      <Filter>Yato</Filter>
-    </ClCompile>
-    <ClCompile Include="TimeSceneY.cpp">
-      <Filter>Yato\Scenes</Filter>
     </ClCompile>
     <ClCompile Include="LobbyScene.cpp">
       <Filter>Yato\Scenes</Filter>
     </ClCompile>
-    <ClCompile Include="RoomSceneY.cpp">
+    <ClCompile Include="Animation.cpp">
+      <Filter>Framework\Animation</Filter>
+    </ClCompile>
+    <ClCompile Include="Sprite.cpp">
+      <Filter>Framework\Animation</Filter>
+    </ClCompile>
+    <ClCompile Include="SpriteList.cpp">
+      <Filter>Framework\Animation</Filter>
+    </ClCompile>
+    <ClCompile Include="RoomView.cpp">
+      <Filter>Old\Framework</Filter>
+    </ClCompile>
+    <ClCompile Include="Game.cpp">
+      <Filter>Yato\Framework</Filter>
+    </ClCompile>
+    <ClCompile Include="SceneManager.cpp">
+      <Filter>Yato\Framework</Filter>
+    </ClCompile>
+    <ClCompile Include="RoomScene.cpp">
       <Filter>Yato\Scenes</Filter>
+    </ClCompile>
+    <ClCompile Include="TimingScene.cpp">
+      <Filter>Yato\Scenes</Filter>
+    </ClCompile>
+    <ClCompile Include="Main.cpp">
+      <Filter>Yato</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

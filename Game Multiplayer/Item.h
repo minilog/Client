@@ -1,28 +1,75 @@
-#pragma once
+﻿#pragma once
+
 #include "Entity.h"
-#include "Sprite.h"
+#include "Animation.h"
+
 class Item : public Entity
 {
-public:
-	~Item();
-
-	virtual void Update(float dt);
-	void Draw(D3DXVECTOR3 position = D3DXVECTOR3(), RECT sourceRect = RECT(), D3DXVECTOR2 scale = D3DXVECTOR2(), D3DXVECTOR2 transform = D3DXVECTOR2(), float angle = 0, D3DXVECTOR2 rotationCenter = D3DXVECTOR2(), D3DXCOLOR colorKey = D3DCOLOR_XRGB(255, 255, 255));
-	void OnSetPosition(D3DXVECTOR3 position);
-	void BeCollideWith_Player();
-	void Read(InputMemoryBitStream& is) override;
-	bool getDelete();
+private:
+	int flashingTime = 0;
 protected:
-	Item();
-	bool Init(D3DXVECTOR3 position);
+	float existTime = 0.f;
+	float count_existTime = 0.f;
 
-	float exist_time = 0;
-	float cout_time = 0;
+	Animation* animation;
 
-	virtual const char* fileName() = 0;
-	virtual RECT rect() = 0;
-	Sprite* mSprite;
-	RECT reg;
-	bool isDelete;
+protected:
+	void BaseInit(D3DXVECTOR2 _pos)
+	{
+		width = 32;
+		height = 32;
+
+		SetPosition(_pos);
+	}
+public:
+	Item()
+	{
+		IsDelete = false;
+		existTime = 7.f;
+	}
+
+	~Item() {}
+
+	virtual void Update(float _dt)
+	{
+		count_existTime += _dt;
+		if (count_existTime >= existTime)
+		{
+			IsDelete = true;
+		}
+	}
+
+	void Draw() override
+	{
+		if (IsDelete)
+			return;
+
+		// nếu còn 2 giây tồn tại, vẽ 1 lần mỗi 5 frame
+		if (existTime - count_existTime < 2)
+		{
+			flashingTime++;
+			if (flashingTime == 5)
+			{
+				animation->Draw(GetPosition());
+				flashingTime = 0;
+			}
+		}
+		else
+		{
+			animation->Draw(GetPosition());
+		}
+	}
+
+	void CollisionWith(Entity* _e) override
+	{
+		IsDelete = true;
+	}
+
+	void Read(InputMemoryBitStream& _is) override
+	{
+		Entity::Read(_is);
+		// còn đọc x, y nữa
+		BaseInit(D3DXVECTOR2(x, y));
+	}
 };
 

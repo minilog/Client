@@ -1,34 +1,32 @@
-#pragma once
+﻿#pragma once
+
 #include <d3dx9.h>
 #include <d3d9.h>
 #include <Windows.h>
 #include <dinput.h>
-
 #include "GameTime.h"
-
-#define KEYBOARD_BUFFERD_SIZE 1024
+#include "TimingScene.h"
 
 class Game
 {
+	float FPS;
+	TimingScene* timingScene;
+
 public:
-	Game(int fps = 60);
-	~Game();
+	Game(int _fps = 60);
+	~Game() {}
 
-	PDIRECT3DSURFACE9       mBackground,
-		mBackBuffer;
-
-	int                     mWidth,
-		mHeight;
-	static int              mIsDone;
-	float                   mFPS;
-
-	//khoi tao vong lap cho game
+private:
+	// tạo vòng lặp game
 	void InitLoop();
 
-	//ham dung de ve sau khi update
+	// vẽ hình sau khi update
 	void Render();
 
-	//ham update cua game
+	// cập nhật game
 	void Update(float dt);
+
+	// khởi tạo socket và kết nối với server
+	void CreateSocketAndTryConnectToServer();
 };
 

@@ -1,318 +1,519 @@
-#include "Player.h"
+﻿#include "Player.h"
+
 #include "GameLog.h"
+#include "SpriteList.h"
 
-
-Player::Player()
+Player::Player(int _networkID)
 {
-	mUpSprite = new Sprite("Resource files/tank.png", RECT{ 2,4,2 + 32,4 + 32 }, 0, 0, D3DXCOLOR(255, 0, 255, 255));
-	mLeftSprite = new Sprite("Resource files/tank.png", RECT{ 82,2,82 + 32,2 + 32 }, 0, 0, D3DXCOLOR(255, 0, 255, 255));
-	mDownSprite = new Sprite("Resource files/tank.png", RECT{ 156,2,156 + 32,2 + 32 }, 0, 0, D3DXCOLOR(255, 0, 255, 255));
-	mRightSprite = new Sprite("Resource files/tank.png", RECT{ 233,2,233 + 32,2 + 32 }, 0, 0, D3DXCOLOR(255, 0, 255, 255));
-	/*mUpSprite->SetScale(D3DXVECTOR2(1.5, 1.5));
-	mLeftSprite->SetScale(D3DXVECTOR2(1.5, 1.5));
-	mDownSprite->SetScale(D3DXVECTOR2(1.5, 1.5));
-	mRightSprite->SetScale(D3DXVECTOR2(1.5, 1.5));*/
-	this->vx = 0;
-	this->vy = 0;
+	// gán ID network cho Player
+	NetworkID = _networkID;
 
-	Tag = Entity::player;
-	mCurrentSprite = mUpSprite;
-	mAction = Idle;
+	// gán loại đối tượng
+	Type = ET_Player;
 
-	m_top_sprite = new Sprite("Resource files/topOfplayer.png", RECT(), 0, 0, D3DXCOLOR(255, 0, 255, 255));
+	// khởi tạo các animation dựa theo NetworkID
+	InitAnimation();
 
-	vector<RECT> list;
-	RECT a;
-	a.left = 0; a.right = a.left + 39; a.top = 111; a.bottom = a.top + 42; list.push_back(a);
-	a.left = 39; a.right = a.left + 40; a.top = 111; a.bottom = a.top + 40; list.push_back(a);
-	shield = new Animation("Resource files/Somethings.png", list, 0.05f, D3DXCOLOR(255, 0, 255, 255));
-	vector<RECT> list1;
-	a.left = 0; a.right = a.left + 30; a.top = 0; a.bottom = a.top + 30; list1.push_back(a);
-	a.left = 30; a.right = a.left + 30; a.top = 0; a.bottom = a.top + 30; list1.push_back(a);
-	a.left = 60; a.right = a.left + 34; a.top = 0; a.bottom = a.top + 31; list1.push_back(a);
-	a.left = 93; a.right = a.left + 35; a.top = 0; a.bottom = a.top + 32; list1.push_back(a);
-	spawn = new Animation("Resource files/Somethings.png", list1, 0.05f, D3DXCOLOR(255, 0, 255, 255));
+	// animation ban đầu
+	currentAnimation = upAnimationLv01;
+
+	// kích cỡ va chạm, 28, 28 cho dễ di chuyển
+	width = 28;
+	height = 28;
 }
 
 Player::~Player()
 {
-	delete shield;
-	delete spawn;
-
-	delete mLeftSprite;
-	delete mUpSprite;
-	delete  mRightSprite;
-	delete  mDownSprite;
-	delete m_top_sprite;
+	// xóa các animation đã khởi tạo new
+	delete leftAnimationLv01;
+	delete rightAnimationLv01;
+	delete upAnimationLv01;
+	delete downAnimationLv01;
+	delete leftAnimationLv02;
+	delete rightAnimationLv02;
+	delete upAnimationLv02;
+	delete downAnimationLv02;
+	delete leftAnimationLv03;
+	delete rightAnimationLv03;
+	delete upAnimationLv03;
+	delete downAnimationLv03;
+	delete shieldAnimation;
+	delete spawnAnimation;
+	delete arrowAnimation;
 }
-void Player::Write(OutputMemoryBitStream& os)
-{
-	Entity::Write(os);
-	os.Write((int)mAction, Define::bitofID);
 
+void Player::Write(OutputMemoryBitStream& _os)
+{
+	Entity::Write(_os);
+	// cần đọc tọa độ
+	_os.Write(direction, 3); // dao đọng từ 0 - 5 => 3 bit
 }
 
-void Player::OnsetLevel(int m_level)
+void Player::Read(InputMemoryBitStream& _is)
 {
-	if (m_level == 2)
+	// đọc networkd ID và loại đối tượng
+	Entity::Read(_is);
+
+	// đọc hướng di chuyển
+	Direction _dir;
+	_is.Read(_dir, 3); // dao động từ 0 - 5 => 3 bit
+
+	// đọc cấp độ
+	int _level;
+	_is.Read(_level, 3); // dao động từ 1 - 3 => 2 bit 
+
+	// đọc được bảo vệ hay không
+	_is.Read(IsProtect); // => 1 bit
+
+	LastHealth = Health; // lưu lại HP trước khi đọc
+
+	// đọc HP
+	_is.Read(Health, 2); // HP dao động từ 0 - 2 => 2 bit
+
+	// đọc time di chuyển lần cuối
+	_is.Read(LastMoveTime);
+
+	// đọc điểm
+	Score_Send = 0;
+	_is.Read(Score_Send, 10); // dao động từ 0 - 1023 => 10 bit
+
+
+	// đọc vị trí Score
+	int x, y;
+	_is.Read(x, 12); // => 12 bit
+	_is.Read(y, 12); // => 12 bit
+
+	// xử lý level đọc được
+	if (Level != _level)
 	{
-		switch (ID)
-		{
-		case 1:
-			mUpSprite = new Sprite("Resource files/tank.png", RECT{ 2,192,34,192 + 36 }, 0, 0, D3DXCOLOR(255, 0, 255, 255), GameGlobal::mTankTexture);
-			mLeftSprite = new Sprite("Resource files/tank.png", RECT{ 76,196,76 + 37,196 + 32 }, 0, 0, D3DXCOLOR(255, 0, 255, 255), GameGlobal::mTankTexture);
-			mDownSprite = new Sprite("Resource files/tank.png", RECT{ 156,195,156 + 31,195 + 34 }, 0, 0, D3DXCOLOR(255, 0, 255, 255), GameGlobal::mTankTexture);
-			mRightSprite = new Sprite("Resource files/tank.png", RECT{ 233,195,233 + 36,195 + 30 }, 0, 0, D3DXCOLOR(255, 0, 255, 255), GameGlobal::mTankTexture);
-			break;
-		case 2:
-			mUpSprite = new Sprite("Resource files/tank.png", RECT{ 310,192,310 + 32,192 + 36 }, 0, 0, D3DXCOLOR(255, 0, 255, 255), GameGlobal::mTankTexture);
-			mLeftSprite = new Sprite("Resource files/tank.png", RECT{ 384,196,384 + 37,196 + 32 }, 0, 0, D3DXCOLOR(255, 0, 255, 255), GameGlobal::mTankTexture);
-			mDownSprite = new Sprite("Resource files/tank.png", RECT{ 464,195,464 + 31,195 + 34 }, 0, 0, D3DXCOLOR(255, 0, 255, 255), GameGlobal::mTankTexture);
-			mRightSprite = new Sprite("Resource files/tank.png", RECT{ 540,195,540 + 36,195 + 30 }, 0, 0, D3DXCOLOR(255, 0, 255, 255), GameGlobal::mTankTexture);
-			break;
-		case 3:
-			mUpSprite = new Sprite("Resource files/tank.png", RECT{ 2,500,34,500 + 36 }, 0, 0, D3DXCOLOR(255, 0, 255, 255), GameGlobal::mTankTexture);
-			mLeftSprite = new Sprite("Resource files/tank.png", RECT{ 76,504,76 + 37,504 + 32 }, 0, 0, D3DXCOLOR(255, 0, 255, 255), GameGlobal::mTankTexture);
-			mDownSprite = new Sprite("Resource files/tank.png", RECT{ 156,502,156 + 31,502 + 34 }, 0, 0, D3DXCOLOR(255, 0, 255, 255), GameGlobal::mTankTexture);
-			mRightSprite = new Sprite("Resource files/tank.png", RECT{ 233,502,233 + 36,502 + 30 }, 0, 0, D3DXCOLOR(255, 0, 255, 255), GameGlobal::mTankTexture);
-			break;
-		case 4:
-			mUpSprite = new Sprite("Resource files/tank.png", RECT{ 310,500,310 + 32,500 + 36 }, 0, 0, D3DXCOLOR(255, 0, 255, 255), GameGlobal::mTankTexture);
-			mLeftSprite = new Sprite("Resource files/tank.png", RECT{ 384,504,384 + 37,504 + 32 }, 0, 0, D3DXCOLOR(255, 0, 255, 255), GameGlobal::mTankTexture);
-			mDownSprite = new Sprite("Resource files/tank.png", RECT{ 464,502,464 + 31,502 + 34 }, 0, 0, D3DXCOLOR(255, 0, 255, 255), GameGlobal::mTankTexture);
-			mRightSprite = new Sprite("Resource files/tank.png", RECT{ 540,502,540 + 36,502 + 30 }, 0, 0, D3DXCOLOR(255, 0, 255, 255), GameGlobal::mTankTexture);
-			break;
-
-		}
+		Level = _level;
+		//OnSetLevel()
 	}
-	else if (m_level == 3)
-	{
-		switch (ID)
-		{
-		case 1:
-			mUpSprite = new Sprite("Resource files/tank.png", RECT{ 2,77,34,77 + 37 }, 0, 0, D3DXCOLOR(255, 0, 255, 255), GameGlobal::mTankTexture);
-			mLeftSprite = new Sprite("Resource files/tank.png", RECT{ 77,79,77 + 37,79 + 31 }, 0, 0, D3DXCOLOR(255, 0, 255, 255), GameGlobal::mTankTexture);
-			mDownSprite = new Sprite("Resource files/tank.png", RECT{ 156,78,156 + 31,78 + 37 }, 0, 0, D3DXCOLOR(255, 0, 255, 255), GameGlobal::mTankTexture);
-			mRightSprite = new Sprite("Resource files/tank.png", RECT{ 233,79,233 + 36,79 + 31 }, 0, 0, D3DXCOLOR(255, 0, 255, 255), GameGlobal::mTankTexture);
-			break;
-		case 2:
-			mUpSprite = new Sprite("Resource files/tank.png", RECT{ 310,77,310 + 32,77 + 37 }, 0, 0, D3DXCOLOR(255, 0, 255, 255), GameGlobal::mTankTexture);
-			mLeftSprite = new Sprite("Resource files/tank.png", RECT{ 384,79,384 + 37,79 + 31 }, 0, 0, D3DXCOLOR(255, 0, 255, 255), GameGlobal::mTankTexture);
-			mDownSprite = new Sprite("Resource files/tank.png", RECT{ 464,78,464 + 31,78 + 37 }, 0, 0, D3DXCOLOR(255, 0, 255, 255), GameGlobal::mTankTexture);
-			mRightSprite = new Sprite("Resource files/tank.png", RECT{ 540,79,540 + 36,79 + 31 }, 0, 0, D3DXCOLOR(255, 0, 255, 255), GameGlobal::mTankTexture);
-			break;
-		case 3:
-			mUpSprite = new Sprite("Resource files/tank.png", RECT{ 2,384,34,384 + 37 }, 0, 0, D3DXCOLOR(255, 0, 255, 255), GameGlobal::mTankTexture);
-			mLeftSprite = new Sprite("Resource files/tank.png", RECT{ 77,387,77 + 37,387 + 31 }, 0, 0, D3DXCOLOR(255, 0, 255, 255), GameGlobal::mTankTexture);
-			mDownSprite = new Sprite("Resource files/tank.png", RECT{ 156,387,156 + 31,387 + 37 }, 0, 0, D3DXCOLOR(255, 0, 255, 255), GameGlobal::mTankTexture);
-			mRightSprite = new Sprite("Resource files/tank.png", RECT{ 233,387,233 + 36,387 + 31 }, 0, 0, D3DXCOLOR(255, 0, 255, 255), GameGlobal::mTankTexture);
-			break;
-		case 4:
-			mUpSprite = new Sprite("Resource files/tank.png", RECT{ 310,384,310 + 32,384 + 37 }, 0, 0, D3DXCOLOR(255, 0, 255, 255), GameGlobal::mTankTexture);
-			mLeftSprite = new Sprite("Resource files/tank.png", RECT{ 384,387,384 + 37,387 + 31 }, 0, 0, D3DXCOLOR(255, 0, 255, 255), GameGlobal::mTankTexture);
-			mDownSprite = new Sprite("Resource files/tank.png", RECT{ 464,387,464 + 31,387 + 37 }, 0, 0, D3DXCOLOR(255, 0, 255, 255), GameGlobal::mTankTexture);
-			mRightSprite = new Sprite("Resource files/tank.png", RECT{ 540,387,540 + 36,387 + 31 }, 0, 0, D3DXCOLOR(255, 0, 255, 255), GameGlobal::mTankTexture);
-			break;
 
+	// xử lý điểm đọc được
+	Score += Score_Send;
+
+	//  xử lý vị trí score đọc được
+	positionScore.x = (float)x;
+	positionScore.y = (float)y;
+}
+
+void Player::Update(float _dt)
+{
+	// khi HP hiện tại lớn hớn HP lần gần nhất => Hồi sinh
+	if (Health != 0 && LastHealth == 0)
+	{
+		isSpawn = true;
+		// thời gian bắt đầu hồi sinh
+		lastTimeSpawn = GetTickCount();
+	}
+
+	// khi HP hiện tại = 0 và chưa bị delete
+	if (Health == 0 && !IsDelete)
+	{
+		IsDelete = true;
+		// thời gian đã chết
+		LastTimeDie = GetTickCount();
+	}
+
+	// nếu đang bị delete, tính toán sự hồi sinh dựa vào thời gian đã chết gần nhất
+	if (IsDelete) 
+	{
+		// hồi sinh trong 4 giây
+		if (GetTickCount() - LastTimeDie > 4000)
+		{
+			IsDelete = false;
 		}
+		return;
+	}
+
+	// nếu đang hồi sinh
+	if (isSpawn)
+	{
+		spawnAnimation->Update(_dt);
+		// nếu lần chết gần nhất đã quá 2 giây...
+		if (GetTickCount() - LastTimeDie > 2000)
+		{
+			isSpawn = false;
+		}
+		return;
+	}
+
+	if (IsProtect)
+		shieldAnimation->Update(_dt);
+
+	x += vx * _dt;
+	y += vy * _dt;
+
+	// thay đổi animation đựa vào hướng đi
+	SetAnimationByDirection(direction);
+	switch (direction)
+	{
+	case D_Stand:
+		SetAnimationByDirection(lastDirection);
+		vx = 0.f;
+		vy = 0.f;
+		break;
+	case D_Left:
+		if (Level == 1)
+		{
+			vx = -Define::PLAYER_SPEED;
+		}
+		else
+		{
+			vx = -250.f;
+		}
+		vy = 0.f;
+		break;
+	case D_Right:
+		if (Level == 1)
+		{
+			vx = Define::PLAYER_SPEED;
+		}
+		else
+		{
+			vx = 250.f;
+		}
+		vy = 0.f;
+		break;
+	case D_Up:
+		if (Level == 1)
+		{
+			vy = -Define::PLAYER_SPEED;
+		}
+		else
+		{
+			vy = -250.f;
+		}
+		vx = 0.f;
+		break;
+	case D_Down:
+		if (Level == 1)
+		{
+			vy = Define::PLAYER_SPEED;
+		}
+		else
+		{
+			vy = 250.f;
+		}
+		vx = 0.f;
+		break;
+	}
+}
+
+void Player::HandleKeyboard(std::map<int, bool> keys)
+{
+	// nếu đã thua, đã bị delete hoặc đang hồi sinh => không nhận phím
+	if (isLose ||
+		IsDelete ||
+		isSpawn)
+	{
+		return;
+	}
+
+	// thay đổi hướng đi dựa vào bàn phím
+	if (keys[VK_LEFT])
+	{
+		direction = D_Left;
+		lastDirection = D_Left;
+	}
+	else if (keys[VK_RIGHT])
+	{
+		direction = D_Right;
+		lastDirection = D_Right;
+	}
+	else if (keys[VK_UP])
+	{
+		direction = D_Up;
+		lastDirection = D_Up;
+	}
+	else if (keys[VK_DOWN])
+	{
+		direction = D_Down;
+		lastDirection = D_Down;
 	}
 	else
 	{
-		switch (ID)
-		{
-		case 1:
-			mUpSprite = new Sprite("Resource files/tank.png", RECT{ 2,4,2 + 32,4 + 32 }, 0, 0, D3DXCOLOR(255, 0, 255, 255));
-			mLeftSprite = new Sprite("Resource files/tank.png", RECT{ 82,2,82 + 32,2 + 32 }, 0, 0, D3DXCOLOR(255, 0, 255, 255));
-			mDownSprite = new Sprite("Resource files/tank.png", RECT{ 156,2,156 + 32,2 + 32 }, 0, 0, D3DXCOLOR(255, 0, 255, 255));
-			mRightSprite = new Sprite("Resource files/tank.png", RECT{ 233,2,233 + 32,2 + 32 }, 0, 0, D3DXCOLOR(255, 0, 255, 255));
-			break;
-		case 2:
-			mUpSprite = new Sprite("Resource files/tank.png", RECT{ 310,4,310 + 32,4 + 32 }, 0, 0, D3DXCOLOR(255, 0, 255, 255), GameGlobal::mTankTexture);
-			mLeftSprite = new Sprite("Resource files/tank.png", RECT{ 389,2,389 + 32,2 + 32 }, 0, 0, D3DXCOLOR(255, 0, 255, 255), GameGlobal::mTankTexture);
-			mDownSprite = new Sprite("Resource files/tank.png", RECT{ 464,2,464 + 32,2 + 32 }, 0, 0, D3DXCOLOR(255, 0, 255, 255), GameGlobal::mTankTexture);
-			mRightSprite = new Sprite("Resource files/tank.png", RECT{ 540,2,540 + 32,2 + 32 }, 0, 0, D3DXCOLOR(255, 0, 255, 255), GameGlobal::mTankTexture);
-			break;
-		case 3:
-			mUpSprite = new Sprite("Resource files/tank.png", RECT{ 2,312,2 + 32,312 + 32 }, 0, 0, D3DXCOLOR(255, 0, 255, 255), GameGlobal::mTankTexture);
-			mLeftSprite = new Sprite("Resource files/tank.png", RECT{ 82,310,82 + 32,310 + 32 }, 0, 0, D3DXCOLOR(255, 0, 255, 255), GameGlobal::mTankTexture);
-			mDownSprite = new Sprite("Resource files/tank.png", RECT{ 156,310,156 + 32,310 + 32 }, 0, 0, D3DXCOLOR(255, 0, 255, 255), GameGlobal::mTankTexture);
-			mRightSprite = new Sprite("Resource files/tank.png", RECT{ 233,310,233 + 32,310 + 32 }, 0, 0, D3DXCOLOR(255, 0, 255, 255), GameGlobal::mTankTexture);
-			break;
-		case 4:
-			mUpSprite = new Sprite("Resource files/tank.png", RECT{ 310,312,310 + 32,312 + 32 }, 0, 0, D3DXCOLOR(255, 0, 255, 255), GameGlobal::mTankTexture);
-			mLeftSprite = new Sprite("Resource files/tank.png", RECT{ 389,310,389 + 32,310 + 32 }, 0, 0, D3DXCOLOR(255, 0, 255, 255), GameGlobal::mTankTexture);
-			mDownSprite = new Sprite("Resource files/tank.png", RECT{ 464,310,464 + 32,310 + 32 }, 0, 0, D3DXCOLOR(255, 0, 255, 255), GameGlobal::mTankTexture);
-			mRightSprite = new Sprite("Resource files/tank.png", RECT{ 540,310,540 + 32,310 + 32 }, 0, 0, D3DXCOLOR(255, 0, 255, 255), GameGlobal::mTankTexture);
-			break;
-
-		}
-	}
-}
-
-
-void Player::Read(InputMemoryBitStream& is)
-{
-	last_position = GetPosition();
-
-	Entity::Read(is);
-	int action = 0;
-	is.Read(action, Define::bitofID);
-
-	int level = 0;
-	is.Read(level, Define::bitOfTypePacket);
-	if (level != mLevel)
-	{
-		mLevel = level;
-		OnsetLevel(mLevel);
-	}
-	mAction = (Action)action;
-	is.Read(is_protect);
-	last_mHeal = mHeal;
-	is.Read(mHeal, Define::bitOfTypePacket);
-
-	is.Read(last_move_time);
-	//is.Read(mScore, Define::bitofID);
-
-	mScore_send = 0;
-	is.Read(mScore_send, Define::bitofID);
-	mScore += mScore_send;
-	int x = 0; int y = 0;
-	is.Read(x, Define::bitofLocation);
-	is.Read(y, Define::bitofLocation);
-	position_score.x = x; position_score.y = y;
-
-
-
-}
-void Player::Update(float dt)
-{
-	if (mHeal != 0 && last_mHeal == 0)
-	{
-		SetSpawn();
-	}
-	if (mHeal == 0 && !isDelete)
-	{
-		last_time_die = GetTickCount();
-		isDelete = true;
+		direction = D_Stand;
 	}
 
-	if (isDelete) {
-		if (GetTickCount() - last_time_die > 4000) isDelete = false;
-		return;
-	}
-
-	if (is_respaw)
-	{
-		spawn->Update(dt);
-		if (GetTickCount() - last_time_spawn > 2000) is_respaw = false;
-		return;
-	}
-	Entity::Update(dt);
-	switch (dir) {
-	case Direction::left:mCurrentSprite = mLeftSprite; break;
-	case Direction::right:mCurrentSprite = mRightSprite; break;
-	case up:mCurrentSprite = mUpSprite; break;
-	case down:mCurrentSprite = mDownSprite; break;
-	default:;
-	}
-	switch (mAction)
-	{
-	case Idle:  Stand();  break;
-	case GoLeft: MoveLeft(); break;
-	case GoRight:MoveRight(); break;
-	case GoUp:MoveUp(); break;
-	case GoDown:MoveDown(); break;
-	case Action::Fight:break;
-	default: break;
-	}
-
-	if (is_protect) shield->Update(dt);
-
-
-
-}
-void Player::HandleKeyboard(std::map<int, bool> keys)
-{
-	if (isLose) return;
-	if (isDelete) return;
-	if (is_respaw) return;
-
-	if (keys[VK_LEFT]) {
-		//if (mAction != GoLeft)
-		MoveLeft();
-	}
-	else if (keys[VK_RIGHT]) {
-		//if (mAction != GoRight)
-		MoveRight();
-	}
-	else if (keys[VK_DOWN]) {
-		//if (mAction != GoDown)
-		MoveDown();
-	}
-	else if (keys[VK_UP]) {
-		//if (mAction != GoUp)
-		MoveUp();
-	}
-	else {
-		//if (mAction != Idle)
-		Stand();
-	}
-
+	// tính toán bắn đạn
 	int time_to_fight = 1000;
 	if (keys[VK_SPACE])
 	{
-		if (mLevel > 2)
-			time_to_fight = 700;
-		if (GetTickCount() - lastFire > time_to_fight)
+		if (Level > 2)
 		{
-			mAction = Fight;
-			lastFire = GetTickCount();
+			time_to_fight = 700;
+		}
+
+		if ((int)GetTickCount() - LastFire > time_to_fight)
+		{
+			LastFire = (int)GetTickCount();
+			// bắn đạn ở đây
 		}
 	}
 
+	// gửi dữ liệu
 
+	//if (mLastAction != mAction)
+	//{
 
-	if (mLastAction != mAction)
-	{
-
-		OutputMemoryBitStream os;
-		os.Write(Define::InputPacket, Define::bitOfTypePacket);
-		os.Write(ID, Define::bitofID);
-		os.Write((int)mAction, Define::bitofID);
-		os.Write(last_id_packet++, Define::bitofID);
-		if (last_id_packet == 1000) last_id_packet = 0;
-		GameGlobal::socket->Send(os.GetBufferPtr(), os.GetByteLength());
-	}
-
-	mLastAction = mAction;
-
+	//	OutputMemoryBitStream os;
+	//	os.Write(Define::InputPacket, Define::bitOfTypePacket);
+	//	os.Write(ID, Define::bitofID);
+	//	os.Write((int)mAction, Define::bitofID);
+	//	os.Write(last_id_packet++, Define::bitofID);
+	//	if (last_id_packet == 1000) last_id_packet = 0;
+	//	GameGlobal::socket->Send(os.GetBufferPtr(), os.GetByteLength());
+	//}
 
 }
-void Player::Draw(D3DXVECTOR3 position, RECT sourceRect, D3DXVECTOR2 scale, D3DXVECTOR2 transform, float angle, D3DXVECTOR2 rotationCenter, D3DXCOLOR colorKey)
+
+void Player::InitAnimation()
 {
-	if (isLose) return;
-	if (isDelete) return;
-	if (is_respaw)
+	leftAnimationLv01 = new Animation();
+	rightAnimationLv01 = new Animation();
+	upAnimationLv01 = new Animation();
+	downAnimationLv01 = new Animation();
+	leftAnimationLv02 = new Animation();
+	rightAnimationLv02 = new Animation();
+	upAnimationLv02 = new Animation();
+	downAnimationLv02 = new Animation();
+	leftAnimationLv03 = new Animation();
+	rightAnimationLv03 = new Animation();
+	upAnimationLv03 = new Animation();
+	downAnimationLv03 = new Animation();
+
+	// animation xe tăng của người chơi 0
+	if (NetworkID == 0)
 	{
-		spawn->SetPosition(GetPosition());
-		spawn->Draw();
-		return;
+		leftAnimationLv01->AddFrameInfo(FrameInfo(SpriteList::Instance()->Tank, 82, 82 + 32, 2, 2 + 32,
+			D3DXVECTOR2(16.f, 16.f)));
+		rightAnimationLv01->AddFrameInfo(FrameInfo(SpriteList::Instance()->Tank, 233, 233 + 32, 2, 2 + 32,
+			D3DXVECTOR2(16.f, 16.f)));
+		upAnimationLv01->AddFrameInfo(FrameInfo(SpriteList::Instance()->Tank, 2, 2 + 32, 4, 4 + 32,
+			D3DXVECTOR2(16.f, 16.f)));
+		downAnimationLv01->AddFrameInfo(FrameInfo(SpriteList::Instance()->Tank, 156, 156 + 32, 2, 2 + 32,
+			D3DXVECTOR2(16.f, 16.f)));
+
+		leftAnimationLv02->AddFrameInfo(FrameInfo(SpriteList::Instance()->Tank, 76, 76 + 37, 196, 196 + 32,
+			D3DXVECTOR2(18.f, 16.f)));
+		rightAnimationLv02->AddFrameInfo(FrameInfo(SpriteList::Instance()->Tank, 233, 233 + 36, 195, 195 + 30,
+			D3DXVECTOR2(18.f, 15.f)));
+		upAnimationLv02->AddFrameInfo(FrameInfo(SpriteList::Instance()->Tank, 2, 2 + 32, 192, 192 + 36,
+			D3DXVECTOR2(16.f, 18.f)));
+		downAnimationLv02->AddFrameInfo(FrameInfo(SpriteList::Instance()->Tank, 156, 156 + 31, 195, 195 + 34,
+			D3DXVECTOR2(15.f, 17.f)));
+		
+		leftAnimationLv03->AddFrameInfo(FrameInfo(SpriteList::Instance()->Tank, 77, 77 + 37, 79, 79 + 31,
+			D3DXVECTOR2(18.f, 15.f)));
+		rightAnimationLv03->AddFrameInfo(FrameInfo(SpriteList::Instance()->Tank, 233, 233 + 36, 79, 79 + 31,
+			D3DXVECTOR2(18.f, 15.f)));
+		upAnimationLv03->AddFrameInfo(FrameInfo(SpriteList::Instance()->Tank, 2, 2 + 32, 77, 77 + 37,
+			D3DXVECTOR2(16.f, 18.f)));
+		downAnimationLv03->AddFrameInfo(FrameInfo(SpriteList::Instance()->Tank, 156, 156 + 31, 78, 78 + 37,
+			D3DXVECTOR2(15.f, 18.f)));
+	}
+	// animation xe tăng của người chơi 1
+	else if (NetworkID == 1)
+	{
+		leftAnimationLv01->AddFrameInfo(FrameInfo(SpriteList::Instance()->Tank, 389, 389 + 32, 2, 2 + 32,
+			D3DXVECTOR2(16.f, 16.f)));
+		rightAnimationLv01->AddFrameInfo(FrameInfo(SpriteList::Instance()->Tank, 540, 540 + 32, 2, 2 + 32,
+			D3DXVECTOR2(16.f, 16.f)));
+		upAnimationLv01->AddFrameInfo(FrameInfo(SpriteList::Instance()->Tank, 310, 310 + 32, 4, 4 + 32,
+			D3DXVECTOR2(16.f, 16.f)));
+		downAnimationLv01->AddFrameInfo(FrameInfo(SpriteList::Instance()->Tank, 464, 464 + 32, 2, 2 + 32,
+			D3DXVECTOR2(16.f, 16.f)));
+
+		leftAnimationLv02->AddFrameInfo(FrameInfo(SpriteList::Instance()->Tank, 384, 384 + 37, 196, 196 + 32,
+			D3DXVECTOR2(18.f, 16.f)));
+		rightAnimationLv02->AddFrameInfo(FrameInfo(SpriteList::Instance()->Tank, 540, 540 + 36, 195, 195 + 30,
+			D3DXVECTOR2(18.f, 15.f)));
+		upAnimationLv02->AddFrameInfo(FrameInfo(SpriteList::Instance()->Tank, 310, 310 + 32, 192, 192 + 36,
+			D3DXVECTOR2(16.f, 18.f)));
+		downAnimationLv02->AddFrameInfo(FrameInfo(SpriteList::Instance()->Tank, 464, 464 + 31, 195, 195 + 34,
+			D3DXVECTOR2(15.f, 17.f)));
+
+		leftAnimationLv03->AddFrameInfo(FrameInfo(SpriteList::Instance()->Tank, 384, 384 + 37, 79, 79 + 31,
+			D3DXVECTOR2(18.f, 15.f)));
+		rightAnimationLv03->AddFrameInfo(FrameInfo(SpriteList::Instance()->Tank, 540, 540 + 36, 79, 79 + 31,
+			D3DXVECTOR2(18.f, 15.f)));
+		upAnimationLv03->AddFrameInfo(FrameInfo(SpriteList::Instance()->Tank, 310, 310 + 32, 77, 77 + 37,
+			D3DXVECTOR2(16.f, 18.f)));
+		downAnimationLv03->AddFrameInfo(FrameInfo(SpriteList::Instance()->Tank, 464, 464 + 31, 78, 78 + 37,
+			D3DXVECTOR2(15.f, 18.f)));
+	}
+	// animation xe tăng của người chơi 2
+	else if (NetworkID == 2)
+	{
+		leftAnimationLv01->AddFrameInfo(FrameInfo(SpriteList::Instance()->Tank, 82, 82 + 32, 310, 310 + 32, 
+			D3DXVECTOR2(16.f, 16.f)));
+		rightAnimationLv01->AddFrameInfo(FrameInfo(SpriteList::Instance()->Tank, 233, 233 + 32, 310, 310 + 32,
+			D3DXVECTOR2(16.f, 16.f)));
+		upAnimationLv01->AddFrameInfo(FrameInfo(SpriteList::Instance()->Tank, 2, 2 + 32, 312, 312 + 32,
+			D3DXVECTOR2(16.f, 16.f)));
+		downAnimationLv01->AddFrameInfo(FrameInfo(SpriteList::Instance()->Tank, 156, 156 + 32, 310, 310 + 32,
+			D3DXVECTOR2(16.f, 16.f)));
+
+		leftAnimationLv02->AddFrameInfo(FrameInfo(SpriteList::Instance()->Tank, 76, 76 + 37, 504, 504 + 32,
+			D3DXVECTOR2(18.f, 16.f)));
+		rightAnimationLv02->AddFrameInfo(FrameInfo(SpriteList::Instance()->Tank, 233, 233 + 36, 502, 502 + 30,
+			D3DXVECTOR2(18.f, 15.f)));
+		upAnimationLv02->AddFrameInfo(FrameInfo(SpriteList::Instance()->Tank, 2, 2 + 32, 500, 500 + 36,
+			D3DXVECTOR2(16.f, 18.f)));
+		downAnimationLv02->AddFrameInfo(FrameInfo(SpriteList::Instance()->Tank, 156, 156 + 31, 502, 502 + 34,
+			D3DXVECTOR2(15.f, 17.f)));
+	
+		leftAnimationLv03->AddFrameInfo(FrameInfo(SpriteList::Instance()->Tank, 77, 77 + 37, 387, 387 + 31,
+			D3DXVECTOR2(18.f, 15.f)));
+		rightAnimationLv03->AddFrameInfo(FrameInfo(SpriteList::Instance()->Tank, 233, 233 + 36, 387, 387 + 31,
+			D3DXVECTOR2(18.f, 15.f)));
+		upAnimationLv03->AddFrameInfo(FrameInfo(SpriteList::Instance()->Tank, 2, 2 + 32, 384, 384 + 37,
+			D3DXVECTOR2(16.f, 18.f)));
+		downAnimationLv03->AddFrameInfo(FrameInfo(SpriteList::Instance()->Tank, 156, 156 + 31, 387, 387 + 37,
+			D3DXVECTOR2(15.f, 18.f)));
+	}
+	// animation xe tăng của người chơi 3
+	else if (NetworkID == 3)
+	{
+		leftAnimationLv01->AddFrameInfo(FrameInfo(SpriteList::Instance()->Tank, 389, 389 + 32, 310, 310 + 32,
+			D3DXVECTOR2(16.f, 16.f)));
+		rightAnimationLv01->AddFrameInfo(FrameInfo(SpriteList::Instance()->Tank, 540, 540 + 32, 310, 310 + 32,
+			D3DXVECTOR2(16.f, 16.f)));
+		upAnimationLv01->AddFrameInfo(FrameInfo(SpriteList::Instance()->Tank, 310, 310 + 32, 312, 312 + 32,
+			D3DXVECTOR2(16.f, 16.f)));
+		downAnimationLv01->AddFrameInfo(FrameInfo(SpriteList::Instance()->Tank, 464, 464 + 32, 310, 310 + 32,
+			D3DXVECTOR2(16.f, 16.f)));
+
+		leftAnimationLv02->AddFrameInfo(FrameInfo(SpriteList::Instance()->Tank, 384, 384 + 37, 504, 504 + 32,
+			D3DXVECTOR2(18.f, 16.f)));
+		rightAnimationLv02->AddFrameInfo(FrameInfo(SpriteList::Instance()->Tank, 540, 540 + 36, 502, 502 + 30,
+			D3DXVECTOR2(18.f, 15.f)));
+		upAnimationLv02->AddFrameInfo(FrameInfo(SpriteList::Instance()->Tank, 310, 310 + 32, 500, 500 + 36,
+			D3DXVECTOR2(16.f, 18.f)));
+		downAnimationLv02->AddFrameInfo(FrameInfo(SpriteList::Instance()->Tank, 464, 464 + 31, 502, 502 + 34,
+			D3DXVECTOR2(15.f, 17.f)));
+
+		leftAnimationLv03->AddFrameInfo(FrameInfo(SpriteList::Instance()->Tank, 384, 384 + 37, 387, 387 + 31, 
+			D3DXVECTOR2(18.f, 15.f)));
+		rightAnimationLv03->AddFrameInfo(FrameInfo(SpriteList::Instance()->Tank, 540, 540 + 36, 387, 387 + 31,
+			D3DXVECTOR2(18.f, 15.f)));
+		upAnimationLv03->AddFrameInfo(FrameInfo(SpriteList::Instance()->Tank, 310, 310 + 32, 384, 384 + 37,
+			D3DXVECTOR2(16.f, 18.f)));
+		downAnimationLv03->AddFrameInfo(FrameInfo(SpriteList::Instance()->Tank, 464, 464 + 31, 387, 387 + 37,
+			D3DXVECTOR2(15.f, 18.f)));
 	}
 
-	mCurrentSprite->SetPosition(this->GetPosition());
 
-	mCurrentSprite->Draw(D3DXVECTOR3(posX, posY, 0));
-	if (isMe)
-	{
-		m_top_sprite->SetPosition(D3DXVECTOR3(posX, posY + 35, 0));
-		m_top_sprite->Draw();
-	}
+	arrowAnimation = new Animation();
+	arrowAnimation->AddFrameInfo(FrameInfo(SpriteList::Instance()->Arrow, 0, 26, 0, 26,
+		D3DXVECTOR2(13.f, 13.f)));
+	shieldAnimation = new Animation(0.05f);
+	shieldAnimation->AddFrameInfo(FrameInfo(SpriteList::Instance()->Others, 0, 0 + 39, 11, 111 + 42,
+		D3DXVECTOR2(20.f, 21.f)));
+	shieldAnimation->AddFrameInfo(FrameInfo(SpriteList::Instance()->Others, 39, 39 + 40, 111, 111 + 40,
+		D3DXVECTOR2(20.f, 20.f)));
+	spawnAnimation = new Animation(0.05f);
+	spawnAnimation->AddFrameInfo(FrameInfo(SpriteList::Instance()->Others, 0, 30, 0, 30,
+		D3DXVECTOR2(15.f, 15.f)));
+	spawnAnimation->AddFrameInfo(FrameInfo(SpriteList::Instance()->Others, 30, 60, 0, 30,
+		D3DXVECTOR2(15.f, 15.f)));
+	spawnAnimation->AddFrameInfo(FrameInfo(SpriteList::Instance()->Others, 60, 60 + 34, 0, 0 + 31,
+		D3DXVECTOR2(17.f, 15.f)));
+	spawnAnimation->AddFrameInfo(FrameInfo(SpriteList::Instance()->Others, 96, 93 + 35, 0, 0 + 32,
+		D3DXVECTOR2(17.f, 16.f)));
+}
 
-	if (is_protect)
+void Player::SetAnimationByDirection(Direction _dir)
+{
+	if (Level == 1)
 	{
-		shield->SetPosition(GetPosition());
-		shield->Draw();
+		switch (_dir)
+		{
+		case D_Left:
+			currentAnimation = leftAnimationLv01;
+			break;
+		case D_Right:
+			currentAnimation = rightAnimationLv01;
+			break;
+		case D_Up:
+			currentAnimation = upAnimationLv01;
+			break;
+		case D_Down:
+			currentAnimation = downAnimationLv01;
+			break;
+		default:
+			break;
+		}
 	}
+	else if (Level == 2)
+	{
+		switch (_dir)
+		{
+		case D_Left:
+			currentAnimation = leftAnimationLv02;
+			break;
+		case D_Right:
+			currentAnimation = rightAnimationLv02;
+			break;
+		case D_Up:
+			currentAnimation = upAnimationLv02;
+			break;
+		case D_Down:
+			currentAnimation = downAnimationLv02;
+			break;
+		default:
+			break;
+		}
+	}
+	else if (Level == 3)
+	{
+		switch (_dir)
+		{
+		case D_Left:
+			currentAnimation = leftAnimationLv03;
+			break;
+		case D_Right:
+			currentAnimation = rightAnimationLv03;
+			break;
+		case D_Up:
+			currentAnimation = upAnimationLv03;
+			break;
+		case D_Down:
+			currentAnimation = downAnimationLv03;
+			break;
+		default:
+			break;
+		}
+	}
+}
+
+void Player::Draw()
+{
+	//if (isLose) return;
+	//if (isDelete) return;
+	//if (is_respaw)
+	//{
+	//	spawn->SetPosition(GetPosition());
+	//	spawn->Draw();
+	//	return;
+	//}
+
+	//mCurrentSprite->SetPosition(this->GetPosition());
+
+	//mCurrentSprite->Draw(D3DXVECTOR3(x, y, 0));
+	//if (isMe)
+	//{
+	//	m_top_sprite->SetPosition(D3DXVECTOR3(x, y + 35, 0));
+	//	m_top_sprite->Draw();
+	//}
+
+	//if (is_protect)
+	//{
+	//	shield->SetPosition(GetPosition());
+	//	shield->Draw();
+	//}
 }
 
 void Player::CollideWith_World()
@@ -322,117 +523,21 @@ void Player::CollideWith_World()
 }
 
 
-bool Player::Check_to_create_anim()
+bool Player::CheckCreateAnim()
 {
-	if (mHeal == 0 && last_mHeal != 0)
+	if (Health == 0 && LastHealth != 0)
+	{
 		return true;
+	}
+
 	return false;
-}
-
-void Player::ActiveShield()
-{
-
-}
-
-void Player::SetSpawn()
-{
-	is_respaw = true;
-	last_time_spawn = GetTickCount();
-}
-
-RECT Player::GetBound()
-{
-	RECT rect;
-	rect.left = this->posX - mCurrentSprite->GetWidth() / 2;
-	rect.right = rect.left + mCurrentSprite->GetWidth();
-	rect.top = this->posY - mCurrentSprite->GetHeight() / 2;
-	rect.bottom = rect.top + mCurrentSprite->GetHeight();
-	return rect;
 }
 
 void Player::CollisionWith(Entity* en)
 {
-	if (en->Tag == EntityTypes::player || en->Tag == EntityTypes::npc)
-	{
-		vx = 0;
-		vy = 0;
-	}
-}
-
-void Player::onSetID(int ID)
-{
-	this->ID = ID;
-	switch (ID)
-	{
-	case 2:
-		mUpSprite = new Sprite("Resource files/tank.png", RECT{ 310,4,310 + 32,4 + 32 }, 0, 0, D3DXCOLOR(255, 0, 255, 255), GameGlobal::mTankTexture);
-		mLeftSprite = new Sprite("Resource files/tank.png", RECT{ 389,2,389 + 32,2 + 32 }, 0, 0, D3DXCOLOR(255, 0, 255, 255), GameGlobal::mTankTexture);
-		mDownSprite = new Sprite("Resource files/tank.png", RECT{ 464,2,464 + 32,2 + 32 }, 0, 0, D3DXCOLOR(255, 0, 255, 255), GameGlobal::mTankTexture);
-		mRightSprite = new Sprite("Resource files/tank.png", RECT{ 540,2,540 + 32,2 + 32 }, 0, 0, D3DXCOLOR(255, 0, 255, 255), GameGlobal::mTankTexture);
-		break;
-	case 3:
-		mUpSprite = new Sprite("Resource files/tank.png", RECT{ 2,312,2 + 32,312 + 32 }, 0, 0, D3DXCOLOR(255, 0, 255, 255), GameGlobal::mTankTexture);
-		mLeftSprite = new Sprite("Resource files/tank.png", RECT{ 82,310,82 + 32,310 + 32 }, 0, 0, D3DXCOLOR(255, 0, 255, 255), GameGlobal::mTankTexture);
-		mDownSprite = new Sprite("Resource files/tank.png", RECT{ 156,310,156 + 32,310 + 32 }, 0, 0, D3DXCOLOR(255, 0, 255, 255), GameGlobal::mTankTexture);
-		mRightSprite = new Sprite("Resource files/tank.png", RECT{ 233,310,233 + 32,310 + 32 }, 0, 0, D3DXCOLOR(255, 0, 255, 255), GameGlobal::mTankTexture);
-		break;
-	case 4:
-		mUpSprite = new Sprite("Resource files/tank.png", RECT{ 310,312,310 + 32,312 + 32 }, 0, 0, D3DXCOLOR(255, 0, 255, 255), GameGlobal::mTankTexture);
-		mLeftSprite = new Sprite("Resource files/tank.png", RECT{ 389,310,389 + 32,310 + 32 }, 0, 0, D3DXCOLOR(255, 0, 255, 255), GameGlobal::mTankTexture);
-		mDownSprite = new Sprite("Resource files/tank.png", RECT{ 464,310,464 + 32,310 + 32 }, 0, 0, D3DXCOLOR(255, 0, 255, 255), GameGlobal::mTankTexture);
-		mRightSprite = new Sprite("Resource files/tank.png", RECT{ 540,310,540 + 32,310 + 32 }, 0, 0, D3DXCOLOR(255, 0, 255, 255), GameGlobal::mTankTexture);
-		break;
-
-	}
-	mCurrentSprite = mUpSprite;
-}
-
-
-void Player::MoveLeft() {
-
-	mCurrentSprite = mLeftSprite;
-
-	if (mLevel > 1)
-		this->SetVx(-Define::PLAYER_SPEED);
-	else 	this->SetVx(-250);
-
-	this->SetVy(0);
-	this->mAction = GoLeft;
-}
-void Player::MoveRight() {
-
-	mCurrentSprite = mRightSprite;
-
-	if (mLevel > 1)
-		this->SetVx(Define::PLAYER_SPEED);
-	else 	this->SetVx(250);
-
-
-	this->SetVy(0);
-	this->mAction = GoRight;
-}
-void Player::MoveUp() {
-
-	mCurrentSprite = mUpSprite;
-	if (mLevel > 1)
-		this->SetVy(250);
-	else
-		this->SetVy(Define::PLAYER_SPEED);
-
-	this->SetVx(0);
-	this->mAction = GoUp;
-}
-void Player::MoveDown() {
-
-	mCurrentSprite = mDownSprite;
-	if (mLevel > 1)
-		this->SetVy(-250);
-	else this->SetVy(-200);
-	this->SetVx(0);
-	this->mAction = GoDown;
-}
-void Player::Stand() {
-	this->SetVx(0);
-	this->SetVy(0);
-	this->mAction = Idle;
+	//if (en->Type == EntityTypes::player || en->Type == EntityTypes::npc)
+	//{
+	//	vx = 0;
+	//	vy = 0;
+	//}
 }

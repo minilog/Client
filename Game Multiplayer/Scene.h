@@ -1,25 +1,41 @@
 #pragma once
 
 #include "GameGlobal.h"
+#include <vector>
+#include <map>
+#include "Label.h"
+#include "MemoryBitStream.h"
 
 class Scene
 {
-public:
-	virtual void Update(float dt);
-	virtual void LoadContent();
-	virtual void Draw();
-	virtual void ReceivePakcet();
-	virtual void OnKeyDown(int keyCode);
-	virtual void OnKeyUp(int keyCode);
-	virtual void SendData();
-	D3DCOLOR GetBackcolor();
-
-	virtual ~Scene();
-
 protected:
-	Scene();
+	D3DCOLOR backgroundColor;
+	std::map<int, bool> keyboard;
 
-	D3DCOLOR                mBackColor;
+public:
+	Scene()
+	{
+		backgroundColor = D3DCOLOR_XRGB(0, 0, 0);
+	}
+	~Scene() {}
 
+	virtual void Update(float _dt) {}
+	virtual void Draw() {}
+	virtual void ReceivePacket(InputMemoryBitStream& _is, int _typePacket) {}
+
+	virtual void OnKeyDown(int _keyCode) 
+	{
+		keyboard[_keyCode] = true; 
+	}
+
+	virtual void OnKeyUp(int _keyCode)
+	{
+		keyboard[_keyCode] = false;
+	}
+
+	D3DCOLOR GetBackcolor()
+	{
+		return backgroundColor;
+	}
 };
 

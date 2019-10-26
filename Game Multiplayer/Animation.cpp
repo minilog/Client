@@ -1,73 +1,46 @@
 #include "Animation.h"
 
-Animation::Animation()
+void Animation::Update(float _dt)
 {
-
-}
-
-Animation::Animation(const char* filePath, vector<RECT> source, float timePerFrame, D3DCOLOR colorKey)
-{
-
-	this->InitWithSprite(filePath, source.at(0), 0, 0, colorKey);
-	mTimePerFrame = timePerFrame;
-	mTotalFrame = source.size();
-	mSourceRect = source;
-
-	mRect = source.at(0);
-	SetSourceRect(mRect);
-}
-
-
-Animation::~Animation()
-{
-	mTexture->Release();
-}
-
-int Animation::GetCurrentFrame()
-{
-	return mCurrentIndex;
-}
-
-void Animation::Update(float dt)
-{
-	if (mTotalFrame <= 1)
-		return;
-	if (mCurrentIndex <= mTotalFrame)
+	// Do have any frame info, return
+	if (frameInfos.size() <= 1)
 	{
-
-		if (mTotalFrame <= 1)
-			return;
-		if (mCurrentIndex <= mTotalFrame)
-		{
-
-			mRect = mSourceRect.at(mCurrentIndex);
-		}
-		if (mCurrentTotalTime >= mTimePerFrame)
-		{
-			mCurrentTotalTime = 0;
-			mCurrentIndex++;
-
-
-			if (mCurrentIndex >= mTotalFrame)
-				mCurrentIndex = 0;
-
-		}
-		else
-		{
-			mCurrentTotalTime += dt;
-		}
-
-
-		SetSourceRect(mRect);
-
+		return;
 	}
 
+	count += _dt;
+
+	if (count >= time)
+	{
+		frameIndex++;
+
+		if (frameIndex >= (int)frameInfos.size())
+		{
+			frameIndex = 0;
+		}
+
+		count -= time;
+	}
 }
-void Animation::SetCurrentTotalTime(float time) {
-	mCurrentTotalTime = time;
-}
-void Animation::Draw(D3DXVECTOR3 position, RECT sourceRect, D3DXVECTOR2 scale,
-	D3DXVECTOR2 transform, float angle, D3DXVECTOR2 rotationCenter, D3DXCOLOR colorKey)
+
+void Animation::Draw(const D3DXVECTOR2 & _position, const D3DXVECTOR2 & _offset, bool _isFlipHorizontal, bool _isFlipVertical, const D3DCOLOR & color)
 {
-	Sprite::Draw(position, sourceRect, scale, transform, angle, rotationCenter, colorKey);
+	FrameInfo currentFrameInfo = frameInfos[frameIndex];
+
+	Sprite* sprite = currentFrameInfo.sprite;
+	sprite->SetRect(currentFrameInfo.rect);
+	sprite->SetCenter(currentFrameInfo.center);
+
+	sprite->SetPosition(_position);
+	sprite->SetOffset(_offset);
+	sprite->SetFipHorizontal(_isFlipHorizontal);
+	sprite->SetFlipVertical(_isFlipVertical);
+
+	sprite->Draw(color);
+}
+
+void Animation::Reset()
+{
+	frameIndex = 0;
+	count = 0.f;
 }

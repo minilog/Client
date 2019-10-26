@@ -1,109 +1,38 @@
-#include "Entity.h"
-
-Entity::Entity()
-{
-	Tag = none;
-}
-void Entity::Emplace(Entity* en)
-{
-	SetPosition(en->GetPosition());
-	vx = en->vx;
-	vy = en->vy;
-	Tag = en->Tag;
-	dir = en->dir;
-	width = en->width;
-	height = en->height;
-}
-
+﻿#include "Entity.h"
 
 void Entity::Write(OutputMemoryBitStream& os)
 {
-	os.Write((int)Tag, Define::bitofID);
-	os.Write(ID, Define::bitofID);
-	os.Write((int)dir, Define::bitofID);
-	os.Write((int)posX, Define::bitofLocation);
-	os.Write((int)posY, Define::bitofLocation);
-
-}
-
-void Entity::Read(InputMemoryBitStream& is)
-{
-	int dir_temp = 0;
-	//is.Read(tag, Define::bitofID);
-	//is.Read(ID, Define::bitofID);
-	is.Read(dir_temp, Define::bitofID);
-	int x = 0; int y = 0;
-	is.Read(x, Define::bitofLocation);
-	is.Read(y, Define::bitofLocation);
-	SetPosition(x, y);
-	//Tag = (EntityTypes)tag;
-	dir = (Direction)dir_temp;
+	os.Write((int)Type, 6); // dao động từ 0 - 63 => 6 bit
+	os.Write(NetworkID, 10); // dao động từ 0 - 1023 => 10 bit
 }
 
 D3DXVECTOR2 Entity::GetPosition()
 {
-	return D3DXVECTOR2(posX, posY);
+	return D3DXVECTOR2(x, y);
 }
 
 RECT Entity::GetBound()
 {
 	RECT bound;
 
-	bound.left = posX - width / 2;
-	bound.right = posX + width / 2;
-	bound.top = posY - height / 2;
-	bound.bottom = posY + height / 2;
+	bound.left = (long)(x - width / 2.f);
+	bound.right = (long)(x + width / 2.f);
+	bound.top = (long)(y - height / 2.f);
+	bound.bottom = (long)(y + height / 2.f);
 
 	return bound;
 }
 
-void Entity::OnSetPosition(D3DXVECTOR3 pos)
-{
-
-}
-
-void Entity::Update(float dt)
-{
-	//velocity = pixel / s
-	posX += vx * dt;
-	posY += vy * dt;
-}
-
-void Entity::CollisionWith(Entity* en)
-{
-	//isDelete = true;
-}
-
-void Entity::SetPosition(float x, float y)
-{
-	this->posX = x;
-	this->posY = y;
-}
-
 void Entity::SetPosition(D3DXVECTOR2 pos)
 {
-	SetPosition(pos.x, pos.y);
+	x = pos.x;
+	y = pos.y;
 }
-
-void Entity::SetPosition(D3DXVECTOR3 pos)
-{
-	this->posX = pos.x;
-	this->posY = pos.y;
-
-}
-
 
 void Entity::AddPosition(D3DXVECTOR2 pos)
 {
 	this->SetPosition(this->GetPosition() + pos);
 }
-
-
-void Entity::AddPosition(float x, float y)
-{
-	AddPosition(D3DXVECTOR2(x, y));
-}
-
 
 void Entity::SetWidth(int width)
 {

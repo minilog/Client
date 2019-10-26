@@ -1,37 +1,49 @@
-#pragma once
+﻿#pragma once
+
 #include "Sprite.h"
 #include <vector>
 
-using namespace std;
-
-class Animation : public Sprite
+class FrameInfo
 {
 public:
-	//ham ho tro lay animation voi anh co duy nhat 1 hang
-	Animation(const char* filePath, vector<RECT> sourcefloat, float timePerFrame = 0.1f, D3DCOLOR colorKey = NULL);
+	Sprite* sprite;
+	RECT rect;
+	D3DXVECTOR2 center;
 
-	Animation();
-
-	virtual void Update(float dt);
-
-	void Draw(D3DXVECTOR3 position = D3DXVECTOR3(), RECT sourceRect = RECT(), D3DXVECTOR2 scale = D3DXVECTOR2(), D3DXVECTOR2 transform = D3DXVECTOR2(), float angle = 0, D3DXVECTOR2 rotationCenter = D3DXVECTOR2(), D3DXCOLOR colorKey = D3DCOLOR_XRGB(255, 255, 255));
-
-	void SetCurrentTotalTime(float time);
-	~Animation();
-	vector<RECT> mSourceRect;
-	int GetCurrentFrame();
-protected:
-	//su dung cho ke thua
-
-	int
-		mCurrentIndex, //gia tri frame hien tai - bat dau tu 0 -> tong so frame - 1
-		mTotalFrame;  //tong so frame
-
-
-	float mTimePerFrame, //thoi gian luan chuyen 1 frame
-		mCurrentTotalTime; //tong thoi gian hien tai de thuc hien timeperframe
-
-	RECT                        mRect;
+public:
+	FrameInfo(Sprite* _sprite, int _left, int _right, int _top, int _bottom, const D3DXVECTOR2& _center)
+	{
+		sprite = _sprite;
+		rect.left = _left;
+		rect.right = _right;
+		rect.top = _top;
+		rect.bottom = _bottom;
+		center = _center;
+	}
 };
 
+class Animation
+{
+	std::vector<FrameInfo> frameInfos; // thông tin về các frame
+	int frameIndex = 0; // frame hiện tại
+	float time = 0.f; // thời gian chuyển frame
+	float count = 0.f; // đếm => chuyển frame
+
+public:
+	// khởi tạo animation với: thời gian chuyển frame
+	Animation(float _time = 0.f) : time(_time) {}
+	~Animation() {}
+
+	// thêm vào animation các frame
+	void AddFrameInfo(const FrameInfo& _frameInfo)
+	{
+		frameInfos.push_back(_frameInfo);
+	}
+
+	void Update(float _dt);
+	void Draw(const D3DXVECTOR2& _position, const D3DXVECTOR2& _offset = D3DXVECTOR2(0.0f, 0.0f), bool _isFlipHorizontal = false,
+		bool _isFlipVertical = false, const D3DCOLOR& color = D3DCOLOR_ARGB(255, 255, 255, 255));
+
+	void Reset();
+};
 

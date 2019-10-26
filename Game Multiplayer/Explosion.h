@@ -1,24 +1,70 @@
-#pragma once
-#include "Sprite.h"
-class Explosion
-{
+﻿#pragma once
+
+#include "Entity.h"
+#include "SpriteList.h"
+
+class Explosion : Entity
+{	
+	float existTime = 0.f; // thời gian tồn tại của vụ nổ
+	float count_existTime = 0.f;
+	bool isActive = false; // đang hoạt động hay không
+
+	Animation* animation;
 public:
-	void Update(float dt);
+	Explosion(D3DXVECTOR2 _pos, bool _isBig)
+	{
+		// khởi tạo animation, mỗi frame 0.2 giây
+		animation = new Animation(0.2f);
+		// animation nổ bé
+		if (!_isBig)
+		{ 
+			existTime = 0.6f;
+			animation->AddFrameInfo(FrameInfo(SpriteList::Instance()->Others, 0, 0 + 32, 64, 64 + 32,
+				D3DXVECTOR2(16.f, 16.f)));
+			animation->AddFrameInfo(FrameInfo(SpriteList::Instance()->Others, 32, 32 + 32, 64, 64 + 32,
+				D3DXVECTOR2(16.f, 16.f)));
+			animation->AddFrameInfo(FrameInfo(SpriteList::Instance()->Others, 64, 64 + 32, 64, 64 + 32,
+				D3DXVECTOR2(16.f, 16.f)));
+		}
+		// animation nổ lớn
+		else
+		{
+			existTime = 0.4f;
+			animation->AddFrameInfo(FrameInfo(SpriteList::Instance()->Others, 96, 96 + 64, 64, 64 + 64,
+				D3DXVECTOR2(32.f, 32.f)));
+			animation->AddFrameInfo(FrameInfo(SpriteList::Instance()->Others, 160, 160 + 64, 64, 64 + 64,
+				D3DXVECTOR2(32.f, 32.f)));
+		}
 
-	void Draw(D3DXVECTOR3 position = D3DXVECTOR3(), RECT sourceRect = RECT(), D3DXVECTOR2 scale = D3DXVECTOR2(), D3DXVECTOR2 transform = D3DXVECTOR2(), float angle = 0, D3DXVECTOR2 rotationCenter = D3DXVECTOR2(), D3DXCOLOR colorKey = D3DCOLOR_XRGB(255, 255, 255));
-	bool isFinish;
-	bool getFinish();
-	Explosion(D3DXVECTOR2 position, bool isBig);
-	~Explosion();
-protected:
-	Sprite * mSmallExplode[3];
-	Sprite * mBigExplode[2];
-	Sprite * mCurrentSprite;
-	int DelayTime;
-	bool isBig;
+		SetPosition(_pos);
+	}
+	~Explosion() {}
 
-	int count;
-	int countTime;
-	D3DXVECTOR2 position;
+	void Update(float _dt)
+	{
+		// nếu không hoạt động => không cập nhật
+		if (!isActive)
+			return;
+
+		// cập nhật animation của vụ nổ
+		animation->Update(_dt);
+
+		// đếm => đặt lại trạng thái không hoạt động
+		count_existTime += _dt;
+		if (count_existTime > existTime)
+		{
+			isActive = false;
+			count_existTime = 0.f;
+		}
+	}
+
+	void Draw()
+	{
+		// nếu không hoạt động, không vẽ
+		if (!isActive)
+			return;
+
+		animation->Draw(GetPosition());
+	}
 };
 

@@ -1,18 +1,17 @@
-#pragma once
+﻿#pragma once
 #include "Scene.h"
 
 class SceneManager
 {
-public:
-	static SceneManager *GetInstance();
-	~SceneManager();
-	Scene* GetCurrentScene();
-	void Update(float dt);
-	void ReplaceScene(Scene *scene);
+	static SceneManager *instance;
+	Scene *currentScene;
 
 private:
 	SceneManager();
-	static SceneManager     *mInstace;
-	Scene                   *mCurrentScene;
+public:
+	static SceneManager* Instance();
+	~SceneManager() {}
+	Scene* GetCurrentScene();
+	void ReplaceScene(Scene* _scene);
 };
 

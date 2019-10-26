@@ -1,7 +1,9 @@
 #pragma once
+
 #include <string>
 #include <d3dx9.h>
 using namespace std;
+
 class Label
 {
 public:

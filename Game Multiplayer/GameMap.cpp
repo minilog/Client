@@ -1,124 +1,88 @@
-#include "GameMap.h"
+﻿#include "GameMap.h"
 #include "GameLog.h"
 
 GameMap::GameMap(char* filePath)
 {
 	LoadMap(filePath);
-	mDebugDraw = new GameDebugDraw();
+	debugDraw = new GameDebugDraw();
 }
-int last_size = 993;
-void GameMap::Update(float dt)
-{
-	for (int i = 0; i < mListBrick.size(); ++i)
-	{
-		if (mListBrick[i]->isDelete)
-		{
 
-			vector<Entity*> list_of_brick_quad;
-			GetQuadTree()->getAllEntities(list_of_brick_quad);
-			for (auto brick2 : list_of_brick_quad)
-			{
-				if (mListBrick[i]->ID == brick2->ID)
-				{
-					brick2->isDelete = true;
-					break;
-				}
-			}
-			eraseBrick(i);
-			i--;
-		}
-	}
-}
 void GameMap::LoadMap(char* filePath)
 {
-	mMap = new Tmx::Map();
-	mMap->ParseFile(filePath);
+	map = new Tmx::Map();
+	map->ParseFile(filePath);
 
+	// ID bắt đầu của các object trong map
+	int networkID = 100;
 
-	int cur_ID = 100;
-
+	// hcn với size của map
 	RECT r;
 	r.left = 0;
 	r.top = 0;
 	r.right = this->GetWidth();
 	r.bottom = this->GetHeight();
-	mQuadTree = new QuadTree(1, r);
 
-	for (size_t i = 0; i < mMap->GetNumTilesets(); i++)
+	// đưa danh sách hình ảnh tileset vào tilesetList
+	for (size_t i = 0; i < map->GetNumTilesets(); i++)
 	{
-		const Tmx::Tileset *tileset = mMap->GetTileset(i);
+		const Tmx::Tileset *tileset = map->GetTileset(i);
 
-		if (tileset->GetName() != "Brick") {
-			Sprite *sprite = new Sprite(tileset->GetImage()->GetSource().c_str(), RECT(), 0, 0, 0, GameGlobal::mMapTexture);
-			mListTileset.insert(std::pair<int, Sprite*>(i, sprite));
-		}
+		Sprite *sprite = new Sprite(tileset->GetImage()->GetSource().c_str());
+		tilesetList.insert(std::pair<int, Sprite*>(i, sprite));
 	}
-	for (size_t i = 0; i < mMap->GetNumTileLayers(); i++)
+
+	for (int i = 0; i < map->GetNumTileLayers(); i++)
 	{
-		const Tmx::TileLayer *layer = mMap->GetTileLayer(i);
-		if (layer->GetName() == "Brick" || layer->GetName() == "Metal Brick" || layer->GetName() == "Water" || layer->GetName() == "Tile Layer 1") {
-			for (size_t j = 0; j < mMap->GetNumTilesets(); j++)
+		// duyệt các layer của map
+		const Tmx::TileLayer *layer = map->GetTileLayer(i);
+		if (layer->GetName() == "Brick" || 
+			layer->GetName() == "Metal Brick" || 
+			layer->GetName() == "Water" || 
+			layer->GetName() == "Tile Layer 1") 
+		{
+			for (int j = 0; j < map->GetNumTilesets(); j++)
 			{
-				const Tmx::Tileset *tileSet = mMap->GetTileset(j);
+				const Tmx::Tileset *tileSet = map->GetTileset(j);
 
-				int tileWidth = mMap->GetTileWidth();
-				int tileHeight = mMap->GetTileHeight();
-
+				int tileWidth = map->GetTileWidth();
+				int tileHeight = map->GetTileHeight();
 				int tileSetWidth = tileSet->GetImage()->GetWidth() / tileWidth;
 				int tileSetHeight = tileSet->GetImage()->GetHeight() / tileHeight;
 
-				for (size_t m = 0; m < layer->GetHeight(); m++)
+				for (int m = 0; m < layer->GetHeight(); m++)
 				{
-					for (size_t n = 0; n < layer->GetWidth(); n++)
+					for (int n = 0; n < layer->GetWidth(); n++)
 					{
 						if (layer->GetTileTilesetIndex(n, m) != -1)
 						{
-							int tileID = layer->GetTileId(n, m);
+							// xác định tọa độ object
+							D3DXVECTOR2 pos(n * tileWidth + tileWidth / 2, 
+								m * tileHeight + tileHeight / 2);
 
-							int y = tileID / tileSetWidth;
-							int x = tileID - y * tileSetWidth;
-
-							RECT sourceRECT;
-							sourceRECT.top = y * tileHeight;
-							sourceRECT.bottom = sourceRECT.top + tileHeight;
-							sourceRECT.left = x * tileWidth;
-							sourceRECT.right = sourceRECT.left + tileWidth;
-
-							RECT bound;
-							bound.left = n * tileWidth;
-							bound.top = m * tileHeight;
-							bound.right = bound.left + tileWidth;
-							bound.bottom = bound.top + tileHeight;
-
-							D3DXVECTOR3 position(n * tileWidth + tileWidth / 2, GameGlobal::GetHeight() - m * tileHeight + tileHeight / 2, 0);
-
+							// khởi tạo các loại brick, tăng ID lên mỗi lần thêm 1 viên
 							Brick* brick;
 							if (layer->GetName() == "Brick")
 							{
-								brick = new BrickNormal(position);
-								brick->ID = cur_ID++;
-
+								brick = new BrickNormal(pos);
+								brick->NetworkID = networkID++;
 							}
 							else if (layer->GetName() == "Metal Brick")
 							{
-								brick = new MetalBrick(position);
-								brick->ID = cur_ID++;
+								brick = new MetalBrick(pos);
+								brick->NetworkID = networkID++;
 							}
 							else if (layer->GetName() == "Water")
 							{
-								brick = new Water(position);
-								brick->ID = cur_ID++;
+								brick = new Water(pos);
+								brick->NetworkID = networkID++;
 							}
 							else if (layer->GetName() == "Tile Layer 1")
 							{
-								brick = new Boundary(position);
-								brick->ID = cur_ID++;
+								brick = new Boundary(pos);
+								brick->NetworkID = networkID++;
 							}
 
-
-							mListBrick.push_back(brick);
-							mQuadTree->insertEntity(brick);
-							//GAMELOG("Position  %f, %f", position.x, position.y);
+							brickList.push_back(brick);
 						}
 					}
 				}
@@ -127,158 +91,128 @@ void GameMap::LoadMap(char* filePath)
 	}
 
 }
-bool GameMap::isContain(RECT rect1, RECT rect2)
-{
-	if (rect1.left > rect2.right || rect1.right < rect2.left || rect1.top > rect2.bottom || rect1.bottom < rect2.top)
-	{
-		return false;
-	}
 
-	return true;
-}
-Tmx::Map* GameMap::GetMap()
-{
-	return mMap;
-}
-int GameMap::GetWidth()
-{
-	return mMap->GetWidth() * mMap->GetTileWidth();
-}
-
-int GameMap::GetHeight()
-{
-	return mMap->GetHeight() * mMap->GetTileHeight();
-}
-int GameMap::GetTileWidth()
-{
-	return mMap->GetTileWidth();
-}
-
-int GameMap::GetTileHeight()
-{
-	return mMap->GetTileHeight();
-}
-
-QuadTree* GameMap::GetQuadTree()
-{
-	return mQuadTree;
-}
-
-std::vector<Brick*> GameMap::GetListBrick()
-{
-	return mListBrick;
-}
-void GameMap::eraseBrick(int i)
-{
-	mListBrick.erase(mListBrick.begin() + i);
-}
 void GameMap::Draw()
 {
-	D3DXVECTOR2 trans = D3DXVECTOR2(0, 0);
-	for (size_t i = 0; i < mMap->GetNumTileLayers(); i++)
+	// vẽ các object viên brick
+	for (int i = 0; i < brickList.size(); i++)
 	{
-		const Tmx::TileLayer *layer = mMap->GetTileLayer(i);
-		if (layer->GetName() == "Brick" || layer->GetName() == "Metal Brick" || layer->GetName() == "Water" || layer->GetName() == "Tile Layer 1")
+		//D3DXVECTOR2 a = mListBrick[i]->GetPosition();
+		//mDebugDraw->DrawRect(mListBrick[i]->GetBound());
+		brickList[i]->Draw();
+	}
+
+	// vẽ các hình ảnh khác lên
+	for (int i = 0; i < map->GetNumTileLayers(); i++)
+	{
+		const Tmx::TileLayer *layer = map->GetTileLayer(i);
+
+		// layer là các viên brick đã khởi tạo => bỏ qua
+		if (layer->GetName() == "Brick" || 
+			layer->GetName() == "Metal Brick" || 
+			layer->GetName() == "Water" || 
+			layer->GetName() == "Tile Layer 1")
 			continue;
+
 		if (!layer->IsVisible())
 		{
 			continue;
 		}
+
 		RECT sourceRECT;
 
-		int tileWidth = mMap->GetTileWidth();
-		int tileHeight = mMap->GetTileHeight();
-		for (size_t m = 0; m < layer->GetHeight(); m++)
+		int tileWidth = map->GetTileWidth();
+		int tileHeight = map->GetTileHeight();
+
+		for (int m = 0; m < layer->GetHeight(); m++)
 		{
-			for (size_t n = 0; n < layer->GetWidth(); n++)
+			for (int n = 0; n < layer->GetWidth(); n++)
 			{
 				int tilesetIndex = layer->GetTileTilesetIndex(n, m);
 
 				if (tilesetIndex != -1)
 				{
-					const Tmx::Tileset *tileSet = mMap->GetTileset(tilesetIndex);
+					const Tmx::Tileset *tileSet = map->GetTileset(tilesetIndex);
 
 					int tileSetWidth = tileSet->GetImage()->GetWidth() / tileWidth;
 					int tileSetHeight = tileSet->GetImage()->GetHeight() / tileHeight;
 
-					Sprite* sprite = mListTileset[layer->GetTileTilesetIndex(n, m)];
+					Sprite* sprite = tilesetList[layer->GetTileTilesetIndex(n, m)];
 
 					//tile index
 					int tileID = layer->GetTileId(n, m);
-
 					int y = tileID / tileSetWidth;
 					int x = tileID - y * tileSetWidth;
 
+					// xác định hcn trong hình ảnh gốc
 					sourceRECT.top = y * tileHeight;
 					sourceRECT.bottom = sourceRECT.top + tileHeight;
 					sourceRECT.left = x * tileWidth;
 					sourceRECT.right = sourceRECT.left + tileWidth;
 
-					//tru tilewidth/2 va tileheight/2 vi Sprite ve o vi tri giua hinh anh cho nen doi hinh de cho
-					//dung toa do (0,0) cua the gioi thuc la (0,0) neu khong thi se la (-tilewidth/2, -tileheigth/2);
-					D3DXVECTOR3 position(n * tileWidth + tileWidth / 2, GameGlobal::GetHeight() - m * tileHeight + tileHeight / 2, 0);
+					// vị trí để vẽ map lên
+					D3DXVECTOR2 pos(n * tileWidth + tileWidth / 2.f, 
+						m * tileHeight + tileHeight / 2.f);
 
-					sprite->SetWidth(tileWidth);
-					sprite->SetHeight(tileHeight);
-
-					sprite->Draw(position, sourceRECT, D3DXVECTOR2(), trans);
-
+					// vẽ lên
+					sprite->SetPosition(pos);
+					sprite->SetRect(sourceRECT);
+					sprite->SetCenter(D3DXVECTOR2(tileWidth / 2.f, tileHeight / 2.f));
+					sprite->Draw();
 				}
 			}
 
 		}
 	}
-	for (size_t i = 0; i < mListBrick.size(); i++)
-	{
-		//D3DXVECTOR2 a = mListBrick[i]->GetPosition();
-		//mDebugDraw->DrawRect(mListBrick[i]->GetBound());
-		mListBrick[i]->Draw();
-	}
 }
+
+Tmx::Map* GameMap::GetMap()
+{
+	return map;
+}
+int GameMap::GetWidth()
+{
+	return map->GetWidth() * map->GetTileWidth();
+}
+
+int GameMap::GetHeight()
+{
+	return map->GetHeight() * map->GetTileHeight();
+}
+int GameMap::GetTileWidth()
+{
+	return map->GetTileWidth();
+}
+
+int GameMap::GetTileHeight()
+{
+	return map->GetTileHeight();
+}
+
+std::vector<Brick*> GameMap::GetBrickList()
+{
+	return brickList;
+}
+
 RECT GameMap::GetWorldMapBound()
 {
 	RECT bound;
 	bound.left = bound.top = 0;
-	bound.right = mMap->GetWidth() * mMap->GetTileWidth();
-	bound.bottom = mMap->GetHeight() * mMap->GetTileHeight();
+	bound.right = map->GetWidth() * map->GetTileWidth();
+	bound.bottom = map->GetHeight() * map->GetTileHeight();
 
 	return bound;
 }
 
 GameMap::~GameMap()
 {
-	delete mQuadTree;
-	for (size_t i = 0; i < mListTileset.size(); i++)
+	for (size_t i = 0; i < tilesetList.size(); i++)
 	{
-		if (mListTileset[i])
-			delete mListTileset[i];
+		if (tilesetList[i])
+			delete tilesetList[i];
 	}
-	mListTileset.clear();
-	delete mMap;
-	for (auto ele : mListBrick)
-		delete ele;
-
-}
-
-void GameMap::DeleteByID(int id)
-{
-	for (int i = 0; i < mListBrick.size(); ++i)
-	{
-		if (mListBrick[i]->ID == id)
-		{
-
-			vector<Entity*> list_of_brick_quad;
-			GetQuadTree()->getAllEntities(list_of_brick_quad);
-			for (auto brick2 : list_of_brick_quad)
-			{
-				if (mListBrick[i]->ID == brick2->ID)
-				{
-					brick2->isDelete = true;
-					break;
-				}
-			}
-			eraseBrick(i);
-			i--;
-		}
-	}
+	tilesetList.clear();
+	delete map;
+	for (auto brick : brickList)
+		delete brick;
 }

@@ -134,7 +134,7 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClInclude Include="Animation.h" />
-    <ClInclude Include="Boss.h" />
+    <ClInclude Include="Eagle.h" />
     <ClInclude Include="Boundary.h" />
     <ClInclude Include="Brick.h" />
     <ClInclude Include="BrickNormal.h" />
@@ -142,7 +142,6 @@
     <ClInclude Include="Camera.h" />
     <ClInclude Include="Entity.h" />
     <ClInclude Include="Explosion.h" />
-    <ClInclude Include="Game.h" />
     <ClInclude Include="GameCollision.h" />
     <ClInclude Include="GameDebugDraw.h" />
     <ClInclude Include="GameDefine.h" />
@@ -150,7 +149,7 @@
     <ClInclude Include="GameLog.h" />
     <ClInclude Include="GameMap.h" />
     <ClInclude Include="GameTime.h" />
-    <ClInclude Include="GameY.h" />
+    <ClInclude Include="Game.h" />
     <ClInclude Include="Item.h" />
     <ClInclude Include="Label.h" />
     <ClInclude Include="LobbyScene.h" />
@@ -182,24 +181,19 @@
     <ClInclude Include="NPC.h" />
     <ClInclude Include="Player.h" />
     <ClInclude Include="Pointed.h" />
-    <ClInclude Include="ProtectPlayer.h" />
+    <ClInclude Include="ProtectItem.h" />
     <ClInclude Include="QuadTree.h" />
-    <ClInclude Include="Room.h" />
+    <ClInclude Include="RoomView.h" />
     <ClInclude Include="RoomScene.h" />
-    <ClInclude Include="RoomSceneY.h" />
-    <ClInclude Include="Scene.h" />
     <ClInclude Include="SceneManager.h" />
-    <ClInclude Include="SceneManagerY.h" />
-    <ClInclude Include="SceneY.h" />
+    <ClInclude Include="Scene.h" />
     <ClInclude Include="SocketAddress.h" />
     <ClInclude Include="SocketUtil.h" />
     <ClInclude Include="Sprite.h" />
+    <ClInclude Include="SpriteList.h" />
     <ClInclude Include="TCPSocket.h" />
-    <ClInclude Include="TestScene.h" />
-    <ClInclude Include="TestTiepScene.h" />
-    <ClInclude Include="TimeSceneY.h" />
+    <ClInclude Include="TimingScene.h" />
     <ClInclude Include="UpgradeItem.h" />
-    <ClInclude Include="WaitRoomScene.h" />
     <ClInclude Include="Water.h" />
   </ItemGroup>
   <ItemGroup>
@@ -207,27 +201,18 @@
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Animation.cpp" />
-    <ClCompile Include="Boss.cpp" />
-    <ClCompile Include="Boundary.cpp" />
-    <ClCompile Include="Brick.cpp" />
-    <ClCompile Include="BrickNormal.cpp" />
-    <ClCompile Include="Bullet.cpp" />
     <ClCompile Include="Camera.cpp" />
     <ClCompile Include="Entity.cpp" />
-    <ClCompile Include="Explosion.cpp" />
-    <ClCompile Include="Game.cpp" />
     <ClCompile Include="GameCollision.cpp" />
     <ClCompile Include="GameDebugDraw.cpp" />
     <ClCompile Include="GameGlobal.cpp" />
     <ClCompile Include="GameLog.cpp" />
     <ClCompile Include="GameMap.cpp" />
     <ClCompile Include="GameTime.cpp" />
-    <ClCompile Include="GameY.cpp" />
-    <ClCompile Include="Item.cpp" />
+    <ClCompile Include="Game.cpp" />
     <ClCompile Include="Label.cpp" />
     <ClCompile Include="LobbyScene.cpp" />
-    <ClCompile Include="main.cpp" />
-    <ClCompile Include="MainY.cpp" />
+    <ClCompile Include="Main.cpp" />
     <ClCompile Include="MapReader\base64.cpp" />
     <ClCompile Include="MapReader\miniz.c" />
     <ClCompile Include="MapReader\tinyxml2.cpp" />
@@ -249,25 +234,16 @@
     <ClCompile Include="MapReader\TmxTileset.cpp" />
     <ClCompile Include="MapReader\TmxUtil.cpp" />
     <ClCompile Include="MemoryBitStream.cpp" />
-    <ClCompile Include="MetalBrick.cpp" />
     <ClCompile Include="NPC.cpp" />
     <ClCompile Include="Player.cpp" />
     <ClCompile Include="Pointed.cpp" />
-    <ClCompile Include="ProtectPlayer.cpp" />
     <ClCompile Include="QuadTree.cpp" />
-    <ClCompile Include="Room.cpp" />
+    <ClCompile Include="RoomView.cpp" />
     <ClCompile Include="RoomScene.cpp" />
-    <ClCompile Include="RoomSceneY.cpp" />
-    <ClCompile Include="Scene.cpp" />
     <ClCompile Include="SceneManager.cpp" />
-    <ClCompile Include="SceneManagerY.cpp" />
     <ClCompile Include="Sprite.cpp" />
-    <ClCompile Include="TestScene.cpp" />
-    <ClCompile Include="TestTiepScene.cpp" />
-    <ClCompile Include="TimeSceneY.cpp" />
-    <ClCompile Include="UpgradeItem.cpp" />
-    <ClCompile Include="WaitRoomScene.cpp" />
-    <ClCompile Include="Water.cpp" />
+    <ClCompile Include="SpriteList.cpp" />
+    <ClCompile Include="TimingScene.cpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

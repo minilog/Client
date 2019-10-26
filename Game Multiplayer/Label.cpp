@@ -1,11 +1,10 @@
 #include "Label.h"
 #include "GameGlobal.h"
 
-
 Label::Label(string s, int w, int h, D3DXVECTOR2 position, D3DCOLOR color)
 {
 	m_string = s;
-	D3DXCreateFont(GameGlobal::GetCurrentDevice()
+	D3DXCreateFont(GameGlobal::Device
 		, w, h
 		, FW_NORMAL, 1
 		, false, DEFAULT_CHARSET
@@ -38,8 +37,13 @@ void Label::Draw(string s)
 	if (my_font != NULL)
 	{
 		if (s._Equal(""))
-			my_font->DrawTextA(GameGlobal::GetCurrentSpriteHandler(), m_string.c_str(), -1, &my_rect, DT_LEFT, my_color);
-		else 	my_font->DrawTextA(GameGlobal::GetCurrentSpriteHandler(), s.c_str(), -1, &my_rect, DT_LEFT, my_color);
+		{
+			my_font->DrawTextA(GameGlobal::XSprite, m_string.c_str(), -1, &my_rect, DT_LEFT, my_color);
+		}
+		else
+		{
+			my_font->DrawTextA(GameGlobal::XSprite, s.c_str(), -1, &my_rect, DT_LEFT, my_color);
+		}
 	}
 }
 

@@ -1,51 +1,39 @@
 #include "Camera.h"
-Camera::Camera(int width, int height)
-{
-	mWidth = width;
-	mHeight = height;
 
-	mPosition = D3DXVECTOR3(0, 0, 0);
+Camera::Camera(int _width, int _height)
+{
+	width = _width;
+	height = _height;
 }
 
-
-Camera::~Camera()
+void Camera::SetPosition(D3DXVECTOR2 _pos)
 {
-
+	position = _pos;
 }
 
-void Camera::SetPosition(float x, float y)
+D3DXVECTOR2 Camera::GetPosition()
 {
-	SetPosition(D3DXVECTOR3(x, y, 0));
-}
-
-void Camera::SetPosition(D3DXVECTOR3 pos)
-{
-	mPosition = pos;
-}
-
-D3DXVECTOR3 Camera::GetPosition()
-{
-	return mPosition;
+	return position;
 }
 
 RECT Camera::GetBound()
 {
 	RECT bound;
 
-	bound.left = mPosition.x - mWidth / 2;
-	bound.right = bound.left + mWidth;;
-	bound.top = mPosition.y - mHeight / 2;
-	bound.bottom = bound.top + mHeight;
+	bound.left = (long)(position.x - width / 2.f);
+	bound.right = bound.left + width;;
+	bound.top = (long)(position.y - height / 2.f);
+	bound.bottom = bound.top + height;
 
 	return bound;
 }
 
 int Camera::GetWidth()
 {
-	return mWidth;
+	return width;
 }
 
 int Camera::GetHeight()
 {
-	return mHeight;
+	return height;
 }
