@@ -6,7 +6,7 @@
 Player::Player(int _networkID)
 {
 	// gán ID network cho Player
-	NetworkID = _networkID;
+	EntityID = _networkID;
 
 	// gán loại đối tượng
 	Type = ET_Player;
@@ -44,8 +44,6 @@ Player::~Player()
 
 void Player::Write(OutputMemoryBitStream& _os)
 {
-	Entity::Write(_os);
-	// cần đọc tọa độ
 	_os.Write(direction, 3); // dao đọng từ 0 - 5 => 3 bit
 }
 
@@ -142,8 +140,7 @@ void Player::Update(float _dt)
 	if (IsProtect)
 		shieldAnimation->Update(_dt);
 
-	x += vx * _dt;
-	y += vy * _dt;
+	position += velocity * _dt;
 
 	// thay đổi animation đựa vào hướng đi
 	SetAnimationByDirection(direction);
@@ -151,52 +148,47 @@ void Player::Update(float _dt)
 	{
 	case D_Stand:
 		SetAnimationByDirection(lastDirection);
-		vx = 0.f;
-		vy = 0.f;
+		velocity = D3DXVECTOR2(0.f, 0.f);
 		break;
 	case D_Left:
 		if (Level == 1)
 		{
-			vx = -Define::PLAYER_SPEED;
+			velocity = D3DXVECTOR2(-speed1, 0.f);
 		}
 		else
 		{
-			vx = -250.f;
+			velocity = D3DXVECTOR2(-speed2, 0.f);
 		}
-		vy = 0.f;
 		break;
 	case D_Right:
 		if (Level == 1)
 		{
-			vx = Define::PLAYER_SPEED;
+			velocity = D3DXVECTOR2(speed1, 0.f);
 		}
 		else
 		{
-			vx = 250.f;
+			velocity = D3DXVECTOR2(speed2, 0.f);
 		}
-		vy = 0.f;
 		break;
 	case D_Up:
 		if (Level == 1)
 		{
-			vy = -Define::PLAYER_SPEED;
+			velocity = D3DXVECTOR2(0.f, -speed1);
 		}
 		else
 		{
-			vy = -250.f;
+			velocity = D3DXVECTOR2(0.f, -speed2);
 		}
-		vx = 0.f;
 		break;
 	case D_Down:
 		if (Level == 1)
 		{
-			vy = Define::PLAYER_SPEED;
+			velocity = D3DXVECTOR2(0.f, speed1);
 		}
 		else
 		{
-			vy = 250.f;
+			velocity = D3DXVECTOR2(0.f, speed1);
 		}
-		vx = 0.f;
 		break;
 	}
 }
@@ -285,7 +277,7 @@ void Player::InitAnimation()
 	downAnimationLv03 = new Animation();
 
 	// animation xe tăng của người chơi 0
-	if (NetworkID == 0)
+	if (EntityID == 0)
 	{
 		leftAnimationLv01->AddFrameInfo(FrameInfo(SpriteList::Instance()->Tank, 82, 82 + 32, 2, 2 + 32,
 			D3DXVECTOR2(16.f, 16.f)));
@@ -315,7 +307,7 @@ void Player::InitAnimation()
 			D3DXVECTOR2(15.f, 18.f)));
 	}
 	// animation xe tăng của người chơi 1
-	else if (NetworkID == 1)
+	else if (EntityID == 1)
 	{
 		leftAnimationLv01->AddFrameInfo(FrameInfo(SpriteList::Instance()->Tank, 389, 389 + 32, 2, 2 + 32,
 			D3DXVECTOR2(16.f, 16.f)));
@@ -345,7 +337,7 @@ void Player::InitAnimation()
 			D3DXVECTOR2(15.f, 18.f)));
 	}
 	// animation xe tăng của người chơi 2
-	else if (NetworkID == 2)
+	else if (EntityID == 2)
 	{
 		leftAnimationLv01->AddFrameInfo(FrameInfo(SpriteList::Instance()->Tank, 82, 82 + 32, 310, 310 + 32, 
 			D3DXVECTOR2(16.f, 16.f)));
@@ -375,7 +367,7 @@ void Player::InitAnimation()
 			D3DXVECTOR2(15.f, 18.f)));
 	}
 	// animation xe tăng của người chơi 3
-	else if (NetworkID == 3)
+	else if (EntityID == 3)
 	{
 		leftAnimationLv01->AddFrameInfo(FrameInfo(SpriteList::Instance()->Tank, 389, 389 + 32, 310, 310 + 32,
 			D3DXVECTOR2(16.f, 16.f)));
@@ -513,31 +505,5 @@ void Player::Draw()
 	//{
 	//	shield->SetPosition(GetPosition());
 	//	shield->Draw();
-	//}
-}
-
-void Player::CollideWith_World()
-{
-	this->vx = 0;
-	this->vy = 0;
-}
-
-
-bool Player::CheckCreateAnim()
-{
-	if (Health == 0 && LastHealth != 0)
-	{
-		return true;
-	}
-
-	return false;
-}
-
-void Player::CollisionWith(Entity* en)
-{
-	//if (en->Type == EntityTypes::player || en->Type == EntityTypes::npc)
-	//{
-	//	vx = 0;
-	//	vy = 0;
 	//}
 }

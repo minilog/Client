@@ -11,8 +11,8 @@ Label::Label(string s, int w, int h, D3DXVECTOR2 position, D3DCOLOR color)
 		, OUT_DEFAULT_PRECIS, ANTIALIASED_QUALITY, FF_DONTCARE, (LPCWSTR) "Arial", &my_font);
 
 
-	my_rect.left = position.x;
-	my_rect.top = position.y;
+	my_rect.left = (long)position.x;
+	my_rect.top = (long)position.y;
 	my_rect.bottom = my_rect.top + 500;
 	my_rect.right = my_rect.left + 1000;
 
@@ -49,8 +49,8 @@ void Label::Draw(string s)
 
 void Label::SetPosition(D3DXVECTOR2 _pos)
 {
-	my_rect.left = _pos.x;
-	my_rect.top = _pos.y;
+	my_rect.left = (long)_pos.x;
+	my_rect.top = (long)_pos.y;
 	my_rect.bottom = my_rect.top + 500;
 	my_rect.right = my_rect.left + 1000;
 }

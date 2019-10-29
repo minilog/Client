@@ -50,13 +50,6 @@ void OutputMemoryBitStream::WriteBits(const void* inData, uint32_t inBitCount)
 	}
 }
 
-
-
-
-
-
-
-
 void OutputMemoryBitStream::ReallocBuffer(uint32_t inNewBitLength)
 {
 	if (mBuffer == nullptr)
@@ -81,7 +74,7 @@ void OutputMemoryBitStream::ReallocBuffer(uint32_t inNewBitLength)
 }
 
 
-
+//// INPUT STREAM
 
 void InputMemoryBitStream::ReadBits(uint8_t& outData, uint32_t inBitCount)
 {
@@ -119,4 +112,3 @@ void InputMemoryBitStream::ReadBits(void* outData, uint32_t inBitCount)
 		ReadBits(*destByte, inBitCount);
 	}
 }
-

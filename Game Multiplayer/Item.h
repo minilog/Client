@@ -5,32 +5,25 @@
 
 class Item : public Entity
 {
-private:
+	const float existTime = 7.f;
+	float count_existTime = 0.f;
 	int flashingTime = 0;
 protected:
-	float existTime = 0.f;
-	float count_existTime = 0.f;
-
 	Animation* animation;
 
 protected:
 	void BaseInit(D3DXVECTOR2 _pos)
 	{
+		position = _pos;
 		width = 32;
 		height = 32;
-
-		SetPosition(_pos);
+		animation = new Animation();
 	}
 public:
-	Item()
-	{
-		IsDelete = false;
-		existTime = 7.f;
-	}
-
+	Item() {}
 	~Item() {}
 
-	virtual void Update(float _dt)
+	void Update(float _dt)
 	{
 		count_existTime += _dt;
 		if (count_existTime >= existTime)
@@ -60,16 +53,13 @@ public:
 		}
 	}
 
-	void CollisionWith(Entity* _e) override
+	void MakeCollision(Entity* _en) override
 	{
 		IsDelete = true;
 	}
 
 	void Read(InputMemoryBitStream& _is) override
 	{
-		Entity::Read(_is);
-		// còn đọc x, y nữa
-		BaseInit(D3DXVECTOR2(x, y));
 	}
 };
 

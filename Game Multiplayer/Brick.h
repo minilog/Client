@@ -12,10 +12,10 @@ protected:
 protected:
 	void BaseInit(D3DXVECTOR2 _pos)
 	{
+		position = _pos;
 		width = 16;
 		height = 16;
-
-		SetPosition(_pos);
+		animation = new Animation();
 	}
 public:
 	Brick() {}
@@ -23,12 +23,15 @@ public:
 
 	void Draw() {
 		if (!IsDelete)
-			animation->Draw(GetPosition());
+			animation->Draw(position);
 	}
 
 	void Read(InputMemoryBitStream& is) override
 	{
-		is.Read(IsDelete);
+		bool _isDelete = false;
+		is.Read(_isDelete);
+
+		IsDelete = _isDelete;
 	}
 };
 

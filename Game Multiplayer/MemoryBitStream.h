@@ -62,8 +62,7 @@ private:
 };
 
 
-
-
+//// INPUT STREAM
 
 class InputMemoryBitStream
 {
@@ -71,7 +70,7 @@ public:
 
 	InputMemoryBitStream(char* inBuffer, uint32_t inByteCount) :
 		mBuffer(inBuffer),
-		mBitCapacity(inByteCount << 3),
+		mBitCapacity(inByteCount * 8),
 		mBitHead(0),
 		mIsBufferOwner(false) {}
 

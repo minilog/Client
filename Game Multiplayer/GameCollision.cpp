@@ -1,29 +1,29 @@
 ﻿#include "GameCollision.h"
 
-bool GameCollision::isCollide(Entity *ent1, Entity *ent2, float dt) {
+bool GameCollision::IsCollideInNextFrame(Entity *_en1, Entity *_en2, float _dt) {
 
-	float cur1X = ent1->GetPosition().x;
-	float cur1Y = ent1->GetPosition().y;
-	float cur2X = ent2->GetPosition().x;
-	float cur2Y = ent2->GetPosition().y;
+	D3DXVECTOR2 currentPosition1 = _en1->GetPosition();
+	D3DXVECTOR2 currentPosition2 = _en2->GetPosition();
 
-	Entity *NextPos_ent1 = ent1;
-	Entity *NextPos_ent2 = ent2;
+	// cho 2 đối tượng cập nhật vị trí 1 frame
+	_en1->SetPosition(_en1->GetPosition() + _en1->GetVelocity() * _dt);
+	_en2->SetPosition(_en2->GetPosition() + _en2->GetVelocity() * _dt);
 
-	// tính vị trí đối tượng trong frame tiếp theo
-	NextPos_ent1->SetPosition(D3DXVECTOR2(ent1->GetPosition().x + ent1->GetVx()*dt, ent1->GetPosition().y + ent1->GetVy()*dt));
-	NextPos_ent2->SetPosition(D3DXVECTOR2(ent2->GetPosition().x + ent2->GetVx()*dt, ent2->GetPosition().y + ent2->GetVy()*dt));
+	// lấy 2 hcn của frame đó
+	RECT rect1 = _en1->GetBound();
+	RECT rect2 = _en2->GetBound();
 
-	RECT rect1 = NextPos_ent1->GetBound();
-	RECT rect2 = NextPos_ent2->GetBound();
+	// đưa 2 đối tượng về lại vị trí ban đầu
+	_en1->SetPosition(currentPosition1);
+	_en2->SetPosition(currentPosition2);
 
 	// trả về - frame tiếp theo có va chạm hay không
 	if (rect1.left > rect2.right || rect1.right < rect2.left || rect1.top > rect2.bottom || rect1.bottom < rect2.top) {
-		ent1->SetPosition(D3DXVECTOR2(cur1X, cur1Y));
-		ent2->SetPosition(D3DXVECTOR2(cur2X, cur2Y));
+
 		return false;
 	}
-	ent1->SetPosition(D3DXVECTOR2(cur1X, cur1Y));
-	ent2->SetPosition(D3DXVECTOR2(cur2X, cur2Y));
-	return true;
+	else
+	{
+		return true;
+	}
 }

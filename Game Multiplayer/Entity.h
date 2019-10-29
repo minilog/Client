@@ -3,26 +3,18 @@
 #include "MemoryBitStream.h"
 #include "Animation.h"
 #include "SpriteList.h"
-
-enum EntityTypes
-{
-	ET_None,
-	ET_Player, ET_Bullet,
-	ET_Boundary, ET_NormalBrick, ET_MetalBrick, ET_Water,
-	ET_ProtectItem, ET_UpgradeItem,
-	ET_NPC,
-	ET_Eagle
-};
+#include "GameDefine.h"
+using namespace Define;
 
 class Entity
 {
 protected:
-	float x, y;
-	float vx = 0, vy = 0;
-	float width = 0, height = 0;
+	D3DXVECTOR2 position = D3DXVECTOR2(0.f, 0.f);
+	D3DXVECTOR2 velocity = D3DXVECTOR2(0.f, 0.f);
+	int width = 0, height = 0; // nên là số chẵn
 public:
-	int NetworkID = -1; // -1: chưa xác định
-	EntityTypes Type = ET_None; //Tag de nhan dien loai Entity
+	int EntityID = -1; // -1: chưa xác định
+	EntityTypes Type = ET_Unknown; //Tag de nhan dien loai Entity
 	bool IsDelete = false;
 
 public:
@@ -31,31 +23,13 @@ public:
 
 	virtual void Update(float dt) {}
 	virtual void Draw() {}
-	virtual void CollisionWith(Entity* en) {}
-	virtual void Write(OutputMemoryBitStream &os);
+	virtual void MakeCollision(Entity* _en) {}	// thực hiện sự va chạm
+	virtual void Write(OutputMemoryBitStream &_os) {}
 	virtual void Read(InputMemoryBitStream& _is){}
 
-	virtual RECT GetBound();
-	D3DXVECTOR2 GetPosition();
-	virtual void SetPosition(D3DXVECTOR2 pos);
-	virtual void AddPosition(D3DXVECTOR2 pos);
-	virtual void SetWidth(int width);
-	virtual int GetWidth();
-	virtual void SetHeight(int height);
-	virtual int GetHeight();
-	virtual float GetVx();
-	virtual void SetVx(float vx);
-	virtual float GetVy();
-	virtual void SetVy(float vy);
-	virtual void AddVx(float vx);
-	virtual void AddVy(float vy);
-};
-
-enum Direction
-{
-	D_Stand,
-	D_Left,
-	D_Right,
-	D_Up,
-	D_Down
+	RECT GetBound();
+	D3DXVECTOR2 GetPosition() { return position; }
+	void SetPosition(D3DXVECTOR2 _pos) { position = _pos; }
+	D3DXVECTOR2 GetVelocity() { return velocity; }
+	void SetVelocity(D3DXVECTOR2 _vel) { velocity = _vel; }
 };

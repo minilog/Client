@@ -3,6 +3,7 @@
 
 class Bullet : public Entity
 {
+	const float speed = 500.f;
 	Direction direction;	// hướng di chuyển của viên đạn
 
 	Animation* leftAnimation;
@@ -13,18 +14,17 @@ class Bullet : public Entity
 	Animation* currentAnimation; // trỏ đến 1 trong 4 animation để vẽ lên
 
 public:
-	int NetworkPlayerID = -1; // -1: chưa xác định
-	bool IsActive = false;
+	int PlayerID = -1; // -1: chưa xác định
 
 public:
-	Bullet(int _networkID, int _networkPlayerID)
+	Bullet(int _entityID, int _playerID)
 	{
 		// gắn network ID và ID của người chơi sở hữu 
-		NetworkPlayerID = _networkID;
-		NetworkPlayerID = _networkPlayerID;
+		EntityID = _entityID;
+		PlayerID = _playerID;
 
-		// loại đối tượng viên đạn
 		Type = ET_Bullet;
+		IsDelete = true;
 
 		// khởi tạo 4 animation
 		leftAnimation = new Animation();
@@ -58,59 +58,45 @@ public:
 
 	void Update(float _dt) 
 	{
-		// nếu không hoạt động => không cập nhật
-		if (!IsActive)
+		if (IsDelete)
 			return;
-
-		x += vx * _dt;
-		y += vy * _dt;
+		
+		position += velocity * _dt;
 	}
 
 	void Draw()
 	{
-		// nếu không hoạt đông => không vẽ
-		if (!IsActive)
+		if (IsDelete)
 			return;
 
 		currentAnimation->Draw(GetPosition());
 	}
 
-	void Write(OutputMemoryBitStream& _os) override
-	{
-		_os.Write(IsActive);
-	}
-
 	void Read(InputMemoryBitStream& _is) override
 	{
-		Entity::Read(_is);
-		_is.Read(IsActive);
 	}
 
+	// thay đổi vận tốc và animation đựa theo hướng bay
 	void SetDirection(Direction _dir)
 	{
-		// thay đổi vận tốc và animation đựa theo hướng bay
 		direction = _dir;
 		switch (direction)
 		{
 		case D_Left:
 			currentAnimation = leftAnimation;
-			vx = -Define::BULLET_SPEED;
-			vy = 0.f;
+			velocity = D3DXVECTOR2(-speed, 0.f);
 			break;
 		case D_Right:
 			currentAnimation = rightAnimation;
-			vx = Define::BULLET_SPEED;
-			vy = 0.f;
+			velocity = D3DXVECTOR2(speed, 0.f);
 			break;
 		case D_Up:
 			currentAnimation = upAnimation;
-			vx = 0.f;
-			vy = -Define::BULLET_SPEED;
+			velocity = D3DXVECTOR2(0.f, -speed);
 			break;
 		case D_Down:
 			currentAnimation = downAnimation;
-			vx = 0.f;
-			vy = Define::BULLET_SPEED;
+			velocity = D3DXVECTOR2(0.f, speed);
 			break;
 		default:
 			break;

@@ -4,42 +4,41 @@
 
 class Eagle:public Entity
 {
-	int HP = 10; // máu của đại bàng
 	Animation* animation;
+
 public:
-	Eagle(int _networkID, D3DXVECTOR2 _pos)
+	Eagle(int _entityID, D3DXVECTOR2 _pos)
 	{
-		NetworkID = _networkID;
+		EntityID = _entityID;
 
 		Type = ET_Eagle;
+		position = _pos;
+		width = 50;
+		height = 50;
 		animation = new Animation();
 
 		// tùy theo network ID mà màu của đại bàng sẽ khác nhau, tương ứng với các người chơi
-		switch (NetworkID)
+		switch (EntityID)
 		{
 		case 0:
 			// màu vàng
 			animation->AddFrameInfo(FrameInfo(SpriteList::Instance()->Eagle, 0, 50, 0, 50, D3DXVECTOR2(25.f, 25.f)));
 			break;
-		case 2:
+		case 1:
 			// màu trắng
 			animation->AddFrameInfo(FrameInfo(SpriteList::Instance()->Eagle, 50, 100, 0, 50, D3DXVECTOR2(25.f, 25.f)));
 			break;
-		case 3:
+		case 2:
 			// màu xanh
 			animation->AddFrameInfo(FrameInfo(SpriteList::Instance()->Eagle, 0, 50, 50, 100, D3DXVECTOR2(25.f, 25.f)));
 			break;
-		case 4:
+		case 3:
 			// màu đỏ
 			animation->AddFrameInfo(FrameInfo(SpriteList::Instance()->Eagle, 50, 100, 50, 100, D3DXVECTOR2(25.f, 25.f)));
 			break;
 		}
-
-		width = 50;
-		height = 50;
-		SetPosition(_pos);
 	}
-	~Eagle(){}
+	~Eagle() { delete animation; }
 
 	void Draw()
 	{
@@ -50,13 +49,12 @@ public:
 		animation->Draw(GetPosition());
 	}
 
-	void Read(InputMemoryBitStream &is) override
+	void Read(InputMemoryBitStream &_is) override
 	{
-		// chỉ đọc máu của đại bàng
-		is.Read(HP, 4); // dao động từ 0 - 10 => 4 bit
+		bool _isDelete = false;
+		_is.Read(_isDelete); // 1 bit
 
-		if (HP == 0)
-			IsDelete = true;
+		IsDelete = _isDelete;
 	}
 };
 

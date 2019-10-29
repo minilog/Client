@@ -9,6 +9,7 @@
 #include "RoomScene.h"
 #include "MemoryBitStream.h"
 #include "SocketUtil.h"
+using namespace Define;
 
 Game::Game(int _fps)
 {
@@ -24,31 +25,7 @@ Game::Game(int _fps)
 
 void Game::Update(float dt)
 {
-	// đưa Dữ Liệu nhận được vào Input Stream
-	char* buff = static_cast<char*>(std::malloc(1024));
-	int receivedByteCount = GameGlobal::Socket->Receive(buff, 1024);
-
-	// nếu có Dữ Liệu nhận được
-	if (receivedByteCount > 0)
-	{
-		InputMemoryBitStream is(buff,
-			static_cast<uint32_t> (receivedByteCount));
-
-		while (is.GetRemainingBitCount() > Define::bitOfTypePacket)
-		{
-			// đọc packetType, xác định loại dữ liệu sẽ được đọc tiếp theo
-			int packetType = 0;
-			is.Read(packetType, Define::bitOfTypePacket);
-
-			// màn game time server nhận packet
-			timingScene->ReceivePacket(is, packetType);
-
-			// màn game chính nhận packet
-			SceneManager::Instance()->GetCurrentScene()->ReceivePacket(is, packetType);
-		}
-	}
-	// giải phóng buffer
-	free(buff);
+	ReceivePacket();
 
 	// các màn game cập nhật
 	timingScene->Update(dt);
@@ -112,6 +89,32 @@ void Game::InitLoop()
 			delta = tickPerFrame;
 		}
 	}
+}
+
+void Game::ReceivePacket()
+{
+	// đưa Dữ Liệu nhận được vào Input Stream
+	char* buff = static_cast<char*>(std::malloc(1024));
+	int receivedByteCount = GameGlobal::Socket->Receive(buff, 1024);
+
+	// nếu có Dữ Liệu nhận được
+	if (receivedByteCount > 0)
+	{
+		InputMemoryBitStream is(buff,
+			static_cast<uint32_t> (receivedByteCount));
+
+		while ((int)is.GetRemainingBitCount() > NBit_PacketType)
+		{
+			// đọc packetType, xác định loại dữ liệu sẽ được đọc tiếp theo
+			int packetType = 0;
+			is.Read(packetType, NBit_PacketType);
+
+			timingScene->ReceivePacket(is, packetType);
+			SceneManager::Instance()->GetCurrentScene()->ReceivePacket(is, packetType);
+		}
+	}
+	// giải phóng buffer
+	free(buff);
 }
 
 void Game::CreateSocketAndTryConnectToServer()

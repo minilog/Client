@@ -1,6 +1,8 @@
 #include "GameGlobal.h"
 
 #include "MemoryBitStream.h"
+#include "GameDefine.h"
+using namespace Define;
 
 HINSTANCE GameGlobal::HInstance = NULL;
 HWND GameGlobal::Window = NULL;
@@ -16,7 +18,8 @@ int GameGlobal::Height = 770;
 void GameGlobal::Send_Exit()
 {
 	OutputMemoryBitStream os;
-	os.Write(Define::ExitGame, Define::bitOfTypePacket);
+	os.Write(PT_ExitGame, NBit_PacketType);
+
 	GameGlobal::Socket->Send(os);
 	GameGlobal::IsGameRunning = false;
 }

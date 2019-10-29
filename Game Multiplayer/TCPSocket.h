@@ -3,8 +3,8 @@
 #include <wincon.h>
 #include "MemoryBitStream.h"
 
-class TCPSocket {
-
+class TCPSocket 
+{
 public:
 	~TCPSocket();
 	SOCKET mSocket;

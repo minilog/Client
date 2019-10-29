@@ -6,6 +6,7 @@
 #include <dinput.h>
 #include "GameTime.h"
 #include "TimingScene.h"
+#include <thread>
 
 class Game
 {
@@ -16,10 +17,12 @@ public:
 	Game(int _fps = 60);
 	~Game() {}
 
-private:
 	// tạo vòng lặp game
 	void InitLoop();
 
+	void ReceivePacket();
+
+private:
 	// vẽ hình sau khi update
 	void Render();
 

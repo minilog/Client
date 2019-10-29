@@ -5,6 +5,7 @@
 #include <map>
 #include "Label.h"
 #include "MemoryBitStream.h"
+#include "GameDefine.h"
 
 class Scene
 {

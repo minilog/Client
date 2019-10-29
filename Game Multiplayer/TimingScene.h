@@ -4,6 +4,9 @@
 
 class TimingScene : public Scene
 {
+	const int maxPingToSync = 100; // ping < 100 => Sync time
+	const float time_SendSync = 2.0f; // khoảng thời gian gửi Sync
+
 public:
 	TimingScene();
 	~TimingScene() {}
@@ -25,18 +28,19 @@ protected:
 	Label receiveTime_Label;
 	Label label_TimeDistanceAverage;
 	Label serverTime_Label; // = host time + timeDistance
+	Label label_NReceiveExecuted;
+	Label label_TimeDistance;
 
-	int NSend = 0; // NSend xác định đúng Packet muốn nhận
+	float count_SendSync = time_SendSync; // đếm
 
-	float time_SendSync = 2.0f;
-	float count_SendSync = 2.0f;
+	int NSend = 0; // xác định đúng packet muốn nhận
 
-	// thời gian gửi nhận gói tin thời gian
-	int sendTime = -1;
-	int receiveTime = -1;
+	int sendTime = -1; // tg gửi packet
+	int receiveTime = -1; // tg nhận packet
 
-	int NReceivedPacket = 0; // bắt đầu = 0, số packet đã nhận
-	float timeDistanceAverage = 0.0f; // thời gian trễ trung bình so với Server, bắt đầu = 0;
+	int NReceivedExecute = 0; // số packet thực thi, bắt đầu = 0
+	double timeDistanceAverage = 0.f; // tg tương ứng với Server, bắt đầu = 0;
 
 	int ping = -1;
+	double timeDistance = 0.f;
 };

@@ -37,7 +37,7 @@ void GameDebugDraw::DrawLine(D3DXVECTOR2 lines[], int count)
 	LineDraw->End();
 }
 
-void GameDebugDraw::DrawRect(RECT rect, Camera *camera)
+void GameDebugDraw::DrawRect(RECT rect)
 {
 
 	int a = rect.top;

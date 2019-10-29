@@ -3,6 +3,7 @@
 #include "SceneManager.h"
 #include "RoomScene.h"
 #include "SpriteList.h"
+using namespace Define;
 
 LobbyScene::LobbyScene()
 {
@@ -11,36 +12,30 @@ LobbyScene::LobbyScene()
 
 	for (int i = 0; i < 4; i++)
 	{
-		RoomView* room = new RoomView();
+		RoomView* room = new RoomView(i);
 		roomViewList.push_back(room);
 	}
-
-	// thông số mũi tên lựa chọn
-	NCanSelect = 4;
-	selectN = 0;
 }
 
+LobbyScene::~LobbyScene()
+{
+	delete selectAnimation;
+	for (auto room : roomViewList)
+		delete room;
+}
 
 void LobbyScene::Update(float _dt)
 {
 	// điều khiển mũi tên
 	CheckPressArrow();
 
-	// tham gia phòng
 	if (keyboard[VK_SPACE] && !isSpacePressed)
 	{
 		if (roomViewList[selectN]->CanJoin())
 		{
-			// gửi packet JoinRoom lên Server, chuyển Màn sang Phòng Chờ
+			// yêu cầu tham gia phòng
 			Send_JoinRoom();
-			SceneManager::Instance()->ReplaceScene(new RoomScene());
-			return;
 		}	
-		// khi phòng đã vào Trận hoặc đã Đủ người...
-		else
-		{
-			// thông báo tham gia phòng thất bại
-		}
 
 		isSpacePressed = true;
 	}
@@ -49,17 +44,16 @@ void LobbyScene::Update(float _dt)
 		isSpacePressed = false;
 	}
 
-	// yêu cầu thông tin các người chơi
 	count_SendUpdatePlayer += _dt;
 	if (count_SendUpdatePlayer >= time_SendUpdatePlayer)
 	{
-		count_SendUpdatePlayer -= time_SendUpdatePlayer;
+		// yêu cầu thông tin phòng
 		Send_UpdateCountPlayer();
+		count_SendUpdatePlayer -= time_SendUpdatePlayer;
 	}
 }
 
-/////////////////////////// PHẦN BỔ SUNG
-///////////////////////////
+//// PHẦN BỔ SUNG
 void LobbyScene::Draw()
 {
 	// vẽ dấu Select
@@ -74,7 +68,7 @@ void LobbyScene::Draw()
 		D3DXVECTOR2 startPosition = D3DXVECTOR2(275.f, 385.f);
 		int hor = 0;
 		int ver = 0;
-		for (int i = 0; i < roomViewList.size(); ++i)
+		for (int i = 0; i < (int)roomViewList.size(); ++i)
 		{
 			hor = i % 4;
 			ver = i / 4;
@@ -89,10 +83,10 @@ void LobbyScene::Draw()
 
 void LobbyScene::ReceivePacket(InputMemoryBitStream& _is, int _packetType)
 {
-	// packetType là Cập Nhật Người Chơi...
-	if (_packetType == Define::UpdateCountPlayer)
+	if (_packetType == PT_UpdateRooms)
 	{
-		Reveive_UpdateCountPlayer(_is);
+		// cập nhật các phòng
+		Reveive_UpdateRooms(_is);
 	}
 }
 
@@ -113,7 +107,7 @@ void LobbyScene::CheckPressArrow()
 		isLeftPressed = true;
 		selectN--;
 	}
-	else if (!keyboard[VK_LEFT])
+	if (!keyboard[VK_LEFT])
 	{
 		isLeftPressed = false;
 	}
@@ -123,31 +117,9 @@ void LobbyScene::CheckPressArrow()
 		isRightPressed = true;
 		selectN++;
 	}
-	else if (!keyboard[VK_RIGHT])
+	if (!keyboard[VK_RIGHT])
 	{
 		isRightPressed = false;
-	}
-
-	if (keyboard[VK_UP] && !isUpPressed)
-	{
-		isUpPressed = true;
-		if (selectN >= 4)
-			selectN -= 4;
-	}
-	else if (!keyboard[VK_UP])
-	{
-		isUpPressed = false;
-	}
-
-	if (keyboard[VK_DOWN] && !isDownPressed)
-	{
-		isDownPressed = true;
-		if (selectN < 4)
-			selectN += 4;
-	}
-	else if (!keyboard[VK_DOWN])
-	{
-		isDownPressed = false;
 	}
 
 	if (selectN >= NCanSelect)
@@ -163,45 +135,43 @@ void LobbyScene::CheckPressArrow()
 void LobbyScene::Send_JoinRoom()
 {
 	OutputMemoryBitStream os;
-	os.Write(Define::Join, Define::bitOfTypePacket);
-	os.Write(selectN, 4); // gửi số Phòng muốn tham gia
+	os.Write(PT_JoinRoom, NBit_PacketType);
+	os.Write(selectN, NBit_RoomID); // ID phòng muốn tham gia
+
 	GameGlobal::Socket->Send(os);
 }
 
 void LobbyScene::Send_UpdateCountPlayer()
 {
 	OutputMemoryBitStream os;
-	os.Write(Define::UpdateCountPlayer, Define::bitOfTypePacket);
+	os.Write(PT_UpdateRooms, NBit_PacketType);
+
 	GameGlobal::Socket->Send(os);
 }
 
-void LobbyScene::Reveive_UpdateCountPlayer(InputMemoryBitStream& _is)
+void LobbyScene::Reveive_UpdateRooms(InputMemoryBitStream& _is)
 {
-	// networkID
 	bool _inRoom;
-	_is.Read(_inRoom); // nhận 1 bit
+	_is.Read(_inRoom); // networkID âm hay dương => 1 bit
+
+	for (auto room : roomViewList)
+	{
+		room->Read(_is);
+	}
 
 	if (_inRoom)
 	{
-		_is.Read(GameGlobal::Socket->ID, 2); // ID: 0 - 3 => nhận 2 bit
+		int _socketID = 0;
+		_is.Read(_socketID, NBit_PlayerID); // ID người chơi
+
 		int _roomID;
-		_is.Read(_roomID, 2); // ID phòng: 0 - 3 => nhận 2 bit
+		_is.Read(_roomID, NBit_RoomID); // ID phòng
 
-		// cần chuyển màn
-		int remainingBits;
-		_is.Read(remainingBits, 8); // nhận 8 bit thừa của 4 phòng
+		GameGlobal::Socket->ID = _socketID;
+
+		// chuyển màn
+		SceneManager::Instance()->ReplaceScene(new RoomScene());
+
+		return;
 	}
-
-	// đọc thông tin danh sách Phòng Chơi từ Server
-	for (auto room : roomViewList)
-	{	
-		room->Read(_is);
-	}
-}
-
-LobbyScene::~LobbyScene()
-{
-	delete selectAnimation;
-	for (auto room : roomViewList)
-		delete room;
 }

@@ -1,5 +1,5 @@
 ﻿#pragma once
-#include "Camera.h"
+
 #include "Entity.h"
 #include <map>
 #include "TCPSocket.h"
@@ -11,6 +11,8 @@ using namespace std;
 
 class Player : public Entity
 {
+	const float speed1 = 200.f;
+	const float speed2 = 250.f;
 	Direction direction = D_Stand;
 	Direction lastDirection = D_Stand;
 
@@ -39,13 +41,10 @@ public:
 
 	void Update(float _dt);
 	void Draw();
+	void MakeCollision(Entity* _en) override { velocity = D3DXVECTOR2(0.f, 0.f); }
 	void Write(OutputMemoryBitStream& _os) override;
 	void Read(InputMemoryBitStream& _is) override;
 
-	void CollideWith_World();
-	bool CheckCreateAnim();
-
-	void CollisionWith(Entity* _en) override;
 	void HandleKeyboard(std::map<int, bool> _keys);
 
 // các biến và hàm hỗ trợ

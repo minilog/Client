@@ -2,12 +2,14 @@
 
 #include "SpriteList.h"
 
-NPC::NPC(int _networkID)
+NPC::NPC(int _entityID)
 {
-	// gán địa chỉ ID network
-	NetworkID = _networkID;
+	EntityID = _entityID;
 
 	Type = ET_NPC;
+	IsDelete = true;
+	width = 32;
+	height = 32;
 
 	// khởi tạo các animation
 	leftAnimation = new Animation();
@@ -25,10 +27,6 @@ NPC::NPC(int _networkID)
 
 	// mặc định animation ban đầu
 	currentAnimation = leftAnimation;
-
-	// chiều rộng, chiều cao xét va chạm
-	width = 32.f;
-	height = 32.f;
 }
 
 
@@ -44,82 +42,41 @@ NPC::~NPC()
 
 void NPC::Update(float _dt)
 {
-	// nếu đã bị tiêu diệt => không cập nhật
 	if (IsDelete)
 		return;
 
-	x += vx * _dt;
-	y += vy * _dt;
+	position += velocity * _dt;
 }
 
 void NPC::Draw()
 {
+	if (IsDelete)
+		return;
+
 	currentAnimation->Draw(GetPosition());
 }
 
-void NPC::Read(InputMemoryBitStream& _is)
-{
-	Entity::Read(_is);
-
-	int _direction = 0;
-	_is.Read(_direction, 3); // direction dao động từ 0 - 5 =>  3 bit
-
-	lastHealth = health;
-
-	_is.Read(health, 2); // máu dao động từ 0 - 2 => 2 bit
-
-	SetDirection((Direction)_direction);
-
-	if (health == 0)
-	{
-		IsDelete = true;
-		SetPosition(D3DXVECTOR2(-30.f, -30.f)); // tọa độ ở ngoài map
-	}
-	else
-	{
-		IsDelete = false;
-	}
-}
-
-void NPC::CollisionWith(Entity* _en)
-{
-	if (_en->Type == ET_Player || 
-		_en->Type == ET_NPC)
-	{
-		vx = 0;
-		vy = 0;
-	}
-}
-
-bool NPC::CheckCreateAnim()
-{
-	return (health == 0) && (lastHealth != 0);
-}
-
+// thay đổi vận tốc và animation đựa theo hướng di chuyển
 void NPC::SetDirection(Direction _dir)
 {
-	// thay đổi vận tốc và animation đựa theo hướng di chuyển
 	direction = _dir;
 	switch (direction)
 	{
 	case D_Left:
-		vx = -200.f;
-		vy = 0.f;
 		currentAnimation = leftAnimation;
+		velocity = D3DXVECTOR2(-speed, 0.f);
 		break;
 	case D_Right:
-		vx = 200.f;
-		vy = 0.f;
 		currentAnimation = rightAnimation;
+		velocity = D3DXVECTOR2(speed, 0.f);
 		break;
 	case D_Up:
-		vx = 0.f;
-		vy = -200.f;
 		currentAnimation = upAnimation;
+		velocity = D3DXVECTOR2(0.f, - speed);
 		break;
 	case D_Down:
-		vx = 0.f;
-		vy = 200.f;
+		currentAnimation = downAnimation;
+		velocity = D3DXVECTOR2(0.f, speed);
 		break;
 	default:
 		break;
