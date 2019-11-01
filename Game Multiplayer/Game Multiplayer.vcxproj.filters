@@ -153,12 +153,6 @@
     <ClInclude Include="Eagle.h">
       <Filter>Game Objects</Filter>
     </ClInclude>
-    <ClInclude Include="RoomScene.h">
-      <Filter>Scenes</Filter>
-    </ClInclude>
-    <ClInclude Include="TimingScene.h">
-      <Filter>Scenes</Filter>
-    </ClInclude>
     <ClInclude Include="Scene.h">
       <Filter>Scenes</Filter>
     </ClInclude>
@@ -205,6 +199,9 @@
       <Filter>Game Objects</Filter>
     </ClInclude>
     <ClInclude Include="GameDefine.h" />
+    <ClInclude Include="TimeServer.h">
+      <Filter>Scenes</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include="MapReader\Tmx.h.in">
@@ -290,12 +287,6 @@
     <ClCompile Include="LobbyScene.cpp">
       <Filter>Scenes</Filter>
     </ClCompile>
-    <ClCompile Include="RoomScene.cpp">
-      <Filter>Scenes</Filter>
-    </ClCompile>
-    <ClCompile Include="TimingScene.cpp">
-      <Filter>Scenes</Filter>
-    </ClCompile>
     <ClCompile Include="Main.cpp" />
     <ClCompile Include="Animation.cpp">
       <Filter>Framework</Filter>
@@ -338,6 +329,9 @@
     </ClCompile>
     <ClCompile Include="Label.cpp">
       <Filter>Game Objects</Filter>
+    </ClCompile>
+    <ClCompile Include="TimeServer.cpp">
+      <Filter>Scenes</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

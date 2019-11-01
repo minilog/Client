@@ -7,9 +7,9 @@ class Eagle:public Entity
 	Animation* animation;
 
 public:
-	Eagle(int _entityID, D3DXVECTOR2 _pos)
+	Eagle(int _ID, D3DXVECTOR2 _pos)
 	{
-		EntityID = _entityID;
+		ID = _ID;
 
 		Type = ET_Eagle;
 		position = _pos;
@@ -18,7 +18,7 @@ public:
 		animation = new Animation();
 
 		// tùy theo network ID mà màu của đại bàng sẽ khác nhau, tương ứng với các người chơi
-		switch (EntityID)
+		switch (ID)
 		{
 		case 0:
 			// màu vàng

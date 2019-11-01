@@ -183,7 +183,6 @@
     <ClInclude Include="ProtectItem.h" />
     <ClInclude Include="QuadTree.h" />
     <ClInclude Include="RoomView.h" />
-    <ClInclude Include="RoomScene.h" />
     <ClInclude Include="SceneManager.h" />
     <ClInclude Include="Scene.h" />
     <ClInclude Include="SocketAddress.h" />
@@ -191,7 +190,7 @@
     <ClInclude Include="Sprite.h" />
     <ClInclude Include="SpriteList.h" />
     <ClInclude Include="TCPSocket.h" />
-    <ClInclude Include="TimingScene.h" />
+    <ClInclude Include="TimeServer.h" />
     <ClInclude Include="UpgradeItem.h" />
     <ClInclude Include="Water.h" />
   </ItemGroup>
@@ -237,11 +236,10 @@
     <ClCompile Include="Pointed.cpp" />
     <ClCompile Include="QuadTree.cpp" />
     <ClCompile Include="RoomView.cpp" />
-    <ClCompile Include="RoomScene.cpp" />
     <ClCompile Include="SceneManager.cpp" />
     <ClCompile Include="Sprite.cpp" />
     <ClCompile Include="SpriteList.cpp" />
-    <ClCompile Include="TimingScene.cpp" />
+    <ClCompile Include="TimeServer.cpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

@@ -1,4 +1,5 @@
 #pragma once
+
 #include "SocketAddress.h"
 #include <wincon.h>
 #include "MemoryBitStream.h"
@@ -6,9 +7,14 @@
 class TCPSocket 
 {
 public:
-	~TCPSocket();
+	int PlayerID = -1;
+	int PlayerRoomID = -1;
+
 	SOCKET mSocket;
-	int ID = -1;
+
+public:
+	~TCPSocket();
+
 	int ChangetoDontWait(int flag);
 	int Connect(const SocketAddress& inAddress);
 	int Bind(const SocketAddress& inToAddress);

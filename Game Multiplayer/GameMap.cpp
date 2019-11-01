@@ -4,23 +4,13 @@
 GameMap::GameMap(char* filePath)
 {
 	LoadMap(filePath);
-	debugDraw = new GameDebugDraw();
+	//debugDraw = new GameDebugDraw();
 }
 
 void GameMap::LoadMap(char* filePath)
 {
 	map = new Tmx::Map();
 	map->ParseFile(filePath);
-
-	// ID bắt đầu của các object trong map
-	int networkID = 100;
-
-	// hcn với size của map
-	RECT r;
-	r.left = 0;
-	r.top = 0;
-	r.right = this->GetWidth();
-	r.bottom = this->GetHeight();
 
 	// đưa danh sách hình ảnh tileset vào tilesetList
 	for (int i = 0; i < map->GetNumTilesets(); i++)
@@ -31,9 +21,9 @@ void GameMap::LoadMap(char* filePath)
 		tilesetList.insert(std::pair<int, Sprite*>(i, sprite));
 	}
 
+	// duyệt các layer của map
 	for (int i = 0; i < map->GetNumTileLayers(); i++)
-	{
-		// duyệt các layer của map
+	{	
 		const Tmx::TileLayer *layer = map->GetTileLayer(i);
 		if (layer->GetName() == "Brick" || 
 			layer->GetName() == "Metal Brick" || 
@@ -46,8 +36,6 @@ void GameMap::LoadMap(char* filePath)
 
 				int tileWidth = map->GetTileWidth();
 				int tileHeight = map->GetTileHeight();
-				int tileSetWidth = tileSet->GetImage()->GetWidth() / tileWidth;
-				int tileSetHeight = tileSet->GetImage()->GetHeight() / tileHeight;
 
 				for (int m = 0; m < layer->GetHeight(); m++)
 				{
@@ -55,31 +43,27 @@ void GameMap::LoadMap(char* filePath)
 					{
 						if (layer->GetTileTilesetIndex(n, m) != -1)
 						{
-							// xác định tọa độ object
+							// tọa độ object
 							D3DXVECTOR2 pos((float)(n * tileWidth + tileWidth / 2), 
 								(float)(m * tileHeight + tileHeight / 2));
 
-							// khởi tạo các loại brick, tăng ID lên mỗi lần thêm 1 viên
+							// khởi tạo brick
 							Brick* brick;
 							if (layer->GetName() == "Brick")
 							{
 								brick = new BrickNormal(pos);
-								brick->EntityID = networkID++;
 							}
 							else if (layer->GetName() == "Metal Brick")
 							{
 								brick = new MetalBrick(pos);
-								brick->EntityID = networkID++;
 							}
 							else if (layer->GetName() == "Water")
 							{
 								brick = new Water(pos);
-								brick->EntityID = networkID++;
 							}
 							else if (layer->GetName() == "Tile Layer 1")
 							{
 								brick = new Boundary(pos);
-								brick->EntityID = networkID++;
 							}
 
 							brickList.push_back(brick);
@@ -89,7 +73,6 @@ void GameMap::LoadMap(char* filePath)
 			}
 		}
 	}
-
 }
 
 void GameMap::Draw()
@@ -164,44 +147,6 @@ void GameMap::Draw()
 
 		}
 	}
-}
-
-Tmx::Map* GameMap::GetMap()
-{
-	return map;
-}
-int GameMap::GetWidth()
-{
-	return map->GetWidth() * map->GetTileWidth();
-}
-
-int GameMap::GetHeight()
-{
-	return map->GetHeight() * map->GetTileHeight();
-}
-int GameMap::GetTileWidth()
-{
-	return map->GetTileWidth();
-}
-
-int GameMap::GetTileHeight()
-{
-	return map->GetTileHeight();
-}
-
-std::vector<Brick*> GameMap::GetBrickList()
-{
-	return brickList;
-}
-
-RECT GameMap::GetWorldMapBound()
-{
-	RECT bound;
-	bound.left = bound.top = 0;
-	bound.right = map->GetWidth() * map->GetTileWidth();
-	bound.bottom = map->GetHeight() * map->GetTileHeight();
-
-	return bound;
 }
 
 GameMap::~GameMap()

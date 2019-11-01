@@ -16,12 +16,15 @@ public:
 
 
 	}
-
 	~BrickNormal() {}
 
-	void MakeCollision(Entity* _en) override
+
+	void Read(InputMemoryBitStream& _is) override
 	{
-		IsDelete = true;
+		bool _isDelete = false;
+		_is.Read(_isDelete);
+
+		IsDelete = _isDelete;
 	}
 };
 

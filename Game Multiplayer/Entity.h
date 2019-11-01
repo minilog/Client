@@ -1,4 +1,5 @@
 ﻿#pragma once
+
 #include "GameGlobal.h"
 #include "MemoryBitStream.h"
 #include "Animation.h"
@@ -13,8 +14,8 @@ protected:
 	D3DXVECTOR2 velocity = D3DXVECTOR2(0.f, 0.f);
 	int width = 0, height = 0; // nên là số chẵn
 public:
-	int EntityID = -1; // -1: chưa xác định
-	EntityTypes Type = ET_Unknown; //Tag de nhan dien loai Entity
+	int ID = -1; // -1: chưa xác định
+	EntityType Type = ET_Unknown; // nhận diện Entity
 	bool IsDelete = false;
 
 public:
@@ -23,9 +24,9 @@ public:
 
 	virtual void Update(float dt) {}
 	virtual void Draw() {}
-	virtual void MakeCollision(Entity* _en) {}	// thực hiện sự va chạm
+	virtual void MakeCollision(Entity* _en) {}	// thực hiện va chạm
 	virtual void Write(OutputMemoryBitStream &_os) {}
-	virtual void Read(InputMemoryBitStream& _is){}
+	virtual void Read(InputMemoryBitStream& _is) {}
 
 	RECT GetBound();
 	D3DXVECTOR2 GetPosition() { return position; }

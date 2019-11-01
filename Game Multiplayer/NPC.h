@@ -6,7 +6,7 @@
 class NPC :public Entity
 {
 	const float speed = 200.f;
-	Direction direction;
+	Direction direction; // hướng di chuyển
 	bool isExplosion = false;
 	Explosion* explosion; // trỏ đến đối tượng trong Scene
 

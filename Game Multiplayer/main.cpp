@@ -34,14 +34,6 @@ LPDIRECT3DDEVICE9       mDevice;
 HINSTANCE               mHInstance;
 int                     mCmdShow;
 
-void Receive_thread(Game* _game)
-{
-	while (1)
-	{
-		_game->ReceivePacket();
-	}
-}
-
 int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, int cmdShow)
 {
 	mHInstance = hInstance;

@@ -7,7 +7,7 @@ using namespace std;
 class Label
 {
 public:
-	Label(string s, int w, int h, D3DXVECTOR2 position, D3DCOLOR color = D3DCOLOR_XRGB(255, 255, 255));
+	Label(string s, int w, int h, D3DXVECTOR2 position = D3DXVECTOR2(0.f, 0.f), D3DCOLOR color = D3DCOLOR_XRGB(255, 255, 255));
 	~Label();
 	Label();
 	ID3DXFont				*my_font = NULL; //Font dung de ve chu
@@ -15,7 +15,7 @@ public:
 	std::string m_string; //Support Font
 	D3DCOLOR my_color;
 	void Update(float dt);
-	void Draw(string s = "");
+	void Draw(string s = "", D3DCOLOR _color = D3DCOLOR_XRGB(255, 255, 255));
 	void SetPosition(D3DXVECTOR2 _pos);
 };
 

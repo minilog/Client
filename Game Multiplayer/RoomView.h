@@ -7,11 +7,20 @@ class InputMemoryBitStream;
 
 class RoomView
 {
-	int networkID = -1; // -1 = chưa xác định
-	int nPlayer = -1; // số người chơi trong phòng
+	int ID = -1; // -1 = chưa xác định
 	bool isPlaying = false; // phòng đã bắt đầu game hay chưa
-
 	const int maxPlayer = 4;
+public:
+	bool Player0 = false;
+	bool Player1 = false;
+	bool Player2 = false;
+	bool Player3 = false;
+	bool Player0_Ready = false;
+	bool Player1_Ready = false;
+	bool Player2_Ready = false;
+	bool Player3_Ready = false;
+	int StartingTime = -1;
+
 public:
 	RoomView(int _networkID);
 	~RoomView();
@@ -19,7 +28,8 @@ public:
 	void Draw();
 	void Read(InputMemoryBitStream& _is);
 
-	bool CanJoin() { return (nPlayer < maxPlayer) && (!isPlaying); }
+	bool CanJoin() { return (!Player0 || !Player1 || !Player2 || !Player3) && (!isPlaying); }
+	bool GetIsPlaying() { return isPlaying; }
 	void SetPosition(D3DXVECTOR2 _pos) { position = _pos; }
 
 // các hàm và biến hỗ trợ

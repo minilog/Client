@@ -1,8 +1,7 @@
 ﻿C:\Program Files (x86)\Microsoft Visual Studio\2017\Enterprise\Common7\IDE\VC\VCTargets\Microsoft.CppBuild.targets(391,5): warning MSB8028: The intermediate directory (Debug\) contains files shared from another project (Game Multiplayer.vcxproj).  This can lead to incorrect clean and rebuild behavior.
-  GameCollision.cpp
-  GameGlobal.cpp
+  Game.cpp
+  c:\program files (x86)\microsoft directx sdk (june 2010)\include\dinput.h: DIRECTINPUT_VERSION undefined. Defaulting to version 0x0800
   LobbyScene.cpp
-  Player.cpp
-  TimingScene.cpp
+  RoomView.cpp
   Generating Code...
   Game Multiplayer.vcxproj -> C:\Users\Minh\Desktop\Client\Debug\Client.exe

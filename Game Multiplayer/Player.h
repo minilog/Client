@@ -15,28 +15,10 @@ class Player : public Entity
 	const float speed2 = 250.f;
 	Direction direction = D_Stand;
 	Direction lastDirection = D_Stand;
-
-	bool isSpawn = false;
-	int lastTimeSpawn = 0;
+	int level = 1;
 
 public:
-	bool IsMe = false; // tôi là người điều khiển ?
-	string Name = "";
-	int Health = 2;
-	int LastHealth = 2;
-	int LastTimeDie = 0;
-	int LastFire = 0;
-	int LastMoveTime = 0;
-	int Level = 1;
-	D3DXVECTOR2 positionScore = D3DXVECTOR2(0, 0);
-	int Score_Send = 0;
-	int LastIDPacket = 0;
-	bool isLose = false;
-	int Score = 0;
-	bool IsProtect = false;
-
-public:
-	Player(int _networkID);
+	Player(int _ID);
 	~Player();
 
 	void Update(float _dt);

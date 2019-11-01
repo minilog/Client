@@ -5,13 +5,11 @@
 #include <Windows.h>
 #include <dinput.h>
 #include "GameTime.h"
-#include "TimingScene.h"
 #include <thread>
 
 class Game
 {
 	float FPS;
-	TimingScene* timingScene;
 
 public:
 	Game(int _fps = 60);
@@ -20,16 +18,11 @@ public:
 	// tạo vòng lặp game
 	void InitLoop();
 
-	void ReceivePacket();
-
 private:
 	// vẽ hình sau khi update
 	void Render();
 
 	// cập nhật game
 	void Update(float dt);
-
-	// khởi tạo socket và kết nối với server
-	void CreateSocketAndTryConnectToServer();
 };
 

@@ -3,10 +3,10 @@
 #include "GameLog.h"
 #include "SpriteList.h"
 
-Player::Player(int _networkID)
+Player::Player(int _ID)
 {
 	// gán ID network cho Player
-	EntityID = _networkID;
+	ID = _ID;
 
 	// gán loại đối tượng
 	Type = ET_Player;
@@ -44,101 +44,15 @@ Player::~Player()
 
 void Player::Write(OutputMemoryBitStream& _os)
 {
-	_os.Write(direction, 3); // dao đọng từ 0 - 5 => 3 bit
+	_os.Write(direction, NBit_Direction); // gửi hướng di chuyển
 }
 
 void Player::Read(InputMemoryBitStream& _is)
 {
-	// đọc networkd ID và loại đối tượng
-	Entity::Read(_is);
-
-	// đọc hướng di chuyển
-	Direction _dir;
-	_is.Read(_dir, 3); // dao động từ 0 - 5 => 3 bit
-
-	// đọc cấp độ
-	int _level;
-	_is.Read(_level, 3); // dao động từ 1 - 3 => 2 bit 
-
-	// đọc được bảo vệ hay không
-	_is.Read(IsProtect); // => 1 bit
-
-	LastHealth = Health; // lưu lại HP trước khi đọc
-
-	// đọc HP
-	_is.Read(Health, 2); // HP dao động từ 0 - 2 => 2 bit
-
-	// đọc time di chuyển lần cuối
-	_is.Read(LastMoveTime);
-
-	// đọc điểm
-	Score_Send = 0;
-	_is.Read(Score_Send, 10); // dao động từ 0 - 1023 => 10 bit
-
-
-	// đọc vị trí Score
-	int x, y;
-	_is.Read(x, 12); // => 12 bit
-	_is.Read(y, 12); // => 12 bit
-
-	// xử lý level đọc được
-	if (Level != _level)
-	{
-		Level = _level;
-		//OnSetLevel()
-	}
-
-	// xử lý điểm đọc được
-	Score += Score_Send;
-
-	//  xử lý vị trí score đọc được
-	positionScore.x = (float)x;
-	positionScore.y = (float)y;
 }
 
 void Player::Update(float _dt)
 {
-	// khi HP hiện tại lớn hớn HP lần gần nhất => Hồi sinh
-	if (Health != 0 && LastHealth == 0)
-	{
-		isSpawn = true;
-		// thời gian bắt đầu hồi sinh
-		lastTimeSpawn = GetTickCount();
-	}
-
-	// khi HP hiện tại = 0 và chưa bị delete
-	if (Health == 0 && !IsDelete)
-	{
-		IsDelete = true;
-		// thời gian đã chết
-		LastTimeDie = GetTickCount();
-	}
-
-	// nếu đang bị delete, tính toán sự hồi sinh dựa vào thời gian đã chết gần nhất
-	if (IsDelete) 
-	{
-		// hồi sinh trong 4 giây
-		if (GetTickCount() - LastTimeDie > 4000)
-		{
-			IsDelete = false;
-		}
-		return;
-	}
-
-	// nếu đang hồi sinh
-	if (isSpawn)
-	{
-		spawnAnimation->Update(_dt);
-		// nếu lần chết gần nhất đã quá 2 giây...
-		if (GetTickCount() - LastTimeDie > 2000)
-		{
-			isSpawn = false;
-		}
-		return;
-	}
-
-	if (IsProtect)
-		shieldAnimation->Update(_dt);
 
 	position += velocity * _dt;
 
@@ -151,7 +65,7 @@ void Player::Update(float _dt)
 		velocity = D3DXVECTOR2(0.f, 0.f);
 		break;
 	case D_Left:
-		if (Level == 1)
+		if (level == 1)
 		{
 			velocity = D3DXVECTOR2(-speed1, 0.f);
 		}
@@ -161,7 +75,7 @@ void Player::Update(float _dt)
 		}
 		break;
 	case D_Right:
-		if (Level == 1)
+		if (level == 1)
 		{
 			velocity = D3DXVECTOR2(speed1, 0.f);
 		}
@@ -171,7 +85,7 @@ void Player::Update(float _dt)
 		}
 		break;
 	case D_Up:
-		if (Level == 1)
+		if (level == 1)
 		{
 			velocity = D3DXVECTOR2(0.f, -speed1);
 		}
@@ -181,7 +95,7 @@ void Player::Update(float _dt)
 		}
 		break;
 	case D_Down:
-		if (Level == 1)
+		if (level == 1)
 		{
 			velocity = D3DXVECTOR2(0.f, speed1);
 		}
@@ -196,9 +110,7 @@ void Player::Update(float _dt)
 void Player::HandleKeyboard(std::map<int, bool> keys)
 {
 	// nếu đã thua, đã bị delete hoặc đang hồi sinh => không nhận phím
-	if (isLose ||
-		IsDelete ||
-		isSpawn)
+	if (IsDelete)
 	{
 		return;
 	}
@@ -233,32 +145,17 @@ void Player::HandleKeyboard(std::map<int, bool> keys)
 	int time_to_fight = 1000;
 	if (keys[VK_SPACE])
 	{
-		if (Level > 2)
+		if (level > 2)
 		{
 			time_to_fight = 700;
 		}
 
-		if ((int)GetTickCount() - LastFire > time_to_fight)
-		{
-			LastFire = (int)GetTickCount();
-			// bắn đạn ở đây
-		}
+		//if ((int)GetTickCount() - LastFire > time_to_fight)
+		//{
+		//	LastFire = (int)GetTickCount();
+		//	// bắn đạn ở đây
+		//}
 	}
-
-	// gửi dữ liệu
-
-	//if (mLastAction != mAction)
-	//{
-
-	//	OutputMemoryBitStream os;
-	//	os.Write(Define::InputPacket, Define::bitOfTypePacket);
-	//	os.Write(ID, Define::bitofID);
-	//	os.Write((int)mAction, Define::bitofID);
-	//	os.Write(last_id_packet++, Define::bitofID);
-	//	if (last_id_packet == 1000) last_id_packet = 0;
-	//	GameGlobal::socket->Send(os.GetBufferPtr(), os.GetByteLength());
-	//}
-
 }
 
 void Player::InitAnimation()
@@ -277,7 +174,7 @@ void Player::InitAnimation()
 	downAnimationLv03 = new Animation();
 
 	// animation xe tăng của người chơi 0
-	if (EntityID == 0)
+	if (ID == 0)
 	{
 		leftAnimationLv01->AddFrameInfo(FrameInfo(SpriteList::Instance()->Tank, 82, 82 + 32, 2, 2 + 32,
 			D3DXVECTOR2(16.f, 16.f)));
@@ -307,7 +204,7 @@ void Player::InitAnimation()
 			D3DXVECTOR2(15.f, 18.f)));
 	}
 	// animation xe tăng của người chơi 1
-	else if (EntityID == 1)
+	else if (ID == 1)
 	{
 		leftAnimationLv01->AddFrameInfo(FrameInfo(SpriteList::Instance()->Tank, 389, 389 + 32, 2, 2 + 32,
 			D3DXVECTOR2(16.f, 16.f)));
@@ -337,7 +234,7 @@ void Player::InitAnimation()
 			D3DXVECTOR2(15.f, 18.f)));
 	}
 	// animation xe tăng của người chơi 2
-	else if (EntityID == 2)
+	else if (ID == 2)
 	{
 		leftAnimationLv01->AddFrameInfo(FrameInfo(SpriteList::Instance()->Tank, 82, 82 + 32, 310, 310 + 32, 
 			D3DXVECTOR2(16.f, 16.f)));
@@ -367,7 +264,7 @@ void Player::InitAnimation()
 			D3DXVECTOR2(15.f, 18.f)));
 	}
 	// animation xe tăng của người chơi 3
-	else if (EntityID == 3)
+	else if (ID == 3)
 	{
 		leftAnimationLv01->AddFrameInfo(FrameInfo(SpriteList::Instance()->Tank, 389, 389 + 32, 310, 310 + 32,
 			D3DXVECTOR2(16.f, 16.f)));
@@ -419,7 +316,7 @@ void Player::InitAnimation()
 
 void Player::SetAnimationByDirection(Direction _dir)
 {
-	if (Level == 1)
+	if (level == 1)
 	{
 		switch (_dir)
 		{
@@ -439,7 +336,7 @@ void Player::SetAnimationByDirection(Direction _dir)
 			break;
 		}
 	}
-	else if (Level == 2)
+	else if (level == 2)
 	{
 		switch (_dir)
 		{
@@ -459,7 +356,7 @@ void Player::SetAnimationByDirection(Direction _dir)
 			break;
 		}
 	}
-	else if (Level == 3)
+	else if (level == 3)
 	{
 		switch (_dir)
 		{

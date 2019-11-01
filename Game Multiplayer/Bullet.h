@@ -1,30 +1,31 @@
 ﻿#pragma once
+
 #include "Entity.h"
 
 class Bullet : public Entity
 {
 	const float speed = 500.f;
-	Direction direction;	// hướng di chuyển của viên đạn
-
+	Direction direction;	// hướng bay
+	
 	Animation* leftAnimation;
 	Animation* rightAnimation;
 	Animation* upAnimation;
 	Animation* downAnimation;
-
 	Animation* currentAnimation; // trỏ đến 1 trong 4 animation để vẽ lên
+public:
+	int PlayerID = -1; // là của người chơi nào
 
 public:
-	int PlayerID = -1; // -1: chưa xác định
-
-public:
-	Bullet(int _entityID, int _playerID)
+	Bullet(int _ID, int _playerID)
 	{
 		// gắn network ID và ID của người chơi sở hữu 
-		EntityID = _entityID;
+		ID = _ID;
 		PlayerID = _playerID;
 
 		Type = ET_Bullet;
 		IsDelete = true;
+		width = 6;
+		height = 6;
 
 		// khởi tạo 4 animation
 		leftAnimation = new Animation();
@@ -42,10 +43,6 @@ public:
 
 		// thiết lập animation ban đầu
 		currentAnimation = leftAnimation;
-
-		// thiết lập chiều rộng, chiều cao va chạm => 6, 6
-		width = 6;
-		height = 6;
 	}
 	~Bullet() 
 	{
@@ -56,7 +53,7 @@ public:
 		delete downAnimation;
 	}
 
-	void Update(float _dt) 
+	void Update(float _dt) override
 	{
 		if (IsDelete)
 			return;
@@ -64,12 +61,17 @@ public:
 		position += velocity * _dt;
 	}
 
-	void Draw()
+	void Draw() override
 	{
 		if (IsDelete)
 			return;
 
-		currentAnimation->Draw(GetPosition());
+		currentAnimation->Draw(position);
+	}
+
+	void MakeCollision(Entity* _en) override
+	{
+		IsDelete = true;
 	}
 
 	void Read(InputMemoryBitStream& _is) override

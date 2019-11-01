@@ -18,8 +18,10 @@ int GameGlobal::Height = 770;
 void GameGlobal::Send_Exit()
 {
 	OutputMemoryBitStream os;
+
 	os.Write(PT_ExitGame, NBit_PacketType);
 
 	GameGlobal::Socket->Send(os);
+
 	GameGlobal::IsGameRunning = false;
 }

@@ -18,7 +18,6 @@
 class GameMap
 {
 	std::vector<Brick*> brickList;
-
 	Tmx::Map *map;
 	std::map<int, Sprite*>  tilesetList;
 	GameDebugDraw* debugDraw;
@@ -29,16 +28,15 @@ public:
 
 	void Draw();
 
-	Tmx::Map* GetMap();
-	std::vector<Brick*> GetBrickList();
-	RECT GetWorldMapBound();
+	Tmx::Map* GetMap() { return map; }
+	std::vector<Brick*> GetBrickList() { return brickList; }
 
 // các hàm hỗ trợ
 private:
 	void LoadMap(char* filePath);
-	int GetWidth();
-	int GetHeight();
-	int GetTileWidth();
-	int GetTileHeight();
+	int GetWidth() { return map->GetWidth() * map->GetTileWidth(); }
+	int GetHeight() { return map->GetHeight() * map->GetTileHeight(); }
+	int GetTileWidth() { return map->GetTileWidth(); }
+	int GetTileHeight() { return map->GetTileHeight(); }
 };
 

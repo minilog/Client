@@ -32,10 +32,11 @@ void Label::Update(float dt)
 {
 }
 
-void Label::Draw(string s)
+void Label::Draw(string s, D3DCOLOR _color)
 {
 	if (my_font != NULL)
 	{
+		my_color = _color;
 		if (s._Equal(""))
 		{
 			my_font->DrawTextA(GameGlobal::XSprite, m_string.c_str(), -1, &my_rect, DT_LEFT, my_color);

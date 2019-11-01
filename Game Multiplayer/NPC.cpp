@@ -2,9 +2,9 @@
 
 #include "SpriteList.h"
 
-NPC::NPC(int _entityID)
+NPC::NPC(int _ID)
 {
-	EntityID = _entityID;
+	ID = _ID;
 
 	Type = ET_NPC;
 	IsDelete = true;
@@ -28,7 +28,6 @@ NPC::NPC(int _entityID)
 	// mặc định animation ban đầu
 	currentAnimation = leftAnimation;
 }
-
 
 NPC::~NPC()
 {

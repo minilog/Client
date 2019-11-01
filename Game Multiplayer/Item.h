@@ -6,29 +6,21 @@
 class Item : public Entity
 {
 	const float existTime = 7.f;
-	float count_existTime = 0.f;
-	int flashingTime = 0;
-protected:
-	Animation* animation;
 
-protected:
-	void BaseInit(D3DXVECTOR2 _pos)
-	{
-		position = _pos;
-		width = 32;
-		height = 32;
-		animation = new Animation();
-	}
 public:
 	Item() {}
-	~Item() {}
+	~Item() { delete animation; }
 
-	void Update(float _dt)
+	void Update(float _dt) override
 	{
+		if (IsDelete)
+			return;
+
 		count_existTime += _dt;
 		if (count_existTime >= existTime)
 		{
 			IsDelete = true;
+			count_existTime = 0.f;
 		}
 	}
 
@@ -58,8 +50,19 @@ public:
 		IsDelete = true;
 	}
 
-	void Read(InputMemoryBitStream& _is) override
+// các biến và hàm hỗ trợ
+private:
+	float count_existTime = 0.f; // đếm
+	int flashingTime = 0; // giúp vẽ nhấp nháy
+protected:
+	Animation* animation;
+
+	void BaseInit(D3DXVECTOR2 _pos)
 	{
+		position = _pos;
+		width = 32;
+		height = 32;
+		animation = new Animation();
 	}
 };
 
