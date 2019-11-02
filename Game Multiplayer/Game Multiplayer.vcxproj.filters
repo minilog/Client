@@ -183,9 +183,6 @@
     <ClInclude Include="Game.h">
       <Filter>Framework</Filter>
     </ClInclude>
-    <ClInclude Include="GameMap.h">
-      <Filter>Framework</Filter>
-    </ClInclude>
     <ClInclude Include="QuadTree.h">
       <Filter>Framework</Filter>
     </ClInclude>
@@ -200,6 +197,12 @@
     </ClInclude>
     <ClInclude Include="GameDefine.h" />
     <ClInclude Include="TimeServer.h">
+      <Filter>Scenes</Filter>
+    </ClInclude>
+    <ClInclude Include="GameMap.h">
+      <Filter>Scenes</Filter>
+    </ClInclude>
+    <ClInclude Include="BattleScene.h">
       <Filter>Scenes</Filter>
     </ClInclude>
   </ItemGroup>
@@ -315,9 +318,6 @@
     <ClCompile Include="Game.cpp">
       <Filter>Framework</Filter>
     </ClCompile>
-    <ClCompile Include="GameMap.cpp">
-      <Filter>Framework</Filter>
-    </ClCompile>
     <ClCompile Include="QuadTree.cpp">
       <Filter>Framework</Filter>
     </ClCompile>
@@ -331,6 +331,12 @@
       <Filter>Game Objects</Filter>
     </ClCompile>
     <ClCompile Include="TimeServer.cpp">
+      <Filter>Scenes</Filter>
+    </ClCompile>
+    <ClCompile Include="GameMap.cpp">
+      <Filter>Scenes</Filter>
+    </ClCompile>
+    <ClCompile Include="BattleScene.cpp">
       <Filter>Scenes</Filter>
     </ClCompile>
   </ItemGroup>

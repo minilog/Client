@@ -91,6 +91,7 @@ void TimeServer::ReceivePacket(InputMemoryBitStream& _is, int _packetType)
 
 			timeDistance = (double)_timeServerReceived - correspondingTime;
 			double multiplier = (double)100.f / (double)ping;
+			multiplier = multiplier * multiplier;
 			
 			timeDistanceAverage = (timeDistanceAverage * timeDistanceMultiplier + timeDistance * multiplier)
 				/ (timeDistanceMultiplier + multiplier);

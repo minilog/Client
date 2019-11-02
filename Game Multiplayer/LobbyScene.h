@@ -25,9 +25,8 @@ class LobbyScene : public Scene
 public:
 	LobbyScene();
 	~LobbyScene();
-
-	void Update(float _dt);
-	void Draw();
+	void Update(float _dt) override;
+	void Draw() override;
 	void ReceivePacket(InputMemoryBitStream& _is, int _typePacket) override;
 
 

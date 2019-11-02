@@ -3,6 +3,7 @@
 #include "SceneManager.h"
 #include "SpriteList.h"
 #include "TimeServer.h"
+#include "BattleScene.h"
 using namespace Define;
 
 LobbyScene::LobbyScene()
@@ -50,7 +51,16 @@ void LobbyScene::Update(float _dt)
 		return;
 
 	if (isPlaying)
+	{
+		int remainingTime = time_StartingGame - (TimeServer::Instance()->GetServerTime() - serverTimeStarting);
+		if (remainingTime <= 0)
+		{
+			// go to BattleScene
+			SceneManager::Instance()->ReplaceScene(new BattleScene());
+		}
 		return;
+	}
+
 
 	// controll arrow
 	{
@@ -186,7 +196,6 @@ void LobbyScene::Draw()
 	// you are in looby
 	if (GameGlobal::Socket->PlayerRoomID == -1)
 	{
-		// vẽ title
 		label_LobbyTitle.SetPosition(D3DXVECTOR2(550.f, 50.f));
 		label_LobbyTitle.Draw("LOBBY");
 
