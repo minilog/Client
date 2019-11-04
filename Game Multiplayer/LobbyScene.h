@@ -20,7 +20,7 @@ class LobbyScene : public Scene
 	bool isReady = false;
 	bool isPlaying = false;
 	int serverTimeStarting = -1;
-	int time_StartingGame = 3000;
+	const int time_StartGame = 3000;
 
 public:
 	LobbyScene();

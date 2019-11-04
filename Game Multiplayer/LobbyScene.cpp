@@ -50,14 +50,10 @@ void LobbyScene::Update(float _dt)
 	if (!TimeServer::Instance()->GetIsSync())
 		return;
 
-	if (isPlaying)
+	if (isPlaying && (TimeServer::Instance()->GetServerTime() - serverTimeStarting >= time_StartGame))
 	{
-		int remainingTime = time_StartingGame - (TimeServer::Instance()->GetServerTime() - serverTimeStarting);
-		if (remainingTime <= 0)
-		{
-			// go to BattleScene
-			SceneManager::Instance()->ReplaceScene(new BattleScene());
-		}
+		// go to battle
+		SceneManager::Instance()->ReplaceScene(new BattleScene());
 		return;
 	}
 
@@ -224,7 +220,7 @@ void LobbyScene::Draw()
 		if (isPlaying)
 		{
 			label_LobbyTitle.SetPosition(D3DXVECTOR2(440.f, 260.f));
-			int remainingTime = time_StartingGame - (TimeServer::Instance()->GetServerTime() - serverTimeStarting);
+			int remainingTime = time_StartGame - (TimeServer::Instance()->GetServerTime() - serverTimeStarting);
 			label_LobbyTitle.Draw("Game start in " + to_string(remainingTime));
 		}
 		else
@@ -411,5 +407,9 @@ void LobbyScene::ReceivePacket(InputMemoryBitStream& _is, int _packetType)
 				lastRoomID = -1;
 			}
 		}
+	}
+	if (_packetType == PT_PlayerInput)
+	{
+		int a = 3; // BUG GAME
 	}
 }

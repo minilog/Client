@@ -5,21 +5,35 @@
 
 Player::Player(int _ID)
 {
-	// gán ID network cho Player
 	ID = _ID;
-
-	// gán loại đối tượng
 	Type = ET_Player;
-
-	// khởi tạo các animation dựa theo NetworkID
 	InitAnimation();
-
-	// animation ban đầu
 	currentAnimation = upAnimationLv01;
-
-	// kích cỡ va chạm, 28, 28 cho dễ di chuyển
 	width = 28;
 	height = 28;
+
+	switch (_ID)
+	{
+	case 0:
+		position = D3DXVECTOR2(55.f, 55.f);
+		break;
+	case 1:
+		position = D3DXVECTOR2(745.f, 55.f);
+		break;
+	case 2:
+		position = D3DXVECTOR2(55.f, 745.f);
+		break;
+	case 3:
+		position = D3DXVECTOR2(745.f, 745.f);
+		break;
+	default:
+		break;
+	}
+
+	if (_ID == GameGlobal::Socket->PlayerID)
+	{
+		isMy = true;
+	}
 }
 
 Player::~Player()
@@ -42,26 +56,74 @@ Player::~Player()
 	delete arrowAnimation;
 }
 
-void Player::Write(OutputMemoryBitStream& _os)
-{
-	_os.Write(direction, NBit_Direction); // gửi hướng di chuyển
-}
-
 void Player::Read(InputMemoryBitStream& _is)
 {
+	int x = 0;
+	int y = 0;
+	Direction _dir = D_Stand;
+
+	_is.Read(x, NBit_Position);
+	_is.Read(y, NBit_Position);
+	_is.Read(_dir, NBit_Direction);
+
+	D3DXVECTOR2 _newPos = D3DXVECTOR2(x / 10.f, y / 10.f);
+
+	if (isMy)
+	{
+		D3DXVECTOR2 distance = position - _newPos;
+		if (sqrt(distance.x * distance.x + distance.y * distance.y) >= 5.f)
+		{
+			position = _newPos;
+		}
+	}
+	else
+	{
+		position = _newPos;
+		direction = _dir;
+		// change animation & velocity
+		SetAnimationByDirection(direction);
+	}
 }
 
 void Player::Update(float _dt)
 {
-
 	position += velocity * _dt;
+}
 
-	// thay đổi animation đựa vào hướng đi
+void Player::HandleKeyboard(std::map<int, bool> keys)
+{
+	if (IsDelete || !isMy)
+		return;
+
+	// change direction by keyboard
+	{
+		if (keys[VK_LEFT])
+		{
+			direction = D_Left;
+		}
+		else if (keys[VK_RIGHT])
+		{
+			direction = D_Right;
+		}
+		else if (keys[VK_UP])
+		{
+			direction = D_Up;
+		}
+		else if (keys[VK_DOWN])
+		{
+			direction = D_Down;
+		}
+		else
+		{
+			direction = D_Stand;
+		}
+	}
+
+	// change animation & velocity
 	SetAnimationByDirection(direction);
 	switch (direction)
 	{
 	case D_Stand:
-		SetAnimationByDirection(lastDirection);
 		velocity = D3DXVECTOR2(0.f, 0.f);
 		break;
 	case D_Left:
@@ -105,56 +167,38 @@ void Player::Update(float _dt)
 		}
 		break;
 	}
-}
 
-void Player::HandleKeyboard(std::map<int, bool> keys)
-{
-	// nếu đã thua, đã bị delete hoặc đang hồi sinh => không nhận phím
-	if (IsDelete)
+	if (direction != lastDirection)
 	{
-		return;
-	}
-
-	// thay đổi hướng đi dựa vào bàn phím
-	if (keys[VK_LEFT])
-	{
-		direction = D_Left;
-		lastDirection = D_Left;
-	}
-	else if (keys[VK_RIGHT])
-	{
-		direction = D_Right;
-		lastDirection = D_Right;
-	}
-	else if (keys[VK_UP])
-	{
-		direction = D_Up;
-		lastDirection = D_Up;
-	}
-	else if (keys[VK_DOWN])
-	{
-		direction = D_Down;
-		lastDirection = D_Down;
-	}
-	else
-	{
-		direction = D_Stand;
-	}
-
-	// tính toán bắn đạn
-	int time_to_fight = 1000;
-	if (keys[VK_SPACE])
-	{
-		if (level > 2)
+		// send input
 		{
-			time_to_fight = 700;
-		}
+			OutputMemoryBitStream os;
 
-		//if ((int)GetTickCount() - LastFire > time_to_fight)
-		//{
-		//	LastFire = (int)GetTickCount();
-		//	// bắn đạn ở đây
-		//}
+			os.Write(PT_PlayerInput, NBit_PacketType);
+			os.Write(direction, NBit_Direction);
+
+			GameGlobal::Socket->Send(os);
+		}
+	}
+
+	lastDirection = direction;
+
+	// check fire
+	{
+		int time_to_fight = 1000;
+		if (keys[VK_SPACE])
+		{
+			if (level > 2)
+			{
+				time_to_fight = 700;
+			}
+
+			//if ((int)GetTickCount() - LastFire > time_to_fight)
+			//{
+			//	LastFire = (int)GetTickCount();
+			//	// bắn đạn ở đây
+			//}
+		}
 	}
 }
 
@@ -380,27 +424,5 @@ void Player::SetAnimationByDirection(Direction _dir)
 
 void Player::Draw()
 {
-	//if (isLose) return;
-	//if (isDelete) return;
-	//if (is_respaw)
-	//{
-	//	spawn->SetPosition(GetPosition());
-	//	spawn->Draw();
-	//	return;
-	//}
-
-	//mCurrentSprite->SetPosition(this->GetPosition());
-
-	//mCurrentSprite->Draw(D3DXVECTOR3(x, y, 0));
-	//if (isMe)
-	//{
-	//	m_top_sprite->SetPosition(D3DXVECTOR3(x, y + 35, 0));
-	//	m_top_sprite->Draw();
-	//}
-
-	//if (is_protect)
-	//{
-	//	shield->SetPosition(GetPosition());
-	//	shield->Draw();
-	//}
+	currentAnimation->Draw(position);
 }

@@ -16,22 +16,19 @@ class Player : public Entity
 	Direction direction = D_Stand;
 	Direction lastDirection = D_Stand;
 	int level = 1;
+	bool isMy = false;
 
 public:
 	Player(int _ID);
 	~Player();
-
 	void Update(float _dt);
 	void Draw();
 	void MakeCollision(Entity* _en) override { velocity = D3DXVECTOR2(0.f, 0.f); }
-	void Write(OutputMemoryBitStream& _os) override;
 	void Read(InputMemoryBitStream& _is) override;
-
 	void HandleKeyboard(std::map<int, bool> _keys);
 
-// các biến và hàm hỗ trợ
+// support 
 private:
-	// các animation di chuyển
 	Animation* leftAnimationLv01;
 	Animation* rightAnimationLv01;
 	Animation* upAnimationLv01;
