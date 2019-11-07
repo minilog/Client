@@ -53,7 +53,8 @@ void LobbyScene::Update(float _dt)
 	if (isPlaying && (TimeServer::Instance()->GetServerTime() - serverTimeStarting >= time_StartGame))
 	{
 		// go to battle
-		SceneManager::Instance()->ReplaceScene(new BattleScene());
+		RoomView * room = roomViewList[GameGlobal::Socket->PlayerRoomID];
+		SceneManager::Instance()->ReplaceScene(new BattleScene(room->playerInRoomList));
 		return;
 	}
 
@@ -243,7 +244,8 @@ void LobbyScene::Draw()
 			RoomView* room = roomViewList[GameGlobal::Socket->PlayerRoomID];
 
 			int myID = GameGlobal::Socket->PlayerID;
-			if (room->Player0)
+
+			if (room->playerInRoomList[0])
 			{
 				if (myID == 0)
 				{
@@ -254,14 +256,14 @@ void LobbyScene::Draw()
 					label_Player0.Draw("Player 0");
 				}
 
-				if (room->Player0_Ready)
+				if (room->playerReadyList[0])
 				{
 					label_ready.SetPosition(D3DXVECTOR2(228.f, 352.f));
 					label_ready.Draw();
 				}
 			}
 
-			if (room->Player1)
+			if (room->playerInRoomList[1])
 			{
 				if (myID == 1)
 				{
@@ -272,14 +274,14 @@ void LobbyScene::Draw()
 					label_Player1.Draw("Player 1");
 				}
 
-				if (room->Player1_Ready)
+				if (room->playerReadyList[1])
 				{
 					label_ready.SetPosition(D3DXVECTOR2(228.f + 250.f, 352.f));
 					label_ready.Draw();
 				}
 			}
 
-			if (room->Player2)
+			if (room->playerInRoomList[2])
 			{
 				if (myID == 2)
 				{
@@ -290,14 +292,14 @@ void LobbyScene::Draw()
 					label_Player2.Draw("Player 2");
 				}
 
-				if (room->Player2_Ready)
+				if (room->playerReadyList[2])
 				{
 					label_ready.SetPosition(D3DXVECTOR2(228.f + 250.f * 2, 352.f));
 					label_ready.Draw();
 				}
 			}
 
-			if (room->Player3)
+			if (room->playerInRoomList[3])
 			{
 				if (myID == 3)
 				{
@@ -308,7 +310,7 @@ void LobbyScene::Draw()
 					label_Player3.Draw("Player 3");
 				}
 
-				if (room->Player3_Ready)
+				if (room->playerReadyList[3])
 				{
 					label_ready.SetPosition(D3DXVECTOR2(228.f + 250.f * 3, 352.f));
 					label_ready.Draw();
@@ -367,19 +369,19 @@ void LobbyScene::ReceivePacket(InputMemoryBitStream& _is, int _packetType)
 				RoomView* myRView = roomViewList[_playerRoomID];
 				if (_playerID == 0)
 				{
-					isReady = myRView->Player0_Ready;
+					isReady = myRView->playerReadyList[0];
 				}
 				else if (_playerID == 1)
 				{
-					isReady = myRView->Player1_Ready;
+					isReady = myRView->playerReadyList[1];
 				}
 				else if (_playerID == 2)
 				{
-					isReady = myRView->Player2_Ready;
+					isReady = myRView->playerReadyList[2];
 				}
 				else if (_playerID == 3)
 				{
-					isReady = myRView->Player3_Ready;
+					isReady = myRView->playerReadyList[3];
 				}
 
 				isPlaying = myRView->GetIsPlaying();
@@ -411,5 +413,6 @@ void LobbyScene::ReceivePacket(InputMemoryBitStream& _is, int _packetType)
 	if (_packetType == PT_PlayerInput)
 	{
 		int a = 3; // BUG GAME
+		SceneManager::Instance()->ReplaceScene(new LobbyScene());
 	}
 }

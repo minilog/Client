@@ -18,6 +18,13 @@ RoomView::RoomView(int _networkID)
 
 	// trạng thái phòng màu xanh
 	currentBox = greenBox;
+
+	// init 4 slots
+	for (int i = 0; i < 4; i++)
+	{
+		playerInRoomList.push_back(false);
+		playerReadyList.push_back(false);
+	}
 }
 
 RoomView::~RoomView()
@@ -38,11 +45,13 @@ void RoomView::Draw() {
 	// vẽ số người chơi hiện có / số người chơi tối đa
 	if (!isPlaying)
 	{
-		label_NPlayer.Draw(to_string(Player0 + Player1 + Player2 + Player3) + "/" + to_string(maxPlayer), D3DCOLOR_XRGB(255, 242, 0));
+		label_NPlayer.Draw(to_string(playerInRoomList[0] + playerInRoomList[1] + playerInRoomList[2] + playerInRoomList[3])
+			+ "/" + to_string(maxPlayer), D3DCOLOR_XRGB(255, 242, 0));
 	}
 	else
 	{
-		label_NPlayer.Draw(to_string(Player0 + Player1 + Player2 + Player3) + "/" + to_string(maxPlayer) + "\n(Playing)", D3DCOLOR_XRGB(255, 242, 0));
+		label_NPlayer.Draw(to_string(playerInRoomList[0] + playerInRoomList[1] + playerInRoomList[2] + playerInRoomList[3])
+			+ "/" + to_string(maxPlayer) + "\n(Playing)", D3DCOLOR_XRGB(255, 242, 0));
 	}
 }
 
@@ -70,23 +79,29 @@ void RoomView::Read(InputMemoryBitStream & _is)
 	_is.Read(_player3);
 	_is.Read(_player3_Ready);
 	_is.Read(_isPlaying);
-	_is.Read(_startingTime, NBit_Time);
-
+	if (_isPlaying)
+	{
+		_is.Read(_startingTime, NBit_Time);
+	}
 
 	// result
-	Player0 = _player0;
-	Player0_Ready = _player0_Ready;
-	Player1 = _player1;
-	Player1_Ready = _player1_Ready;
-	Player2 = _player2;
-	Player2_Ready = _player2_Ready;
-	Player3 = _player3;
-	Player3_Ready = _player3_Ready;
+	playerInRoomList[0] = _player0;
+	playerReadyList[0] = _player0_Ready;
+	playerInRoomList[1] = _player1;
+	playerReadyList[1] = _player1_Ready;
+	playerInRoomList[2] = _player2;
+	playerReadyList[2] = _player2_Ready;
+	playerInRoomList[3] = _player3;
+	playerReadyList[3] = _player3_Ready;
+
 	isPlaying = _isPlaying;
-	StartingTime = _startingTime;
+	if (isPlaying)
+	{
+		StartingTime = _startingTime;
+	}
 
 	// đổi màu phòng
-	if ((Player0 && Player1 && Player2 && Player3) 
+	if ((playerInRoomList[0] && playerInRoomList[1] && playerInRoomList[2] && playerInRoomList[3])
 		|| isPlaying)
 	{
 		currentBox = redBox;
@@ -95,4 +110,14 @@ void RoomView::Read(InputMemoryBitStream & _is)
 	{
 		currentBox = greenBox;
 	}
+}
+
+bool RoomView::CanJoin()
+{
+	if (currentBox == redBox)
+	{
+		return false;
+	}
+
+	return true;
 }

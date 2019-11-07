@@ -24,7 +24,7 @@ public:
 	void Update(float _dt);
 	void Draw();
 	void MakeCollision(Entity* _en) override { velocity = D3DXVECTOR2(0.f, 0.f); }
-	void Read(InputMemoryBitStream& _is) override;
+	void Read(InputMemoryBitStream& _is, bool _canReceive);
 	void HandleKeyboard(std::map<int, bool> _keys);
 
 // support 

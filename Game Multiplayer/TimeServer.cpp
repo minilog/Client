@@ -60,10 +60,10 @@ void TimeServer::Draw()
 	receiveTime_Label.Draw("Receive time: " + to_string(receiveTime));
 
 	label_NReceiveExecuted.Draw("Multiplier: " + to_string(timeDistanceMultiplier));
-	label_TimeDistance.Draw("Time server - your time: " + to_string(timeDistance + (double)4.f));
+	label_TimeDistance.Draw("Time server - your time: " + to_string(timeDistance));
 
 	// trong local, số âm nghĩa là servertime tính được chạy chậm hơn thực tế
-	label_TimeDistanceAverage.Draw("Time server - your time average: " + to_string(timeDistanceAverage + (double)4.f));
+	label_TimeDistanceAverage.Draw("Time server - your time average: " + to_string(timeDistanceAverage));
 	serverTime_Label.Draw("Server time: " + to_string(GetServerTime()));
 }
 
@@ -88,8 +88,9 @@ void TimeServer::ReceivePacket(InputMemoryBitStream& _is, int _packetType)
 		if (ping <= maxPingToSync && ping > 0)
 		{
 			double correspondingTime = ((double)receiveTime + (double)sendTime) / 2.f;
-
-			timeDistance = (double)_timeServerReceived - correspondingTime;
+			
+			// time server đo được sẽ chậm hơn 0 - 8ms so với thực tế (vì tính chất frame = 16ms) => + 4ms
+			timeDistance = (double)_timeServerReceived - correspondingTime + 4.f;
 			double multiplier = (double)100.f / (double)ping;
 			multiplier = multiplier * multiplier;
 			
@@ -107,8 +108,7 @@ int TimeServer::GetServerTime()
 {
 	if (isSync)
 	{
-		// time server đo được sẽ chậm hơn 0 - 8ms so với thực tế (vì tính chất frame = 16ms) => + 4ms
-		int t = (int)GetTickCount() + (int)timeDistanceAverage + 4;
+		int t = (int)GetTickCount() + (int)timeDistanceAverage;
 		return t;
 	}
 	return -1;

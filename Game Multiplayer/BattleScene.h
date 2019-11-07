@@ -8,9 +8,10 @@ class BattleScene : public Scene
 {
 	GameMap* map;
 	vector<Player*> playerList;
+	int lastSentTime = -1;
 
 public:
-	BattleScene();
+	BattleScene(vector<bool> _playerInRoomList);
 	~BattleScene();
 	void Update(float _dt) override;
 	void Draw() override;

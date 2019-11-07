@@ -2,6 +2,7 @@
 
 #include "GameLog.h"
 #include "SpriteList.h"
+#include "TimeServer.h"
 
 Player::Player(int _ID)
 {
@@ -56,7 +57,7 @@ Player::~Player()
 	delete arrowAnimation;
 }
 
-void Player::Read(InputMemoryBitStream& _is)
+void Player::Read(InputMemoryBitStream & _is, bool _canReceive)
 {
 	int x = 0;
 	int y = 0;
@@ -66,12 +67,15 @@ void Player::Read(InputMemoryBitStream& _is)
 	_is.Read(y, NBit_Position);
 	_is.Read(_dir, NBit_Direction);
 
+	//if (!_canReceive)
+	//	return;
+
 	D3DXVECTOR2 _newPos = D3DXVECTOR2(x / 10.f, y / 10.f);
 
 	if (isMy)
 	{
 		D3DXVECTOR2 distance = position - _newPos;
-		if (sqrt(distance.x * distance.x + distance.y * distance.y) >= 5.f)
+		if (sqrt(distance.x * distance.x + distance.y * distance.y) >= 20.f)
 		{
 			position = _newPos;
 		}
@@ -175,6 +179,7 @@ void Player::HandleKeyboard(std::map<int, bool> keys)
 			OutputMemoryBitStream os;
 
 			os.Write(PT_PlayerInput, NBit_PacketType);
+			//os.Write(TimeServer::Instance()->GetServerTime(), NBit_Time); // write server time
 			os.Write(direction, NBit_Direction);
 
 			GameGlobal::Socket->Send(os);
