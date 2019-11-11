@@ -24,19 +24,19 @@ BattleScene::~BattleScene()
 
 void BattleScene::Update(float _dt)
 {
-	//for (auto brick : map->GetBrickList())
-	//{
-	//	if (!brick->IsDelete)
-	//	{
-	//		for (auto player : playerList)
-	//		{
-	//			if (GameCollision::IsCollideInNextFrame(player, brick, _dt))
-	//			{
-	//				player->MakeCollision(brick);
-	//			}
-	//		}
-	//	}
-	//}
+	for (auto brick : map->GetBrickList())
+	{
+		if (!brick->IsDelete)
+		{
+			for (auto player : playerList)
+			{
+				if (GameCollision::IsCollideInNextFrame(player, brick, _dt))
+				{
+					player->MakeCollision(brick);
+				}
+			}
+		}
+	}
 
 	for (auto player : playerList)
 	{
@@ -61,22 +61,23 @@ void BattleScene::ReceivePacket(InputMemoryBitStream& _is, int _packetType)
 		int sentTime = 0;
 		_is.Read(sentTime, NBit_Time);
 
-		for (auto player : playerList)
+		// không nhận các packet trễ
+		if (lastSentTime >= sentTime)
 		{
-			//player->Read(_is, true);
-
-			// not receive
-			if (lastSentTime >= sentTime)
+			for (auto player : playerList)
 			{
 				player->Read(_is, false);
 			}
-			else
+		}
+		else
+		{
+			for (auto player : playerList)
 			{
 				player->Read(_is, true);
-				lastSentTime = sentTime;
 			}
 
 			int nFramePrevious = TimeServer::Instance()->GetServerTime() - sentTime; // đã bao nhiêu frame trôi qua từ lúc client gửi
+			lastSentTime = sentTime;
 		}
 	}
 }
