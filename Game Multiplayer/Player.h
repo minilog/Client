@@ -48,6 +48,5 @@ private:
 	Animation* shieldAnimation; // animation khiên 
 	Animation* spawnAnimation; // animation hồi sinh
 
-	void InitAnimation();
 	void SetAnimationByDirection(Direction _dir);
 };

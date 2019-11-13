@@ -232,7 +232,7 @@ void Player::Read(InputMemoryBitStream & _is, bool _canReceive)
 	if (isMy)
 	{
 		D3DXVECTOR2 distance = position - _newPos;
-		if (sqrt(distance.x * distance.x + distance.y * distance.y) >= 60.f)
+		if (sqrt(distance.x * distance.x + distance.y * distance.y) >= 80.f)
 		{
 			position = _newPos;
 		}
@@ -332,6 +332,7 @@ void Player::HandleKeyboard(std::map<int, bool> keys)
 
 	if (direction != lastDirection)
 	{
+		for (int i = 0; i < 3; i++)
 		// send input
 		{
 			OutputMemoryBitStream os;
@@ -363,11 +364,6 @@ void Player::HandleKeyboard(std::map<int, bool> keys)
 			//}
 		}
 	}
-}
-
-void Player::InitAnimation()
-{
-
 }
 
 void Player::SetAnimationByDirection(Direction _dir)
