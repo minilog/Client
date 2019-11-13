@@ -6,13 +6,20 @@ BattleScene::BattleScene(vector<bool> _playerInRoomList)
 {
 	map = new GameMap("Resource files/map.tmx");
 
-	// init players in list
+	// tạo plays
 	for (int i = 0; i < 4; i++)
 	{
 		if (_playerInRoomList[i] == true)
 		{
 			Player* player = new Player(i);
 			playerList.push_back(player);
+
+			// tạo 4 bullet cho mỗi player
+			for (int j = 0; j < 4; j++)
+			{
+				Bullet* bullet = new Bullet(j, i);
+				bulletList.push_back(bullet);
+			}
 		}
 	}
 }
@@ -24,6 +31,12 @@ BattleScene::~BattleScene()
 
 void BattleScene::Update(float _dt)
 {
+	// nhận keyboard
+	for (auto player : playerList)
+	{
+		player->HandleKeyboard(keyboard);
+	}
+
 	for (auto brick : map->GetBrickList())
 	{
 		if (!brick->IsDelete)
@@ -41,7 +54,6 @@ void BattleScene::Update(float _dt)
 	for (auto player : playerList)
 	{
 		player->Update(_dt);
-		player->HandleKeyboard(keyboard);
 	}
 }
 
@@ -52,17 +64,21 @@ void BattleScene::Draw()
 	{
 		player->Draw();
 	}
+	for (auto bullet : bulletList)
+	{
+		bullet->Draw();
+	}
 }
 
 void BattleScene::ReceivePacket(InputMemoryBitStream& _is, int _packetType)
 {
-	if (_packetType == PT_PlayerInput)
+	if (_packetType == PT_World)
 	{
-		int sentTime = 0;
-		_is.Read(sentTime, NBit_Time);
+		int receivedTime = 0;
+		_is.Read(receivedTime, NBit_Time);
 
 		// không nhận các packet trễ
-		if (lastSentTime >= sentTime)
+		if (lastReceivedTime >= receivedTime)
 		{
 			for (auto player : playerList)
 			{
@@ -76,8 +92,8 @@ void BattleScene::ReceivePacket(InputMemoryBitStream& _is, int _packetType)
 				player->Read(_is, true);
 			}
 
-			int nFramePrevious = TimeServer::Instance()->GetServerTime() - sentTime; // đã bao nhiêu frame trôi qua từ lúc client gửi
-			lastSentTime = sentTime;
+			int nFramePrevious = TimeServer::Instance()->GetServerTime() - receivedTime; // đã bao nhiêu frame trôi qua từ lúc client gửi
+			lastReceivedTime = receivedTime;
 		}
 	}
 }

@@ -4,7 +4,7 @@
 
 class Bullet : public Entity
 {
-	const float speed = 500.f;
+	const float speed = 400.f;
 	Direction direction;	// hướng bay
 	
 	Animation* leftAnimation;
@@ -44,6 +44,7 @@ public:
 		// thiết lập animation ban đầu
 		currentAnimation = leftAnimation;
 	}
+	
 	~Bullet() 
 	{
 		// xóa các animation đã khởi tạo
@@ -76,6 +77,19 @@ public:
 
 	void Read(InputMemoryBitStream& _is) override
 	{
+		bool _isDelete = false;
+		int x = 0;
+		int y = 0;
+		Direction dir = D_Stand;
+
+		_is.Read(_isDelete);
+		_is.Read(x, NBit_Position);
+		_is.Read(y, NBit_Position);
+		_is.Read(dir, NBit_Direction);
+
+		IsDelete = _isDelete;
+		position = D3DXVECTOR2((float)x, (float)y);
+		direction = dir;
 	}
 
 	// thay đổi vận tốc và animation đựa theo hướng bay

@@ -15,7 +15,7 @@ namespace Define {
 	const int NBit_NPlayersInRoom = 3; // số lượng người chơi trong phòng [0, 4]
 }
 
-// [0, 8] => 4 bit
+// [0, 15] => 4 bit
 enum PacketType
 {
 	PT_Unknown,
@@ -27,7 +27,9 @@ enum PacketType
 	PT_StartGame,
 	PT_GameState,
 	PT_ReadyCancel,
-	PT_PlayerInput
+	PT_PlayerInput,
+	PT_World,
+	PT_PlayerShoot
 };
 
 // [0, 10] => 4 bit

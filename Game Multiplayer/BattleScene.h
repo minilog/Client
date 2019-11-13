@@ -3,12 +3,14 @@
 #include "Scene.h"
 #include "GameMap.h"
 #include "Player.h"
+#include "Bullet.h"
 
 class BattleScene : public Scene
 {
 	GameMap* map;
 	vector<Player*> playerList;
-	int lastSentTime = -1;
+	vector<Bullet*> bulletList;
+	int lastReceivedTime = -1;
 
 public:
 	BattleScene(vector<bool> _playerInRoomList);

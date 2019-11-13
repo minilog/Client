@@ -232,7 +232,7 @@ void Player::Read(InputMemoryBitStream & _is, bool _canReceive)
 	if (isMy)
 	{
 		D3DXVECTOR2 distance = position - _newPos;
-		if (sqrt(distance.x * distance.x + distance.y * distance.y) >= 80.f)
+		if (sqrt(distance.x * distance.x + distance.y * distance.y) >= 100.f)
 		{
 			position = _newPos;
 		}
@@ -332,7 +332,7 @@ void Player::HandleKeyboard(std::map<int, bool> keys)
 
 	if (direction != lastDirection)
 	{
-		for (int i = 0; i < 3; i++)
+		for (int i = 0; i < 2; i++)
 		// send input
 		{
 			OutputMemoryBitStream os;
@@ -347,22 +347,23 @@ void Player::HandleKeyboard(std::map<int, bool> keys)
 
 	lastDirection = direction;
 
-	// check fire
+	
+	// shoot
+	count_Shoot -= 1 / 60.0f;
+	if (count_Shoot < 0 && keys[VK_SPACE])
 	{
-		int time_to_fight = 1000;
-		if (keys[VK_SPACE])
-		{
-			if (level > 2)
-			{
-				time_to_fight = 700;
-			}
+		count_Shoot = time_BetweenShoots;
+		GAMELOG("Send Shoot");
 
-			//if ((int)GetTickCount() - LastFire > time_to_fight)
-			//{
-			//	LastFire = (int)GetTickCount();
-			//	// bắn đạn ở đây
-			//}
+		// send shoot
+		for (int i = 0; i < 2; i++)
+		{
+			OutputMemoryBitStream os;
+			os.Write(PT_PlayerShoot, NBit_PacketType);
+			os.Write(TimeServer::Instance()->GetServerTime(), NBit_Time); // write server time
 		}
+
+		GameGlobal::Socket->Send(os); 
 	}
 }
 

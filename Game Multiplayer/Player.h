@@ -17,6 +17,8 @@ class Player : public Entity
 	Direction lastDirection = D_Stand;
 	int level = 1;
 	bool isMy = false;
+	const float time_BetweenShoots = 0.7f; // bên client sẽ là 0.7, server sẽ là 0.6
+	float count_Shoot = 0.0f;
 
 public:
 	Player(int _ID);
