@@ -127,8 +127,8 @@ void Game::InitLoop()
 
 		if (delta >= tickPerFrame)
 		{
-			Update(1.0f / 60);
-			delta = 0;
+			Update(1 / 60.0f);
+			delta -= tickPerFrame;
 		}
 		else
 		{

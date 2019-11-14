@@ -231,7 +231,7 @@ void Player::Read(InputMemoryBitStream & _is, bool _canReceive)
 		if (isMy)
 		{
 			D3DXVECTOR2 distance = position - _newPos;
-			if (sqrt(distance.x * distance.x + distance.y * distance.y) >= 100.f)
+			if (sqrt(distance.x * distance.x + distance.y * distance.y) >= 80.f)
 			{
 				position = _newPos;
 			}
@@ -264,7 +264,7 @@ void Player::HandleKeyboard(std::map<int, bool> keys)
 
 		// send shoot
 		int sTime = TimeServer::Instance()->GetServerTime();
-		for (int i = 0; i < 1; i++)
+		for (int i = 0; i < 3; i++)
 		{
 			OutputMemoryBitStream os;
 			os.Write(PT_PlayerShoot, NBit_PacketType);
@@ -353,7 +353,7 @@ void Player::HandleKeyboard(std::map<int, bool> keys)
 	{
 		// send input
 		int sTime = TimeServer::Instance()->GetServerTime();
-		for (int i = 0; i < 2; i++)
+		for (int i = 0; i < 3; i++)
 		{
 			OutputMemoryBitStream os;
 
