@@ -250,13 +250,13 @@ void Player::Update(float _dt)
 	position += velocity * _dt;
 }
 
-void Player::HandleKeyboard(std::map<int, bool> keys)
+void Player::HandleKeyboard(std::map<int, bool> keys, float _dt)
 {
 	if (IsDelete || !isMy)
 		return;
 
 	// shoot
-	count_Shoot -= 1 / 60.0f;
+	count_Shoot -= _dt;
 	if (count_Shoot < 0 && keys[VK_SPACE])
 	{
 		count_Shoot = time_BetweenShoots;

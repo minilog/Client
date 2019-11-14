@@ -34,7 +34,7 @@ void BattleScene::Update(float _dt)
 	// nhận keyboard
 	for (auto player : playerList)
 	{
-		player->HandleKeyboard(keyboard);
+		player->HandleKeyboard(keyboard, _dt);
 	}
 
 	for (auto brick : map->GetBrickList())
