@@ -75,7 +75,7 @@ public:
 		IsDelete = true;
 	}
 
-	void Read(InputMemoryBitStream& _is) override
+	void Read(InputMemoryBitStream& _is, bool _canReceive)
 	{
 		bool _isDelete = false;
 		int x = 0;
@@ -87,9 +87,12 @@ public:
 		_is.Read(y, NBit_Position);
 		_is.Read(dir, NBit_Direction);
 
-		IsDelete = _isDelete;
-		position = D3DXVECTOR2((float)x, (float)y);
-		direction = dir;
+		if (_canReceive)
+		{
+			IsDelete = _isDelete;
+			position = D3DXVECTOR2((float)x, (float)y);
+			SetDirection(dir);
+		}
 	}
 
 	// thay đổi vận tốc và animation đựa theo hướng bay

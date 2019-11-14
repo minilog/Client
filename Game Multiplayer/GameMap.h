@@ -18,6 +18,7 @@
 class GameMap
 {
 	std::vector<Brick*> brickList;
+	std::vector<BrickNormal*> brickNorList;
 	Tmx::Map *map;
 	std::map<int, Sprite*>  tilesetList;
 	GameDebugDraw* debugDraw;
@@ -30,6 +31,7 @@ public:
 
 	Tmx::Map* GetMap() { return map; }
 	std::vector<Brick*> GetBrickList() { return brickList; }
+	std::vector<BrickNormal*> GetBrickNorList() { return brickNorList; }
 
 // các hàm hỗ trợ
 private:

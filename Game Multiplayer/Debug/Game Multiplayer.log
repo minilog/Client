@@ -1,2 +1,5 @@
-﻿  Player.cpp
+﻿  BattleScene.cpp
+  LobbyScene.cpp
+  Player.cpp
+  Generating Code...
   Game Multiplayer.vcxproj -> C:\Users\Minh\Desktop\Client\Debug\Client.exe

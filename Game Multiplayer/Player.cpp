@@ -224,24 +224,24 @@ void Player::Read(InputMemoryBitStream & _is, bool _canReceive)
 	_is.Read(y, NBit_Position);
 	_is.Read(_dir, NBit_Direction);
 
-	if (!_canReceive)
-		return;
-
-	D3DXVECTOR2 _newPos = D3DXVECTOR2(x / 10.f, y / 10.f);
-
-	if (isMy)
+	if (_canReceive)
 	{
-		D3DXVECTOR2 distance = position - _newPos;
-		if (sqrt(distance.x * distance.x + distance.y * distance.y) >= 100.f)
+		D3DXVECTOR2 _newPos = D3DXVECTOR2(x / 10.f, y / 10.f);
+
+		if (isMy)
+		{
+			D3DXVECTOR2 distance = position - _newPos;
+			if (sqrt(distance.x * distance.x + distance.y * distance.y) >= 100.f)
+			{
+				position = _newPos;
+			}
+		}
+		else
 		{
 			position = _newPos;
+			direction = _dir;
+			SetAnimationByDirection(direction);
 		}
-	}
-	else
-	{
-		position = _newPos;
-		direction = _dir;
-		SetAnimationByDirection(direction);
 	}
 }
 
@@ -254,6 +254,25 @@ void Player::HandleKeyboard(std::map<int, bool> keys)
 {
 	if (IsDelete || !isMy)
 		return;
+
+	// shoot
+	count_Shoot -= 1 / 60.0f;
+	if (count_Shoot < 0 && keys[VK_SPACE])
+	{
+		count_Shoot = time_BetweenShoots;
+		GAMELOG("Send Shoot");
+
+		// send shoot
+		int sTime = TimeServer::Instance()->GetServerTime();
+		for (int i = 0; i < 1; i++)
+		{
+			OutputMemoryBitStream os;
+			os.Write(PT_PlayerShoot, NBit_PacketType);
+			os.Write(sTime, NBit_Time); // write server time
+
+			GameGlobal::Socket->Send(os);
+		}
+	}
 
 	// bàn phím thay đổi direction
 	{
@@ -332,13 +351,14 @@ void Player::HandleKeyboard(std::map<int, bool> keys)
 
 	if (direction != lastDirection)
 	{
-		for (int i = 0; i < 2; i++)
 		// send input
+		int sTime = TimeServer::Instance()->GetServerTime();
+		for (int i = 0; i < 2; i++)
 		{
 			OutputMemoryBitStream os;
 
 			os.Write(PT_PlayerInput, NBit_PacketType);
-			os.Write(TimeServer::Instance()->GetServerTime(), NBit_Time); // write server time
+			os.Write(sTime, NBit_Time); // write server time
 			os.Write(direction, NBit_Direction);
 
 			GameGlobal::Socket->Send(os);
@@ -346,25 +366,6 @@ void Player::HandleKeyboard(std::map<int, bool> keys)
 	}
 
 	lastDirection = direction;
-
-	
-	// shoot
-	count_Shoot -= 1 / 60.0f;
-	if (count_Shoot < 0 && keys[VK_SPACE])
-	{
-		count_Shoot = time_BetweenShoots;
-		GAMELOG("Send Shoot");
-
-		// send shoot
-		for (int i = 0; i < 2; i++)
-		{
-			OutputMemoryBitStream os;
-			os.Write(PT_PlayerShoot, NBit_PacketType);
-			os.Write(TimeServer::Instance()->GetServerTime(), NBit_Time); // write server time
-		}
-
-		GameGlobal::Socket->Send(os); 
-	}
 }
 
 void Player::SetAnimationByDirection(Direction _dir)

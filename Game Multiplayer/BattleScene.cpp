@@ -51,6 +51,11 @@ void BattleScene::Update(float _dt)
 		}
 	}
 
+	for (auto bullet : bulletList)
+	{
+		bullet->Update(_dt);
+	}
+
 	for (auto player : playerList)
 	{
 		player->Update(_dt);
@@ -84,12 +89,39 @@ void BattleScene::ReceivePacket(InputMemoryBitStream& _is, int _packetType)
 			{
 				player->Read(_is, false);
 			}
+
+			// nhận bulletList
+			for (auto bullet : bulletList)
+			{
+				bullet->Read(_is, false);
+			}
+
+			for (auto brick : map->GetBrickNorList())
+			{
+				bool _isDelete = false;
+				_is.Read(_isDelete);
+			}
 		}
 		else
 		{
 			for (auto player : playerList)
 			{
 				player->Read(_is, true);
+			}
+
+			// nhận bulletList
+			for (auto bullet : bulletList)
+			{
+				bullet->Read(_is, true);
+			}
+
+			// nhận brickNorList
+			for (auto brick : map->GetBrickNorList())
+			{
+				bool _isDelete = false;
+				_is.Read(_isDelete);
+
+				brick->IsDelete = _isDelete;
 			}
 
 			int nFramePrevious = TimeServer::Instance()->GetServerTime() - receivedTime; // đã bao nhiêu frame trôi qua từ lúc client gửi
