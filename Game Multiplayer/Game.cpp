@@ -39,7 +39,7 @@ Game::Game(int _fps)
 
 	SceneManager::Instance()->ReplaceScene(new LobbyScene());
 
-	InitLoop();
+	InitLoop2();
 }
 
 void Game::Update(float _dt)
@@ -136,5 +136,34 @@ void Game::InitLoop()
 			Sleep(delta_time);
 			delta = tickPerFrame;
 		}
+	}
+}
+
+void Game::InitLoop2()
+{
+	MSG msg;
+
+	double lastTime = (double)GetTickCount();
+
+	while (GameGlobal::IsGameRunning)
+	{
+		if (PeekMessage(&msg, NULL, 0, 0, PM_REMOVE))
+		{
+			TranslateMessage(&msg);
+			DispatchMessage(&msg);
+		}
+
+		double delta = (double)GetTickCount() - lastTime;
+
+		if (delta >= 1000 / 60.0f)
+		{
+			lastTime += 1000 / 60.0f;
+			Update(1 / 60.0f);
+		}
+		else
+		{
+			Sleep((DWORD)(1000 / 60.0f - delta));
+		}
+
 	}
 }

@@ -5,22 +5,17 @@
 
 class NPC :public Entity
 {
-	const float speed = 200.f;
+	const float speed = 150.f;
 	Direction direction; // hướng di chuyển
-	bool isExplosion = false;
-	Explosion* explosion; // trỏ đến đối tượng trong Scene
 
 public:
 	NPC(int _entityID);
 	~NPC();
-
 	void Update(float _dt) override;
 	void Draw() override;
 	void MakeCollision(Entity* _en) override { velocity = D3DXVECTOR2(0.f, 0.f); }
-	void Read(InputMemoryBitStream& is) override {}
-
-	void SetExplosion(Explosion *_explosion) { explosion = _explosion; }
-	void SetDirection(Direction _dir);
+	void Read(InputMemoryBitStream& is, bool _canReceive);
+	void SetDirection(Direction _dir); // thay đổi vận tốc và animation đựa theo hướng di chuyển
 
 // các biến và hàm hỗ trợ
 private:

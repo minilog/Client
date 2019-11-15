@@ -8,8 +8,8 @@ NPC::NPC(int _ID)
 
 	Type = ET_NPC;
 	IsDelete = true;
-	width = 32;
-	height = 32;
+	width = 28;
+	height = 28;
 
 	// khởi tạo các animation
 	leftAnimation = new Animation();
@@ -38,7 +38,6 @@ NPC::~NPC()
 	delete downAnimation;
 }
 
-
 void NPC::Update(float _dt)
 {
 	if (IsDelete)
@@ -55,7 +54,26 @@ void NPC::Draw()
 	currentAnimation->Draw(GetPosition());
 }
 
-// thay đổi vận tốc và animation đựa theo hướng di chuyển
+void NPC::Read(InputMemoryBitStream & is, bool _canReceive)
+{
+	int x = 0;
+	int y = 0;
+	Direction dir = D_Stand;
+	bool _isDelete = false;
+
+	is.Read(x, NBit_Position);
+	is.Read(y, NBit_Position);
+	is.Read(dir, NBit_Direction);
+	is.Read(_isDelete);
+
+	if (_canReceive)
+	{
+		position = D3DXVECTOR2(x / 10.0f, y / 10.0f);
+		SetDirection(dir);
+		IsDelete = _isDelete;
+	}
+}
+
 void NPC::SetDirection(Direction _dir)
 {
 	direction = _dir;
@@ -76,6 +94,9 @@ void NPC::SetDirection(Direction _dir)
 	case D_Down:
 		currentAnimation = downAnimation;
 		velocity = D3DXVECTOR2(0.f, speed);
+		break;
+	case D_Stand:
+		velocity = D3DXVECTOR2(0, 0);
 		break;
 	default:
 		break;

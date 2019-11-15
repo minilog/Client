@@ -241,6 +241,54 @@ void Player::Read(InputMemoryBitStream & _is, bool _canReceive)
 			position = _newPos;
 			direction = _dir;
 			SetAnimationByDirection(direction);
+
+			// thay đổi vận tốc
+			switch (direction)
+			{
+			case D_Stand:
+				velocity = D3DXVECTOR2(0.f, 0.f);
+				break;
+			case D_Left:
+				if (level == 1)
+				{
+					velocity = D3DXVECTOR2(-speed1, 0.f);
+				}
+				else
+				{
+					velocity = D3DXVECTOR2(-speed2, 0.f);
+				}
+				break;
+			case D_Right:
+				if (level == 1)
+				{
+					velocity = D3DXVECTOR2(speed1, 0.f);
+				}
+				else
+				{
+					velocity = D3DXVECTOR2(speed2, 0.f);
+				}
+				break;
+			case D_Up:
+				if (level == 1)
+				{
+					velocity = D3DXVECTOR2(0.f, -speed1);
+				}
+				else
+				{
+					velocity = D3DXVECTOR2(0.f, -speed2);
+				}
+				break;
+			case D_Down:
+				if (level == 1)
+				{
+					velocity = D3DXVECTOR2(0.f, speed1);
+				}
+				else
+				{
+					velocity = D3DXVECTOR2(0.f, speed1);
+				}
+				break;
+			}
 		}
 	}
 }
@@ -264,7 +312,7 @@ void Player::HandleKeyboard(std::map<int, bool> keys, float _dt)
 
 		// send shoot
 		int sTime = TimeServer::Instance()->GetServerTime();
-		for (int i = 0; i < 3; i++)
+		for (int i = 0; i < 2; i++)
 		{
 			OutputMemoryBitStream os;
 			os.Write(PT_PlayerShoot, NBit_PacketType);
@@ -353,7 +401,7 @@ void Player::HandleKeyboard(std::map<int, bool> keys, float _dt)
 	{
 		// send input
 		int sTime = TimeServer::Instance()->GetServerTime();
-		for (int i = 0; i < 3; i++)
+		for (int i = 0; i < 2; i++)
 		{
 			OutputMemoryBitStream os;
 

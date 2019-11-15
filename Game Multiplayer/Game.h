@@ -18,6 +18,8 @@ public:
 	// tạo vòng lặp game
 	void InitLoop();
 
+	void InitLoop2();
+
 private:
 	// vẽ hình sau khi update
 	void Render();

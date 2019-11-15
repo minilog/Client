@@ -22,6 +22,8 @@ BattleScene::BattleScene(vector<bool> _playerInRoomList)
 			}
 		}
 	}
+
+	npc = new NPC(0);
 }
 
 BattleScene::~BattleScene()
@@ -43,9 +45,21 @@ void BattleScene::Update(float _dt)
 		{
 			for (auto player : playerList)
 			{
-				if (GameCollision::IsCollideInNextFrame(player, brick, _dt))
+				if (player->IsDelete == false)
 				{
-					player->MakeCollision(brick);
+					if (GameCollision::IsCollideInNextFrame(player, brick, _dt))
+					{
+						player->MakeCollision(brick);
+					}
+				}
+			}
+
+			// npc va chạm bricks
+			if (npc->IsDelete == false)
+			{
+				if (GameCollision::IsCollideInNextFrame(npc, brick, _dt))
+				{
+					npc->MakeCollision(brick);
 				}
 			}
 		}
@@ -55,11 +69,11 @@ void BattleScene::Update(float _dt)
 	{
 		bullet->Update(_dt);
 	}
-
 	for (auto player : playerList)
 	{
 		player->Update(_dt);
 	}
+	npc->Update(_dt);
 }
 
 void BattleScene::Draw()
@@ -73,6 +87,7 @@ void BattleScene::Draw()
 	{
 		bullet->Draw();
 	}
+	npc->Draw();
 }
 
 void BattleScene::ReceivePacket(InputMemoryBitStream& _is, int _packetType)
@@ -96,6 +111,8 @@ void BattleScene::ReceivePacket(InputMemoryBitStream& _is, int _packetType)
 				bullet->Read(_is, false);
 			}
 
+			npc->Read(_is, false);
+
 			for (auto brick : map->GetBrickNorList())
 			{
 				bool _isDelete = false;
@@ -114,6 +131,8 @@ void BattleScene::ReceivePacket(InputMemoryBitStream& _is, int _packetType)
 			{
 				bullet->Read(_is, true);
 			}
+
+			npc->Read(_is, true);
 
 			// nhận brickNorList
 			for (auto brick : map->GetBrickNorList())
