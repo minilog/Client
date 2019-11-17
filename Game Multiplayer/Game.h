@@ -9,22 +9,14 @@
 
 class Game
 {
-	float FPS;
-
 public:
-	Game(int _fps = 60);
+	Game();
 	~Game() {}
 
-	// tạo vòng lặp game
-	void InitLoop();
-
-	void InitLoop2();
-
 private:
-	// vẽ hình sau khi update
-	void Render();
-
-	// cập nhật game
-	void Update(float dt);
+	void InitLoop();
+	void Render(); // vẽ hình
+	void Update(float dt); // cập nhật game
+	void ReceivePacket();
 };
 

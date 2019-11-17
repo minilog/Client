@@ -87,7 +87,7 @@ int initWindow(int cmdShow)
 	WSAStartup(MAKEWORD(2, 2), &a);
 	if (InitDevice())
 	{
-		Game *game = new Game(60);
+		Game *game = new Game();
 	}
 
 	return 0;
@@ -123,9 +123,6 @@ int InitDevice()
 
 LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 {
-	/*
-	su dung cac event cua window
-	*/
 	switch (message)
 	{
 	case WM_DESTROY:

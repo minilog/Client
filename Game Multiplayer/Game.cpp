@@ -10,11 +10,9 @@
 #include "SocketUtil.h"
 using namespace Define;
 
-Game::Game(int _fps)
+Game::Game()
 {
-	FPS = (float)_fps;
-
-	// create socket & connect to server
+	// tạo socket & kết nối với server
 	{
 		string ip = "127.0.0.1";
 		if (__argv[1] != NULL)
@@ -33,16 +31,21 @@ Game::Game(int _fps)
 		{
 			OutputDebugStringA("Connect to Server successfull!");
 		}
-
 		GameGlobal::Socket->ChangetoDontWait(1);
 	}
 
 	SceneManager::Instance()->ReplaceScene(new LobbyScene());
 
-	InitLoop2();
+	InitLoop();
 }
 
 void Game::Update(float _dt)
+{
+	TimeServer::Instance()->Update(_dt);
+	SceneManager::Instance()->GetCurrentScene()->Update(_dt);
+}
+
+void Game::ReceivePacket()
 {
 	// receive packet
 	{
@@ -64,7 +67,7 @@ void Game::Update(float _dt)
 				TimeServer::Instance()->ReceivePacket(is, packetType);
 				SceneManager::Instance()->GetCurrentScene()->ReceivePacket(is, packetType);
 
-				// clear the reading byte
+				// dọn dẹp byte cuối của packet (khi có nhiều packet 1 lúc)
 				{
 					int nClearBit = is.GetRemainingBitCount() % 8; // số bit cần clear
 					int k;
@@ -75,11 +78,6 @@ void Game::Update(float _dt)
 			free(buff);
 		}
 	}
-
-	TimeServer::Instance()->Update(_dt);
-	SceneManager::Instance()->GetCurrentScene()->Update(_dt);
-
-	Render();
 }
 
 void Game::Render()
@@ -111,10 +109,15 @@ void Game::InitLoop()
 {
 	MSG msg;
 
+	//std::thread task_receive_packet(ReceivePacket);
+	//task_receive_packet.detach();
 	float tickPerFrame = 1.0f / 60, delta = 0;
 
+	int count = 0;
 	while (GameGlobal::IsGameRunning)
 	{
+		ReceivePacket();
+
 		GameTime::GetInstance()->StartCounter();
 
 		if (PeekMessage(&msg, NULL, 0, 0, PM_REMOVE))
@@ -123,46 +126,28 @@ void Game::InitLoop()
 			DispatchMessage(&msg);
 		}
 
+
 		delta += GameTime::GetInstance()->GetCouter();
 
 		if (delta >= tickPerFrame)
 		{
-			Update(tickPerFrame);
-			delta -= tickPerFrame;
+			count++;
+			if (count == 60)
+			{
+				count = 0;
+				GAMELOG("%i", (int)GetTickCount());
+			}
+
+			Update(delta);
+			delta = 0;
+			Render();
 		}
 		else
 		{
+			ReceivePacket();
 			int delta_time = (int)(tickPerFrame - delta);
 			Sleep(delta_time);
-			delta = tickPerFrame;
-		}
-	}
-}
-
-void Game::InitLoop2()
-{
-	MSG msg;
-
-	double lastTime = (double)GetTickCount();
-
-	while (GameGlobal::IsGameRunning)
-	{
-		if (PeekMessage(&msg, NULL, 0, 0, PM_REMOVE))
-		{
-			TranslateMessage(&msg);
-			DispatchMessage(&msg);
-		}
-
-		double delta = (double)GetTickCount() - lastTime;
-
-		if (delta >= 1000 / 60.0f)
-		{
-			lastTime += 1000 / 60.0f;
-			Update(1 / 60.0f);
-		}
-		else
-		{
-			Sleep((DWORD)(1000 / 60.0f - delta));
+			delta = tickPerFrame;	
 		}
 
 	}
