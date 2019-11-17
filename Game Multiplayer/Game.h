@@ -14,9 +14,10 @@ public:
 	~Game() {}
 
 private:
-	void InitLoop();
+	void CreateSocket(); // tạo socket & kết nối với server
+	void InitLoop(); // vòng lặp game
 	void Render(); // vẽ hình
 	void Update(float dt); // cập nhật game
-	void ReceivePacket();
+	void ReceivePacket(); // nhận packet từ server
 };
 

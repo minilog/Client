@@ -12,27 +12,7 @@ using namespace Define;
 
 Game::Game()
 {
-	// tạo socket & kết nối với server
-	{
-		string ip = "127.0.0.1";
-		if (__argv[1] != NULL)
-		{
-			ip = string(__argv[1]);
-		}
-
-		SocketAddress socketAddress(inet_addr(ip.c_str()), 8888);
-
-		GameGlobal::Socket = SocketUtil::CreateTCPSocket();
-		if (GameGlobal::Socket->Connect(socketAddress) == SOCKET_ERROR)
-		{
-			OutputDebugStringA("Connect to Server failed!");
-		}
-		else
-		{
-			OutputDebugStringA("Connect to Server successfull!");
-		}
-		GameGlobal::Socket->ChangetoDontWait(1);
-	}
+	CreateSocket();
 
 	SceneManager::Instance()->ReplaceScene(new LobbyScene());
 
@@ -105,12 +85,31 @@ void Game::Render()
 	device->Present(0, 0, 0, 0);
 }
 
+void Game::CreateSocket()
+{
+	string ip = "127.0.0.1";
+	if (__argv[1] != NULL)
+	{
+		ip = string(__argv[1]);
+	}
+
+	SocketAddress socketAddress(inet_addr(ip.c_str()), 8888);
+
+	GameGlobal::Socket = SocketUtil::CreateTCPSocket();
+	if (GameGlobal::Socket->Connect(socketAddress) == SOCKET_ERROR)
+	{
+		OutputDebugStringA("Connect to Server failed!");
+	}
+	else
+	{
+		OutputDebugStringA("Connect to Server successfull!");
+	}
+	GameGlobal::Socket->ChangetoDontWait(1);
+}
+
 void Game::InitLoop()
 {
 	MSG msg;
-
-	//std::thread task_receive_packet(ReceivePacket);
-	//task_receive_packet.detach();
 	float tickPerFrame = 1.0f / 60, delta = 0;
 
 	int count = 0;
@@ -131,13 +130,6 @@ void Game::InitLoop()
 
 		if (delta >= tickPerFrame)
 		{
-			count++;
-			if (count == 60)
-			{
-				count = 0;
-				GAMELOG("%i", (int)GetTickCount());
-			}
-
 			Update(delta);
 			delta = 0;
 			Render();
