@@ -91,6 +91,7 @@ void Player::Read(InputMemoryBitStream & _is, bool _canReceive, int receivedTime
 		if (sqrt(distance.x * distance.x + distance.y * distance.y) >= flashDistance)
 		{
 			position = receivedPosition;
+			direction = _dir;
 		}
 
 		if (IsDelete)
@@ -419,7 +420,7 @@ void Player::ApplyVelocity()
 
 	if (!isMy)
 	{
-		velocity += (receivedPosition - position) * 3;
+		velocity += (receivedPosition - position) * lerpSmooth;
 	}
 	else
 	{
@@ -472,27 +473,26 @@ void Player::CheckCollision(Entity * e)
 	if (IsDelete)
 		return;
 
-	if (e->Type == ET_MetalBrick || e->Type == ET_NormalBrick || e->Type == ET_Boundary || e->Type == ET_Water)
+
+	CollisionResult cR = GameCollision::Get_CollisionResult(this, e);
+	if (cR.IsCollided)
 	{
-		CollisionResult cR = GameCollision::Get_CollisionResult(this, e);
-		if (cR.IsCollided)
+		if (cR.Side == CS_Left)
 		{
-			if (cR.Side == CS_Left)
-			{
-				position.x += (float)(cR.Rect.right - cR.Rect.left) + 1;
-			}
-			else if (cR.Side == CS_Right)
-			{
-				position.x -= (float)(cR.Rect.right - cR.Rect.left) - 1;
-			}
-			else if (cR.Side == CS_Top)
-			{
-				position.y += (float)(cR.Rect.bottom - cR.Rect.top) + 1;
-			}
-			else if (cR.Side == CS_Bottom)
-			{
-				position.y -= (float)(cR.Rect.bottom - cR.Rect.top) - 1;
-			}
+			position.x += (float)(cR.Rect.right - cR.Rect.left) + 1;
+		}
+		else if (cR.Side == CS_Right)
+		{
+			position.x -= (float)(cR.Rect.right - cR.Rect.left) - 1;
+		}
+		else if (cR.Side == CS_Top)
+		{
+			position.y += (float)(cR.Rect.bottom - cR.Rect.top) + 1;
+		}
+		else if (cR.Side == CS_Bottom)
+		{
+			position.y -= (float)(cR.Rect.bottom - cR.Rect.top) - 1;
 		}
 	}
+
 }

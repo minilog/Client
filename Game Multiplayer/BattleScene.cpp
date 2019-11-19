@@ -66,6 +66,7 @@ void BattleScene::Update(float dt)
 					if (GameCollision::IsCollideInNextFrame(player, npc, dt))
 					{
 						player->ZeroVelocity();
+						player->CheckCollision(npc);
 						npc->ZeroVelocity();
 					}
 				}
@@ -78,6 +79,7 @@ void BattleScene::Update(float dt)
 				{
 					if (GameCollision::IsCollideInNextFrame(player, player2, dt))
 					{
+						player->CheckCollision(player2);
 						player->ZeroVelocity();
 						player2->ZeroVelocity();
 					}
@@ -168,11 +170,9 @@ void BattleScene::ReceivePacket(InputMemoryBitStream& _is, int _packetType)
 			}
 		}
 		isTest.Read(typeTest, NBit_PacketType);
-		if (typeTest != PT_World)
-			return;
 
-		// không nhận các packet trễ
-		if (lastReceivedTime >= receivedTime || nFramePrevious >= 20)
+		// không nhận các packet trễ & bị drop
+		if (lastReceivedTime >= receivedTime || nFramePrevious >= 20 || typeTest != PT_World)
 		{
 			for (auto player : playerList)
 			{

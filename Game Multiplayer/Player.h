@@ -21,6 +21,7 @@ class Player : public Entity
 	D3DXVECTOR2 receivedPosition;
 	D3DXVECTOR2 bestGuessPosition;
 	const float flashDistance = 60.0f;
+	const float lerpSmooth = 2.4f; // cho các players khác
 
 public:
 	Player(int _ID);
