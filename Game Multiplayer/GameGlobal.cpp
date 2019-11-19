@@ -13,7 +13,7 @@ bool GameGlobal::IsGameRunning = true;
 TCPSocketPtr GameGlobal::Socket = NULL;
 
 int GameGlobal::Width = 1300;
-int GameGlobal::Height = 770;
+int GameGlobal::Height = 790;
 
 void GameGlobal::Send_Exit()
 {

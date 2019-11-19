@@ -1,11 +1,10 @@
 ﻿#include "NPC.h"
-
 #include "SpriteList.h"
+#include "GameCollision.h"
 
 NPC::NPC(int _ID)
 {
 	ID = _ID;
-
 	Type = ET_NPC;
 	IsDelete = true;
 	width = 28;
@@ -54,6 +53,36 @@ void NPC::Draw()
 	currentAnimation->Draw(GetPosition());
 }
 
+void NPC::CheckCollision(Entity * e)
+{
+	if (IsDelete)
+		return;
+
+	if (e->Type == ET_MetalBrick || e->Type == ET_NormalBrick || e->Type == ET_Boundary || e->Type == ET_Water)
+	{
+		CollisionResult cR = GameCollision::Get_CollisionResult(this, e);
+		if (cR.IsCollided)
+		{
+			if (cR.Side == CS_Left)
+			{
+				position.x += (float)(cR.Rect.right - cR.Rect.left) + 1;
+			}
+			else if (cR.Side == CS_Right)
+			{
+				position.x -= (float)(cR.Rect.right - cR.Rect.left) - 1;
+			}
+			else if (cR.Side == CS_Top)
+			{
+				position.y += (float)(cR.Rect.bottom - cR.Rect.top) + 1;
+			}
+			else if (cR.Side == CS_Bottom)
+			{
+				position.y -= (float)(cR.Rect.bottom - cR.Rect.top) - 1;
+			}
+		}
+	}
+}
+
 void NPC::Read(InputMemoryBitStream & is, bool _canReceive)
 {
 	int x = 0;
@@ -68,37 +97,64 @@ void NPC::Read(InputMemoryBitStream & is, bool _canReceive)
 
 	if (_canReceive)
 	{
-		position = D3DXVECTOR2(x / 10.0f, y / 10.0f);
-		SetDirection(dir);
+		if (IsDelete)
+			position = D3DXVECTOR2(x / 10.0f, y / 10.0f);
+
+		receivedPosition = D3DXVECTOR2(x / 10.0f, y / 10.0f);
 		IsDelete = _isDelete;
+		direction = dir;
+		ApplyAnimation();
+
+		// nếu vị trí nhận được quá xa so với hiện tại => tốc biến
+		D3DXVECTOR2 distance = position - receivedPosition;
+		if (sqrt(distance.x * distance.x + distance.y * distance.y) >= 80.f)
+		{
+			position = receivedPosition;
+		}
 	}
 }
 
-void NPC::SetDirection(Direction _dir)
+void NPC::ApplyAnimation()
 {
-	direction = _dir;
 	switch (direction)
 	{
 	case D_Left:
 		currentAnimation = leftAnimation;
-		velocity = D3DXVECTOR2(-speed, 0.f);
 		break;
 	case D_Right:
 		currentAnimation = rightAnimation;
-		velocity = D3DXVECTOR2(speed, 0.f);
 		break;
 	case D_Up:
 		currentAnimation = upAnimation;
-		velocity = D3DXVECTOR2(0.f, - speed);
 		break;
 	case D_Down:
 		currentAnimation = downAnimation;
-		velocity = D3DXVECTOR2(0.f, speed);
-		break;
-	case D_Stand:
-		velocity = D3DXVECTOR2(0, 0);
 		break;
 	default:
 		break;
 	}
+}
+
+void NPC::ApplyVelocity()
+{
+	switch (direction)
+	{
+	case D_Stand:
+		velocity = D3DXVECTOR2(0.f, 0.f);
+		break;
+	case D_Left:
+		velocity = D3DXVECTOR2(-speed, 0.f);
+		break;
+	case D_Right:
+		velocity = D3DXVECTOR2(speed, 0.f);
+		break;
+	case D_Up:
+		velocity = D3DXVECTOR2(0.f, -speed);
+		break;
+	case D_Down:
+		velocity = D3DXVECTOR2(0.f, speed);
+		break;
+	}
+
+	velocity += (receivedPosition - position) * 3;
 }

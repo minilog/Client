@@ -23,7 +23,12 @@ BattleScene::BattleScene(vector<bool> _playerInRoomList)
 		}
 	}
 
-	npc = new NPC(0);
+	// tạo 3 npcs
+	for (int i = 0; i < 3; i++)
+	{
+		NPC* npc = new NPC(i);
+		npcList.push_back(npc);
+	}
 }
 
 BattleScene::~BattleScene()
@@ -33,34 +38,49 @@ BattleScene::~BattleScene()
 
 void BattleScene::Update(float _dt)
 {
+	// đã nhận packet trước hàm Update này
+
 	// nhận keyboard
 	for (auto player : playerList)
 	{
 		player->HandleKeyboard(keyboard, _dt);
 	}
 
+	for (auto player : playerList)
+	{
+		player->ApplyVelocity();
+	}
+	for (auto npc : npcList)
+	{
+		npc->ApplyVelocity();
+	}
+
+	// check va chạm players với players, NPC ở đây (vận tốc sẽ = 0)
+
+	for (auto player : playerList)
+	{
+		player->Update(_dt);
+	}
+	for (auto npc : npcList)
+	{
+		npc->Update(_dt);
+	}
+
+
 	for (auto brick : map->GetBrickList())
 	{
 		if (!brick->IsDelete)
 		{
+			// players va chạm bricks
 			for (auto player : playerList)
 			{
-				if (player->IsDelete == false)
-				{
-					if (GameCollision::IsCollideInNextFrame(player, brick, _dt))
-					{
-						player->MakeCollision(brick);
-					}
-				}
+				player->CheckCollision(brick);
 			}
 
-			// npc va chạm bricks
-			if (npc->IsDelete == false)
+			// npcs va chạm bricks
+			for (auto npc : npcList)
 			{
-				if (GameCollision::IsCollideInNextFrame(npc, brick, _dt))
-				{
-					npc->MakeCollision(brick);
-				}
+				npc->CheckCollision(brick);
 			}
 		}
 	}
@@ -69,11 +89,6 @@ void BattleScene::Update(float _dt)
 	{
 		bullet->Update(_dt);
 	}
-	for (auto player : playerList)
-	{
-		player->Update(_dt);
-	}
-	npc->Update(_dt);
 }
 
 void BattleScene::Draw()
@@ -83,11 +98,14 @@ void BattleScene::Draw()
 	{
 		player->Draw();
 	}
+	for (auto npc : npcList)
+	{
+		npc->Draw();
+	}
 	for (auto bullet : bulletList)
 	{
 		bullet->Draw();
 	}
-	npc->Draw();
 }
 
 void BattleScene::ReceivePacket(InputMemoryBitStream& _is, int _packetType)
@@ -97,54 +115,51 @@ void BattleScene::ReceivePacket(InputMemoryBitStream& _is, int _packetType)
 		int receivedTime = 0;
 		_is.Read(receivedTime, NBit_Time);
 
+		int nFramePrevious = (int)((TimeServer::Instance()->GetServerTime() - receivedTime) / 16.7f); // đã bao nhiêu frame trôi qua từ lúc client gửi
 		// không nhận các packet trễ
-		if (lastReceivedTime >= receivedTime)
+		if (lastReceivedTime >= receivedTime || nFramePrevious >= 30)
 		{
 			for (auto player : playerList)
 			{
-				player->Read(_is, false);
+				player->Read(_is, false, receivedTime);
 			}
-
-			// nhận bulletList
 			for (auto bullet : bulletList)
 			{
 				bullet->Read(_is, false);
 			}
-
-			npc->Read(_is, false);
-
+			for (auto npc : npcList)
+			{
+				npc->Read(_is, false);
+			}
 			for (auto brick : map->GetBrickNorList())
 			{
 				bool _isDelete = false;
 				_is.Read(_isDelete);
 			}
 		}
+		// nhận packet
 		else
 		{
+			lastReceivedTime = receivedTime;
+
 			for (auto player : playerList)
 			{
-				player->Read(_is, true);
+				player->Read(_is, true, receivedTime);
 			}
-
-			// nhận bulletList
 			for (auto bullet : bulletList)
 			{
 				bullet->Read(_is, true);
 			}
-
-			npc->Read(_is, true);
-
-			// nhận brickNorList
+			for (auto npc : npcList)
+			{
+				npc->Read(_is, true);
+			}
 			for (auto brick : map->GetBrickNorList())
 			{
 				bool _isDelete = false;
 				_is.Read(_isDelete);
-
 				brick->IsDelete = _isDelete;
 			}
-
-			int nFramePrevious = TimeServer::Instance()->GetServerTime() - receivedTime; // đã bao nhiêu frame trôi qua từ lúc client gửi
-			lastReceivedTime = receivedTime;
 		}
 	}
 }

@@ -54,9 +54,8 @@ void Game::ReceivePacket()
 					is.Read(k, nClearBit);
 				}
 			}
-
-			free(buff);
 		}
+		free(buff);
 	}
 }
 

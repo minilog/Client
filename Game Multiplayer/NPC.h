@@ -7,15 +7,16 @@ class NPC :public Entity
 {
 	const float speed = 150.f;
 	Direction direction; // hướng di chuyển
+	D3DXVECTOR2 receivedPosition;
 
 public:
 	NPC(int _entityID);
 	~NPC();
 	void Update(float _dt) override;
 	void Draw() override;
-	void MakeCollision(Entity* _en) override { velocity = D3DXVECTOR2(0.f, 0.f); }
+	void CheckCollision(Entity* e);
 	void Read(InputMemoryBitStream& is, bool _canReceive);
-	void SetDirection(Direction _dir); // thay đổi vận tốc và animation đựa theo hướng di chuyển
+	void ApplyVelocity(); // gọi trước khi gọi CheckCollision
 
 // các biến và hàm hỗ trợ
 private:
@@ -25,5 +26,7 @@ private:
 	Animation* downAnimation;
 
 	Animation *currentAnimation; // animation hiện tại
+
+	void ApplyAnimation();
 };
 

@@ -12,7 +12,7 @@ class BattleScene : public Scene
 	vector<Player*> playerList;
 	vector<Bullet*> bulletList;
 	int lastReceivedTime = -1;
-	NPC* npc;
+	vector<NPC*> npcList;
 
 public:
 	BattleScene(vector<bool> _playerInRoomList);

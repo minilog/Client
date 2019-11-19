@@ -33,4 +33,6 @@ public:
 	void SetPosition(D3DXVECTOR2 _pos) { position = _pos; }
 	D3DXVECTOR2 GetVelocity() { return velocity; }
 	void SetVelocity(D3DXVECTOR2 _vel) { velocity = _vel; }
+	int GetWidth() { return width; }
+	int GetHeight() { return height; }
 };
