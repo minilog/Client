@@ -123,7 +123,7 @@ void Player::HandleKeyboard(std::map<int, bool> keys, float _dt)
 
 		// send shoot
 		int sTime = TimeServer::Instance()->GetServerTime();
-		for (int i = 0; i < 2; i++)
+		for (int i = 0; i < 3; i++)
 		{
 			OutputMemoryBitStream os;
 			os.Write(PT_PlayerShoot, NBit_PacketType);
@@ -161,7 +161,7 @@ void Player::HandleKeyboard(std::map<int, bool> keys, float _dt)
 	{
 		// send input
 		int sTime = TimeServer::Instance()->GetServerTime();
-		for (int i = 0; i < 2; i++)
+		for (int i = 0; i < 3; i++)
 		{
 			OutputMemoryBitStream os;
 

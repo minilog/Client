@@ -1,2 +1,22 @@
 ﻿  BattleScene.cpp
+  Entity.cpp
+  Game.cpp
+  c:\program files (x86)\microsoft directx sdk (june 2010)\include\dinput.h: DIRECTINPUT_VERSION undefined. Defaulting to version 0x0800
+  GameCollision.cpp
+  GameDebugDraw.cpp
+  GameGlobal.cpp
+  GameMap.cpp
+  Label.cpp
+  LobbyScene.cpp
+  Main.cpp
+  c:\program files (x86)\microsoft directx sdk (june 2010)\include\dinput.h: DIRECTINPUT_VERSION undefined. Defaulting to version 0x0800
+  MemoryBitStream.cpp
+  NPC.cpp
+  Player.cpp
+  QuadTree.cpp
+  RoomView.cpp
+  SceneManager.cpp
+  Sprite.cpp
+  TimeServer.cpp
+  Generating Code...
   Game Multiplayer.vcxproj -> C:\Users\Minh\Desktop\Client\Debug\Client.exe

@@ -117,6 +117,8 @@ public:
 
 	void		ResetToCapacity(uint32_t inByteCapacity) { mBitCapacity = inByteCapacity << 3; mBitHead = 0; }
 
+	void FreeBuffer() { free(mBuffer); }
+
 
 	void Read(std::string& inString)
 	{

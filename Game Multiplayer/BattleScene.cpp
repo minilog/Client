@@ -145,8 +145,34 @@ void BattleScene::ReceivePacket(InputMemoryBitStream& _is, int _packetType)
 		_is.Read(receivedTime, NBit_Time);
 
 		int nFramePrevious = (int)((TimeServer::Instance()->GetServerTime() - receivedTime) / 16.7f); // đã bao nhiêu frame trôi qua từ lúc client gửi
+		
+		InputMemoryBitStream isTest(_is);
+		int typeTest = 0;
+		{
+			for (auto player : playerList)
+			{
+				player->Read(isTest, false, receivedTime);
+			}
+			for (auto bullet : bulletList)
+			{
+				bullet->Read(isTest, false);
+			}
+			for (auto npc : npcList)
+			{
+				npc->Read(isTest, false);
+			}
+			for (auto brick : map->GetBrickNorList())
+			{
+				bool _isDelete = false;
+				isTest.Read(_isDelete);
+			}
+		}
+		isTest.Read(typeTest, NBit_PacketType);
+		if (typeTest != PT_World)
+			return;
+
 		// không nhận các packet trễ
-		if (lastReceivedTime >= receivedTime || nFramePrevious >= 30)
+		if (lastReceivedTime >= receivedTime || nFramePrevious >= 20)
 		{
 			for (auto player : playerList)
 			{
@@ -165,6 +191,8 @@ void BattleScene::ReceivePacket(InputMemoryBitStream& _is, int _packetType)
 				bool _isDelete = false;
 				_is.Read(_isDelete);
 			}
+			int pType = 0;
+			_is.Read(pType, NBit_PacketType);
 		}
 		// nhận packet
 		else
@@ -189,6 +217,8 @@ void BattleScene::ReceivePacket(InputMemoryBitStream& _is, int _packetType)
 				_is.Read(_isDelete);
 				brick->IsDelete = _isDelete;
 			}
+			int pType = 0;
+			_is.Read(pType, NBit_PacketType);
 		}
 	}
 }

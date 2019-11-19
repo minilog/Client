@@ -29,8 +29,8 @@ void Game::ReceivePacket()
 {
 	// receive packet
 	{
-		char* buff = static_cast<char*>(std::malloc(1024));
-		int receivedByteCount = GameGlobal::Socket->Receive(buff, 1024);
+		char* buff = static_cast<char*>(std::malloc(4096));
+		int receivedByteCount = GameGlobal::Socket->Receive(buff, 4096);
 
 		// have data to receive
 		if (receivedByteCount > 0)
