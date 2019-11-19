@@ -31,6 +31,7 @@ public:
 	void Read(InputMemoryBitStream& _is, bool _canReceive, int receivedTime);
 	void HandleKeyboard(std::map<int, bool> _keys, float _dt);
 	void ApplyVelocity(); // vận tốc theo direction
+	void ZeroVelocity() { velocity = D3DXVECTOR2(0, 0); }
 
 // support 
 private:

@@ -65,17 +65,21 @@ void Player::Read(InputMemoryBitStream & _is, bool _canReceive, int receivedTime
 	int x = 0;
 	int y = 0;
 	Direction _dir = D_Stand;
+	Direction shootDir = D_Stand;
+	bool _isDelete = false;
 
 	_is.Read(x, NBit_Position);
 	_is.Read(y, NBit_Position);
 	_is.Read(_dir, NBit_Direction);
+	_is.Read(shootDir, NBit_Direction);
+	_is.Read(_isDelete);
 
 	if (_canReceive)
 	{
 		if (!isMy)
 		{
 			direction = _dir;
-			SetAnimation(direction);
+			SetAnimation(shootDir);
 		}
 
 		receivedPosition = D3DXVECTOR2(x / 10.f, y / 10.f);
@@ -88,6 +92,12 @@ void Player::Read(InputMemoryBitStream & _is, bool _canReceive, int receivedTime
 		{
 			position = receivedPosition;
 		}
+
+		if (IsDelete)
+		{
+			position = receivedPosition;
+		}
+		IsDelete = _isDelete;
 	}
 }
 

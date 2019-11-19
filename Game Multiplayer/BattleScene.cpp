@@ -36,14 +36,14 @@ BattleScene::~BattleScene()
 	delete map;
 }
 
-void BattleScene::Update(float _dt)
+void BattleScene::Update(float dt)
 {
 	// đã nhận packet trước hàm Update này
 
 	// nhận keyboard
 	for (auto player : playerList)
 	{
-		player->HandleKeyboard(keyboard, _dt);
+		player->HandleKeyboard(keyboard, dt);
 	}
 
 	for (auto player : playerList)
@@ -55,15 +55,44 @@ void BattleScene::Update(float _dt)
 		npc->ApplyVelocity();
 	}
 
-	// check va chạm players với players, NPC ở đây (vận tốc sẽ = 0)
+	for (auto player : playerList)
+	{
+		if (!player->IsDelete)
+		{	// players va chạm npcs
+			for (auto npc : npcList)
+			{
+				if (!npc->IsDelete)
+				{
+					if (GameCollision::IsCollideInNextFrame(player, npc, dt))
+					{
+						player->ZeroVelocity();
+						npc->ZeroVelocity();
+					}
+				}
+			}
+
+			// players va chạm players
+			for (auto player2 : playerList)
+			{
+				if (!player2->IsDelete && player->ID != player2->ID)
+				{
+					if (GameCollision::IsCollideInNextFrame(player, player2, dt))
+					{
+						player->ZeroVelocity();
+						player2->ZeroVelocity();
+					}
+				}
+			}
+		}
+	}
 
 	for (auto player : playerList)
 	{
-		player->Update(_dt);
+		player->Update(dt);
 	}
 	for (auto npc : npcList)
 	{
-		npc->Update(_dt);
+		npc->Update(dt);
 	}
 
 
@@ -87,7 +116,7 @@ void BattleScene::Update(float _dt)
 
 	for (auto bullet : bulletList)
 	{
-		bullet->Update(_dt);
+		bullet->Update(dt);
 	}
 }
 

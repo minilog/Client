@@ -17,6 +17,7 @@ public:
 	void CheckCollision(Entity* e);
 	void Read(InputMemoryBitStream& is, bool _canReceive);
 	void ApplyVelocity(); // gọi trước khi gọi CheckCollision
+	void ZeroVelocity() { velocity = D3DXVECTOR2(0, 0); }
 
 // các biến và hàm hỗ trợ
 private:
