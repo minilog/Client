@@ -6,6 +6,7 @@ class Bullet : public Entity
 {
 	const float speed = 400.f;
 	Direction direction;	// hướng bay
+	D3DXVECTOR2 receivedPosition;
 	
 	Animation* leftAnimation;
 	Animation* rightAnimation;
@@ -21,7 +22,6 @@ public:
 		// gắn network ID và ID của người chơi sở hữu 
 		ID = _ID;
 		PlayerID = _playerID;
-
 		Type = ET_Bullet;
 		IsDelete = true;
 		width = 6;
@@ -81,16 +81,26 @@ public:
 		int x = 0;
 		int y = 0;
 		Direction dir = D_Stand;
+		int spawnX = 0;
+		int spawnY = 0;
 
 		_is.Read(_isDelete);
 		_is.Read(x, NBit_Position);
 		_is.Read(y, NBit_Position);
 		_is.Read(dir, NBit_Direction);
+		_is.Read(spawnX, NBit_Position);
+		_is.Read(spawnY, NBit_Position);
 
 		if (_canReceive)
 		{
+			receivedPosition = D3DXVECTOR2(x / 10.0f, y / 10.0f);
+
+			// nếu đang delete thì cho nó là vị trí spawn
+			if (IsDelete)
+				position = D3DXVECTOR2(spawnX / 10.0f, spawnY / 10.0f);
+
 			IsDelete = _isDelete;
-			position = D3DXVECTOR2((float)x, (float)y);
+
 			SetDirection(dir);
 		}
 	}
@@ -103,23 +113,43 @@ public:
 		{
 		case D_Left:
 			currentAnimation = leftAnimation;
-			velocity = D3DXVECTOR2(-speed, 0.f);
 			break;
 		case D_Right:
 			currentAnimation = rightAnimation;
-			velocity = D3DXVECTOR2(speed, 0.f);
 			break;
 		case D_Up:
 			currentAnimation = upAnimation;
-			velocity = D3DXVECTOR2(0.f, -speed);
 			break;
 		case D_Down:
 			currentAnimation = downAnimation;
+			break;
+		}
+	}
+
+	void ApplyVelocity()
+	{
+		if (IsDelete)
+			return;
+
+		switch (direction)
+		{
+		case D_Left:
+			velocity = D3DXVECTOR2(-speed, 0.f);
+			break;
+		case D_Right:
+			velocity = D3DXVECTOR2(speed, 0.f);
+			break;
+		case D_Up:
+			velocity = D3DXVECTOR2(0.f, -speed);
+			break;
+		case D_Down:
 			velocity = D3DXVECTOR2(0.f, speed);
 			break;
 		default:
 			break;
 		}
+
+		velocity += (receivedPosition - position) * 1.0f;
 	}
 };
 

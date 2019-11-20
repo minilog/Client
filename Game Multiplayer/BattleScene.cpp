@@ -54,6 +54,10 @@ void BattleScene::Update(float dt)
 	{
 		npc->ApplyVelocity();
 	}
+	for (auto bullet : bulletList)
+	{
+		bullet->ApplyVelocity();
+	}
 
 	for (auto player : playerList)
 	{
@@ -124,7 +128,6 @@ void BattleScene::Update(float dt)
 
 void BattleScene::Draw()
 {
-	map->Draw();
 	for (auto player : playerList)
 	{
 		player->Draw();
@@ -133,6 +136,7 @@ void BattleScene::Draw()
 	{
 		npc->Draw();
 	}
+	map->Draw();
 	for (auto bullet : bulletList)
 	{
 		bullet->Draw();
@@ -172,7 +176,7 @@ void BattleScene::ReceivePacket(InputMemoryBitStream& _is, int _packetType)
 		isTest.Read(typeTest, NBit_PacketType);
 
 		// không nhận các packet trễ & bị drop
-		if (lastReceivedTime >= receivedTime || nFramePrevious >= 20 || typeTest != PT_World)
+		if (lastReceivedTime >= receivedTime || nFramePrevious >= 70 || typeTest != PT_World)
 		{
 			for (auto player : playerList)
 			{

@@ -16,8 +16,8 @@ void GameMap::LoadMap(char* filePath)
 	for (int i = 0; i < map->GetNumTilesets(); i++)
 	{
 		const Tmx::Tileset *tileset = map->GetTileset(i);
-
-		Sprite *sprite = new Sprite(tileset->GetImage()->GetSource().c_str());
+		//char* link = "Resource files/%s", tileset->GetImage()->GetSource().c_str();
+		Sprite *sprite = new Sprite("Resource files/tileset.png", D3DXCOLOR(255, 255, 255, 255));
 		tilesetList.insert(std::pair<int, Sprite*>(i, sprite));
 	}
 
@@ -81,8 +81,6 @@ void GameMap::Draw()
 	// vẽ các object viên brick
 	for (int i = 0; i < (int)brickList.size(); i++)
 	{
-		//D3DXVECTOR2 a = mListBrick[i]->GetPosition();
-		//mDebugDraw->DrawRect(mListBrick[i]->GetBound());
 		brickList[i]->Draw();
 	}
 
