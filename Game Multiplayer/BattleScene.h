@@ -5,6 +5,7 @@
 #include "Player.h"
 #include "Bullet.h"
 #include "NPC.h"
+#include "Explosion.h"
 
 class BattleScene : public Scene
 {
@@ -13,6 +14,7 @@ class BattleScene : public Scene
 	vector<Bullet*> bulletList;
 	int lastReceivedTime = -1;
 	vector<NPC*> npcList;
+	vector<Explosion*> smallExList;
 
 public:
 	BattleScene(vector<bool> _playerInRoomList);

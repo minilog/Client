@@ -29,6 +29,18 @@ BattleScene::BattleScene(vector<bool> _playerInRoomList)
 		NPC* npc = new NPC(i);
 		npcList.push_back(npc);
 	}
+
+	// tạo 10 small explosion
+	for (int i = 0; i < 10; i++)
+	{
+		Explosion* e = new Explosion(false);
+		smallExList.push_back(e);
+
+		for (auto bullet : bulletList)
+		{
+			bullet->AddExpolostion(e);
+		}
+	}
 }
 
 BattleScene::~BattleScene()
@@ -124,6 +136,11 @@ void BattleScene::Update(float dt)
 	{
 		bullet->Update(dt);
 	}
+
+	for (auto e : smallExList)
+	{
+		e->Update(dt);
+	}
 }
 
 void BattleScene::Draw()
@@ -140,6 +157,10 @@ void BattleScene::Draw()
 	for (auto bullet : bulletList)
 	{
 		bullet->Draw();
+	}
+	for (auto e : smallExList)
+	{
+		e->Draw();
 	}
 }
 

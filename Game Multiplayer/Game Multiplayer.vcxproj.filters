@@ -339,5 +339,8 @@
     <ClCompile Include="BattleScene.cpp">
       <Filter>Scenes</Filter>
     </ClCompile>
+    <ClCompile Include="Bullet.cpp">
+      <Filter>Game Objects</Filter>
+    </ClCompile>
   </ItemGroup>
 </Project>

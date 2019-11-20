@@ -1,12 +1,15 @@
 ﻿#pragma once
 
 #include "Entity.h"
+#include "Explosion.h"
 
 class Bullet : public Entity
 {
 	const float speed = 400.f;
 	Direction direction;	// hướng bay
 	D3DXVECTOR2 receivedPosition;
+	D3DXVECTOR2 destroyPosition;
+	std::vector<Explosion*> explosionList; // trỏ đến
 	
 	Animation* leftAnimation;
 	Animation* rightAnimation;
@@ -75,35 +78,7 @@ public:
 		IsDelete = true;
 	}
 
-	void Read(InputMemoryBitStream& _is, bool _canReceive)
-	{
-		bool _isDelete = false;
-		int x = 0;
-		int y = 0;
-		Direction dir = D_Stand;
-		int spawnX = 0;
-		int spawnY = 0;
-
-		_is.Read(_isDelete);
-		_is.Read(x, NBit_Position);
-		_is.Read(y, NBit_Position);
-		_is.Read(dir, NBit_Direction);
-		_is.Read(spawnX, NBit_Position);
-		_is.Read(spawnY, NBit_Position);
-
-		if (_canReceive)
-		{
-			receivedPosition = D3DXVECTOR2(x / 10.0f, y / 10.0f);
-
-			// nếu đang delete thì cho nó là vị trí spawn
-			if (IsDelete)
-				position = D3DXVECTOR2(spawnX / 10.0f, spawnY / 10.0f);
-
-			IsDelete = _isDelete;
-
-			SetDirection(dir);
-		}
-	}
+	void Read(InputMemoryBitStream& _is, bool _canReceive);
 
 	// thay đổi vận tốc và animation đựa theo hướng bay
 	void SetDirection(Direction _dir)
@@ -150,6 +125,11 @@ public:
 		}
 
 		velocity += (receivedPosition - position) * 1.0f;
+	}
+
+	void AddExpolostion(Explosion* e)
+	{
+		explosionList.push_back(e);
 	}
 };
 

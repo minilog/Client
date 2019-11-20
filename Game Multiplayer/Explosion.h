@@ -3,10 +3,10 @@
 #include "Entity.h"
 #include "SpriteList.h"
 
-class Explosion : Entity
+class Explosion : public Entity
 {	
 	float existTime = 0.f; // thời gian tồn tại của vụ nổ
-	float count_existTime = 0.f;
+	float count_Exist = 0.f;
 
 	Animation* animation;
 public:
@@ -15,11 +15,11 @@ public:
 		IsDelete = true;
 
 		// khởi tạo animation, mỗi frame 0.2 giây
-		animation = new Animation(0.2f);
+		animation = new Animation(0.1f);
 		// animation nổ bé
 		if (!_isBig)
 		{ 
-			existTime = 0.6f;
+			existTime = 0.3f;
 			animation->AddFrameInfo(FrameInfo(SpriteList::Instance()->Others, 0, 0 + 32, 64, 64 + 32,
 				D3DXVECTOR2(16.f, 16.f)));
 			animation->AddFrameInfo(FrameInfo(SpriteList::Instance()->Others, 32, 32 + 32, 64, 64 + 32,
@@ -36,6 +36,8 @@ public:
 			animation->AddFrameInfo(FrameInfo(SpriteList::Instance()->Others, 160, 160 + 64, 64, 64 + 64,
 				D3DXVECTOR2(32.f, 32.f)));
 		}
+
+		count_Exist = existTime;
 	}
 	~Explosion() {}
 
@@ -46,11 +48,11 @@ public:
 
 		animation->Update(_dt);
 
-		count_existTime += _dt;
-		if (count_existTime > existTime)
+		count_Exist -= _dt;
+		if (count_Exist < 0)
 		{
+			count_Exist = existTime;
 			IsDelete = true;
-			count_existTime = 0.f;
 		}
 	}
 
