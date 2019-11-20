@@ -41,6 +41,22 @@ BattleScene::BattleScene(vector<bool> _playerInRoomList)
 			bullet->AddExpolostion(e);
 		}
 	}
+
+	// tạo 5 big explosion
+	for (int i = 0; i < 5; i++)
+	{
+		Explosion* e = new Explosion(true);
+		bigExList.push_back(e);
+
+		for (auto npc : npcList)
+		{
+			npc->AddExplosion(e);
+		}
+		for (auto player : playerList)
+		{
+			player->AddExplosion(e);
+		}
+	}
 }
 
 BattleScene::~BattleScene()
@@ -83,7 +99,6 @@ void BattleScene::Update(float dt)
 					{
 						player->ZeroVelocity();
 						player->CheckCollision(npc);
-						npc->ZeroVelocity();
 					}
 				}
 			}
@@ -104,10 +119,30 @@ void BattleScene::Update(float dt)
 		}
 	}
 
+	// check vận tốc của npc ngay sau khi player check va chạm với bản thân mình
+	for (auto npc : npcList)
+	{
+		if (!npc->IsDelete)
+		{
+			for (auto player : playerList)
+			{
+				if (!player->IsDelete)
+				{
+					if (GameCollision::IsCollideInNextFrame(player, npc, dt))
+					{
+						npc->ZeroVelocity();
+					}
+				}
+			}
+		}
+	}
+
+
 	for (auto player : playerList)
 	{
 		player->Update(dt);
 	}
+
 	for (auto npc : npcList)
 	{
 		npc->Update(dt);
@@ -141,6 +176,10 @@ void BattleScene::Update(float dt)
 	{
 		e->Update(dt);
 	}
+	for (auto e : bigExList)
+	{
+		e->Update(dt);
+	}
 }
 
 void BattleScene::Draw()
@@ -162,6 +201,10 @@ void BattleScene::Draw()
 	{
 		e->Draw();
 	}
+	for (auto e : bigExList)
+	{
+		e->Draw();
+	}
 }
 
 void BattleScene::ReceivePacket(InputMemoryBitStream& _is, int _packetType)
@@ -174,7 +217,7 @@ void BattleScene::ReceivePacket(InputMemoryBitStream& _is, int _packetType)
 		int nFramePrevious = (int)((TimeServer::Instance()->GetServerTime() - receivedTime) / 16.7f); // đã bao nhiêu frame trôi qua từ lúc client gửi
 		
 		InputMemoryBitStream isTest(_is);
-		int typeTest = 0;
+
 		{
 			for (auto player : playerList)
 			{
@@ -194,10 +237,11 @@ void BattleScene::ReceivePacket(InputMemoryBitStream& _is, int _packetType)
 				isTest.Read(_isDelete);
 			}
 		}
-		isTest.Read(typeTest, NBit_PacketType);
+		int typeTest1 = 0;
+		isTest.Read(typeTest1, NBit_PacketType);
 
 		// không nhận các packet trễ & bị drop
-		if (lastReceivedTime >= receivedTime || nFramePrevious >= 70 || typeTest != PT_World)
+		if (lastReceivedTime >= receivedTime || nFramePrevious >= 70 || typeTest1 != PT_World)
 		{
 			for (auto player : playerList)
 			{

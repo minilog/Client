@@ -19,7 +19,7 @@ public:
 		// animation nổ bé
 		if (!_isBig)
 		{ 
-			existTime = 0.3f;
+			existTime = 0.28f;
 			animation->AddFrameInfo(FrameInfo(SpriteList::Instance()->Others, 0, 0 + 32, 64, 64 + 32,
 				D3DXVECTOR2(16.f, 16.f)));
 			animation->AddFrameInfo(FrameInfo(SpriteList::Instance()->Others, 32, 32 + 32, 64, 64 + 32,
@@ -30,7 +30,7 @@ public:
 		// animation nổ lớn
 		else
 		{
-			existTime = 0.4f;
+			existTime = 0.18f;
 			animation->AddFrameInfo(FrameInfo(SpriteList::Instance()->Others, 96, 96 + 64, 64, 64 + 64,
 				D3DXVECTOR2(32.f, 32.f)));
 			animation->AddFrameInfo(FrameInfo(SpriteList::Instance()->Others, 160, 160 + 64, 64, 64 + 64,

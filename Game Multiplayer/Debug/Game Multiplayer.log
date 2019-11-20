@@ -1,7 +1,4 @@
-﻿  BattleScene.cpp
-  Bullet.cpp
-  LobbyScene.cpp
-  NPC.cpp
-  Player.cpp
-  Generating Code...
+﻿  Game.cpp
+  c:\program files (x86)\microsoft directx sdk (june 2010)\include\dinput.h: DIRECTINPUT_VERSION undefined. Defaulting to version 0x0800
+  miniz.c
   Game Multiplayer.vcxproj -> C:\Users\Minh\Desktop\Client\Debug\Client.exe

@@ -20,8 +20,9 @@ class Player : public Entity
 	float count_Shoot = 0.0f;
 	D3DXVECTOR2 receivedPosition;
 	D3DXVECTOR2 bestGuessPosition;
-	const float flashDistance = 60.0f;
+	const float flashDistance = 90.0f;
 	const float lerpSmooth = 2.4f; // cho các players khác
+	std::vector<Explosion*> explosionList; // trỏ đến
 
 public:
 	Player(int _ID);
@@ -33,6 +34,7 @@ public:
 	void HandleKeyboard(std::map<int, bool> _keys, float _dt);
 	void ApplyVelocity(); // vận tốc theo direction
 	void ZeroVelocity() { velocity = D3DXVECTOR2(0, 0); }
+	void AddExplosion(Explosion* e) { explosionList.push_back(e); }
 
 // support 
 private:

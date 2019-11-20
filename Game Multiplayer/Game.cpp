@@ -8,7 +8,9 @@
 #include "LobbyScene.h"
 #include "MemoryBitStream.h"
 #include "SocketUtil.h"
+#include <stdio.h>
 using namespace Define;
+
 
 Game::Game()
 {
@@ -86,7 +88,13 @@ void Game::Render()
 
 void Game::CreateSocket()
 {
-	string ip = "127.0.0.1";
+	FILE *fp;
+	char buff[255];
+
+	fopen_s(&fp, "Resource files/Config.txt", "r");
+	fgets(buff, 255, (FILE*)fp);
+
+	string ip = /*"127.0.0.1"*/buff;
 	if (__argv[1] != NULL)
 	{
 		ip = string(__argv[1]);

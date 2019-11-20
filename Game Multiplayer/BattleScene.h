@@ -15,6 +15,7 @@ class BattleScene : public Scene
 	int lastReceivedTime = -1;
 	vector<NPC*> npcList;
 	vector<Explosion*> smallExList;
+	vector<Explosion*> bigExList;
 
 public:
 	BattleScene(vector<bool> _playerInRoomList);

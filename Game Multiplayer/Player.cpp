@@ -76,6 +76,19 @@ void Player::Read(InputMemoryBitStream & _is, bool _canReceive, int receivedTime
 
 	if (_canReceive)
 	{
+		// spawn nổ
+		if (!IsDelete && _isDelete)
+		{
+			for (auto e : explosionList)
+			{
+				if (e->IsDelete)
+				{
+					e->Spawn(position);
+					break;
+				}
+			}
+		}
+
 		if (!isMy)
 		{
 			direction = _dir;
@@ -92,6 +105,7 @@ void Player::Read(InputMemoryBitStream & _is, bool _canReceive, int receivedTime
 		{
 			position = receivedPosition;
 			direction = _dir;
+			lastDirection = _dir;
 		}
 
 		if (IsDelete)
@@ -162,7 +176,7 @@ void Player::HandleKeyboard(std::map<int, bool> keys, float _dt)
 	{
 		// send input
 		int sTime = TimeServer::Instance()->GetServerTime();
-		for (int i = 0; i < 3; i++)
+		for (int i = 0; i < 5; i++)
 		{
 			OutputMemoryBitStream os;
 

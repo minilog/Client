@@ -97,6 +97,19 @@ void NPC::Read(InputMemoryBitStream & is, bool _canReceive)
 
 	if (_canReceive)
 	{
+		// spawn nổ
+		if (!IsDelete && _isDelete)
+		{
+			for (auto e : explosionList)
+			{
+				if (e->IsDelete)
+				{
+					e->Spawn(position);
+					break;
+				}
+			}
+		}
+
 		if (IsDelete)
 			position = D3DXVECTOR2(x / 10.0f, y / 10.0f);
 
