@@ -5,7 +5,7 @@
 
 class Item : public Entity
 {
-	const float existTime = 7.f;
+	const float existTime = 7.0f;
 
 public:
 	Item() {}
@@ -30,18 +30,22 @@ public:
 			return;
 
 		// nếu còn 2 giây tồn tại, vẽ 1 lần mỗi 5 frame
-		if (existTime - count_existTime < 2)
+		if (existTime - count_existTime < 1.5f)
 		{
 			flashingTime++;
-			if (flashingTime == 5)
+			if (flashingTime > 5)
 			{
-				animation->Draw(GetPosition());
+				animation->Draw(position);
+				//flashingTime = 0;
+			}
+			if (flashingTime == 10)
+			{
 				flashingTime = 0;
 			}
 		}
 		else
 		{
-			animation->Draw(GetPosition());
+			animation->Draw(position);
 		}
 	}
 

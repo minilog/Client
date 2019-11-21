@@ -57,6 +57,10 @@ BattleScene::BattleScene(vector<bool> _playerInRoomList)
 			player->AddExplosion(e);
 		}
 	}
+
+	// tạo 2 loại Protected Item và Upgrade Item
+	protectItem = new ProtectItem(D3DXVECTOR2(250.0f, 250.0f));
+	upgradeItem = new UpgradeItem(D3DXVECTOR2(350.0f, 350.0f));
 }
 
 BattleScene::~BattleScene()
@@ -171,7 +175,6 @@ void BattleScene::Update(float dt)
 	{
 		bullet->Update(dt);
 	}
-
 	for (auto e : smallExList)
 	{
 		e->Update(dt);
@@ -180,6 +183,8 @@ void BattleScene::Update(float dt)
 	{
 		e->Update(dt);
 	}
+	protectItem->Update(dt);
+	upgradeItem->Update(dt);
 }
 
 void BattleScene::Draw()
@@ -205,6 +210,8 @@ void BattleScene::Draw()
 	{
 		e->Draw();
 	}
+	protectItem->Draw();
+	upgradeItem->Draw();
 }
 
 void BattleScene::ReceivePacket(InputMemoryBitStream& _is, int _packetType)

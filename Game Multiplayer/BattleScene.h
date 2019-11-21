@@ -6,6 +6,8 @@
 #include "Bullet.h"
 #include "NPC.h"
 #include "Explosion.h"
+#include "ProtectItem.h"
+#include "UpgradeItem.h"
 
 class BattleScene : public Scene
 {
@@ -16,6 +18,8 @@ class BattleScene : public Scene
 	vector<NPC*> npcList;
 	vector<Explosion*> smallExList;
 	vector<Explosion*> bigExList;
+	ProtectItem* protectItem;
+	UpgradeItem* upgradeItem;
 
 public:
 	BattleScene(vector<bool> _playerInRoomList);
