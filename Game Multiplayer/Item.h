@@ -6,6 +6,8 @@
 class Item : public Entity
 {
 	const float existTime = 7.0f;
+	float count_existTime = 0.0f; // đếm
+	int flashingTime = 0; // giúp vẽ nhấp nháy
 
 public:
 	Item() {}
@@ -29,7 +31,7 @@ public:
 		if (IsDelete)
 			return;
 
-		// nếu còn 2 giây tồn tại, vẽ 1 lần mỗi 5 frame
+		// nếu còn 1.5 giây tồn tại, vẽ nhấp nháy
 		if (existTime - count_existTime < 1.5f)
 		{
 			flashingTime++;
@@ -54,10 +56,29 @@ public:
 		IsDelete = true;
 	}
 
+	void Read(InputMemoryBitStream& is, bool canReceive)
+	{
+		int posX = 0;
+		int posY = 0;
+		bool _isDelete = false;
+
+		is.Read(posX, NBit_Position);
+		is.Read(posY, NBit_Position);
+		is.Read(_isDelete);
+
+		if (canReceive)
+		{
+			if (IsDelete && !_isDelete)
+			{
+				count_existTime = 0;
+			}
+			IsDelete = _isDelete;
+
+			position = D3DXVECTOR2(posX / 10.0f, posY / 10.0f);
+		}
+	}
+
 // các biến và hàm hỗ trợ
-private:
-	float count_existTime = 0.f; // đếm
-	int flashingTime = 0; // giúp vẽ nhấp nháy
 protected:
 	Animation* animation;
 

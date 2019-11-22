@@ -60,7 +60,9 @@ BattleScene::BattleScene(vector<bool> _playerInRoomList)
 
 	// tạo 2 loại Protected Item và Upgrade Item
 	protectItem = new ProtectItem(D3DXVECTOR2(250.0f, 250.0f));
+	protectItem->IsDelete = true;
 	upgradeItem = new UpgradeItem(D3DXVECTOR2(350.0f, 350.0f));
+	upgradeItem->IsDelete = true;
 }
 
 BattleScene::~BattleScene()
@@ -223,6 +225,7 @@ void BattleScene::ReceivePacket(InputMemoryBitStream& _is, int _packetType)
 
 		int nFramePrevious = (int)((TimeServer::Instance()->GetServerTime() - receivedTime) / 16.7f); // đã bao nhiêu frame trôi qua từ lúc client gửi
 		
+		// test check packet
 		InputMemoryBitStream isTest(_is);
 
 		{
@@ -243,6 +246,8 @@ void BattleScene::ReceivePacket(InputMemoryBitStream& _is, int _packetType)
 				bool _isDelete = false;
 				isTest.Read(_isDelete);
 			}
+			protectItem->Read(isTest, false);
+			upgradeItem->Read(isTest, false);
 		}
 		int typeTest1 = 0;
 		isTest.Read(typeTest1, NBit_PacketType);
@@ -267,6 +272,9 @@ void BattleScene::ReceivePacket(InputMemoryBitStream& _is, int _packetType)
 				bool _isDelete = false;
 				_is.Read(_isDelete);
 			}
+			protectItem->Read(_is, false);
+			upgradeItem->Read(_is, false);
+
 			int pType = 0;
 			_is.Read(pType, NBit_PacketType);
 		}
@@ -293,6 +301,9 @@ void BattleScene::ReceivePacket(InputMemoryBitStream& _is, int _packetType)
 				_is.Read(_isDelete);
 				brick->IsDelete = _isDelete;
 			}
+			protectItem->Read(_is, true);
+			upgradeItem->Read(_is, true);
+
 			int pType = 0;
 			_is.Read(pType, NBit_PacketType);
 		}

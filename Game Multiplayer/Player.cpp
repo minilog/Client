@@ -442,8 +442,8 @@ void Player::ApplyVelocity()
 		float magnitude = sqrt(extraVel.x * extraVel.x + extraVel.y * extraVel.y);
 		D3DXVec2Normalize(&extraVel, &extraVel);
 
-		if (magnitude > 25)
-			magnitude = 25;
+		if (magnitude > 30)
+			magnitude = 30;
 		velocity += (extraVel * magnitude) * 1.2f;
 	}
 }
