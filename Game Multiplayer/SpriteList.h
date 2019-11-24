@@ -15,6 +15,7 @@ private:
 		Tank = new Sprite("Resource files/Tank.png", D3DCOLOR_XRGB(255, 0, 255));
 		Arrow = new Sprite("Resource files/Arrow.png", D3DCOLOR_XRGB(255, 0, 255));
 		Point = new Sprite("Resource files/Point.png", D3DCOLOR_XRGB(255, 0, 0));
+		All = new Sprite("Resource files/All.png", D3DCOLOR_XRGB(255, 0, 255));
 	}
 	static SpriteList* instance;
 
@@ -40,5 +41,6 @@ public:
 	Sprite* Tank;
 	Sprite* TankAI;
 	Sprite* tileset;
+	Sprite* All;
 };
 

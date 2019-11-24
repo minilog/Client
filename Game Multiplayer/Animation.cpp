@@ -30,6 +30,7 @@ void Animation::Draw(const D3DXVECTOR2 & _position, const D3DXVECTOR2 & _offset,
 	Sprite* sprite = currentFrameInfo.sprite;
 	sprite->SetRect(currentFrameInfo.rect);
 	sprite->SetCenter(currentFrameInfo.center);
+	sprite->SetScale(scale);
 
 	sprite->SetPosition(_position);
 	sprite->SetOffset(_offset);

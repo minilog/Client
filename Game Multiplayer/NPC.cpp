@@ -58,27 +58,24 @@ void NPC::CheckCollision(Entity * e)
 	if (IsDelete)
 		return;
 
-	if (e->Type == ET_MetalBrick || e->Type == ET_NormalBrick || e->Type == ET_Boundary || e->Type == ET_Water)
+	CollisionResult cR = GameCollision::Get_CollisionResult(this, e);
+	if (cR.IsCollided)
 	{
-		CollisionResult cR = GameCollision::Get_CollisionResult(this, e);
-		if (cR.IsCollided)
+		if (cR.Side == CS_Left)
 		{
-			if (cR.Side == CS_Left)
-			{
-				position.x += (float)(cR.Rect.right - cR.Rect.left) + 1;
-			}
-			else if (cR.Side == CS_Right)
-			{
-				position.x -= (float)(cR.Rect.right - cR.Rect.left) - 1;
-			}
-			else if (cR.Side == CS_Top)
-			{
-				position.y += (float)(cR.Rect.bottom - cR.Rect.top) + 1;
-			}
-			else if (cR.Side == CS_Bottom)
-			{
-				position.y -= (float)(cR.Rect.bottom - cR.Rect.top) - 1;
-			}
+			position.x += (float)(cR.Rect.right - cR.Rect.left) + 1;
+		}
+		else if (cR.Side == CS_Right)
+		{
+			position.x -= (float)(cR.Rect.right - cR.Rect.left) - 1;
+		}
+		else if (cR.Side == CS_Top)
+		{
+			position.y += (float)(cR.Rect.bottom - cR.Rect.top) + 1;
+		}
+		else if (cR.Side == CS_Bottom)
+		{
+			position.y -= (float)(cR.Rect.bottom - cR.Rect.top) - 1;
 		}
 	}
 }

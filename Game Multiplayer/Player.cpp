@@ -67,12 +67,16 @@ void Player::Read(InputMemoryBitStream & _is, bool _canReceive, int receivedTime
 	Direction _dir = D_Stand;
 	Direction shootDir = D_Stand;
 	bool _isDelete = false;
+	bool _isShield = false;
+	int _level = 0;
 
 	_is.Read(x, NBit_Position);
 	_is.Read(y, NBit_Position);
 	_is.Read(_dir, NBit_Direction);
 	_is.Read(shootDir, NBit_Direction);
 	_is.Read(_isDelete);
+	_is.Read(_isShield);
+	_is.Read(_level, 3);
 
 	if (_canReceive)
 	{
@@ -113,6 +117,12 @@ void Player::Read(InputMemoryBitStream & _is, bool _canReceive, int receivedTime
 			position = receivedPosition;
 		}
 		IsDelete = _isDelete;
+		isShield = _isShield;
+		if (level != _level)
+		{
+			level = _level;
+			SetAnimation(shootDir);
+		}
 	}
 }
 
@@ -122,6 +132,9 @@ void Player::Update(float _dt)
 		return;
 
 	position += velocity * _dt;
+	if (isShield)
+		shieldAnimation->Update(_dt);
+	//spawnAnimation->Update(_dt);
 }
 
 void Player::HandleKeyboard(std::map<int, bool> keys, float _dt)
@@ -213,7 +226,7 @@ void Player::SetAnimation(Direction _dir)
 			break;
 		}
 	}
-	else if (level == 2)
+	else if (level == 3)
 	{
 		switch (_dir)
 		{
@@ -233,7 +246,7 @@ void Player::SetAnimation(Direction _dir)
 			break;
 		}
 	}
-	else if (level == 3)
+	else if (level == 2)
 	{
 		switch (_dir)
 		{
@@ -391,16 +404,17 @@ void Player::InitAnimation()
 			D3DXVECTOR2(15.f, 18.f)));
 	}
 
-
 	arrowAnimation = new Animation();
 	arrowAnimation->AddFrameInfo(FrameInfo(SpriteList::Instance()->Arrow, 0, 26, 0, 26,
 		D3DXVECTOR2(13.f, 13.f)));
-	shieldAnimation = new Animation(0.05f);
-	shieldAnimation->AddFrameInfo(FrameInfo(SpriteList::Instance()->Others, 0, 0 + 39, 11, 111 + 42,
-		D3DXVECTOR2(20.f, 21.f)));
+
+	shieldAnimation = new Animation(0.07f);
+	shieldAnimation->AddFrameInfo(FrameInfo(SpriteList::Instance()->Others, 0, 0 + 39, 111, 111 + 40,
+		D3DXVECTOR2(20.f, 20.f)));
 	shieldAnimation->AddFrameInfo(FrameInfo(SpriteList::Instance()->Others, 39, 39 + 40, 111, 111 + 40,
 		D3DXVECTOR2(20.f, 20.f)));
-	spawnAnimation = new Animation(0.05f);
+
+	spawnAnimation = new Animation(0.1f);
 	spawnAnimation->AddFrameInfo(FrameInfo(SpriteList::Instance()->Others, 0, 30, 0, 30,
 		D3DXVECTOR2(15.f, 15.f)));
 	spawnAnimation->AddFrameInfo(FrameInfo(SpriteList::Instance()->Others, 30, 60, 0, 30,
@@ -442,8 +456,8 @@ void Player::ApplyVelocity()
 		float magnitude = sqrt(extraVel.x * extraVel.x + extraVel.y * extraVel.y);
 		D3DXVec2Normalize(&extraVel, &extraVel);
 
-		if (magnitude > 30)
-			magnitude = 30;
+		if (magnitude > 25)
+			magnitude = 25;
 		velocity += (extraVel * magnitude) * 1.2f;
 	}
 }
@@ -479,6 +493,19 @@ void Player::Draw()
 	if (!IsDelete)
 	{
 		currentAnimation->Draw(position);
+		if (isShield)
+			shieldAnimation->Draw(position);
+
+		//spawnAnimation->Draw(position);
+	}
+}
+
+void Player::DrawArrow()
+{
+	if (isMy && !IsDelete)
+	{
+		arrowAnimation->SetScale(D3DXVECTOR2(0.66f, 0.66f));
+		arrowAnimation->Draw(position + D3DXVECTOR2(0, -25.0f));
 	}
 }
 
@@ -486,7 +513,6 @@ void Player::CheckCollision(Entity * e)
 {
 	if (IsDelete)
 		return;
-
 
 	CollisionResult cR = GameCollision::Get_CollisionResult(this, e);
 	if (cR.IsCollided)

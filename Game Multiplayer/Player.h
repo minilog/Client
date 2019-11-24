@@ -23,12 +23,14 @@ class Player : public Entity
 	const float flashDistance = 90.0f;
 	const float lerpSmooth = 2.4f; // cho các players khác
 	std::vector<Explosion*> explosionList; // trỏ đến
+	bool isShield = true;
 
 public:
 	Player(int _ID);
 	~Player();
 	void Update(float _dt);
 	void Draw();
+	void DrawArrow();
 	void CheckCollision(Entity* e);
 	void Read(InputMemoryBitStream& _is, bool _canReceive, int receivedTime);
 	void HandleKeyboard(std::map<int, bool> _keys, float _dt);

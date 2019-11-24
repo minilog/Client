@@ -14,7 +14,7 @@ public:
 	{
 		IsDelete = true;
 
-		// khởi tạo animation, mỗi frame 0.2 giây
+		// khởi tạo animation, mỗi frame 0.1 giây
 		animation = new Animation(0.1f);
 		// animation nổ bé
 		if (!_isBig)

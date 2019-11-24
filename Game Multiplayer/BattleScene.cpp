@@ -91,7 +91,7 @@ void BattleScene::Update(float dt)
 	for (auto bullet : bulletList)
 	{
 		bullet->ApplyVelocity();
-	}
+	}	
 
 	for (auto player : playerList)
 	{
@@ -105,6 +105,7 @@ void BattleScene::Update(float dt)
 					{
 						player->ZeroVelocity();
 						player->CheckCollision(npc);
+						npc->CheckCollision(player);
 					}
 				}
 			}
@@ -214,6 +215,10 @@ void BattleScene::Draw()
 	}
 	protectItem->Draw();
 	upgradeItem->Draw();
+	for (auto player : playerList)
+	{
+		player->DrawArrow();
+	}
 }
 
 void BattleScene::ReceivePacket(InputMemoryBitStream& _is, int _packetType)

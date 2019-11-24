@@ -28,6 +28,7 @@ class Animation
 	int frameIndex = 0; // frame hiện tại
 	float time = 0.f; // thời gian chuyển frame
 	float count = 0.f; // đếm => chuyển frame
+	D3DXVECTOR2 scale = D3DXVECTOR2(1.f, 1.f);
 
 public:
 	// khởi tạo animation với: thời gian chuyển frame
@@ -45,5 +46,6 @@ public:
 		bool _isFlipVertical = false, const D3DCOLOR& color = D3DCOLOR_ARGB(255, 255, 255, 255));
 
 	void Reset();
+	void SetScale(D3DXVECTOR2 scale) { this->scale = scale; }
 };
 
