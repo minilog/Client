@@ -63,6 +63,15 @@ BattleScene::BattleScene(vector<bool> _playerInRoomList)
 	protectItem->IsDelete = true;
 	upgradeItem = new UpgradeItem(D3DXVECTOR2(350.0f, 350.0f));
 	upgradeItem->IsDelete = true;
+	pointed = new Pointed();
+
+	label_Player0 = Label("", 26, 13, D3DXVECTOR2(0, 0));
+	label_Player1 = Label("", 26, 13, D3DXVECTOR2(0, 0));
+	label_Player2 = Label("", 26, 13, D3DXVECTOR2(0, 0));
+	label_Player3 = Label("", 26, 13, D3DXVECTOR2(0, 0));
+	label_CountTime = Label("", 26, 13, D3DXVECTOR2(0, 0));
+	label_TimeUp = Label("TIME UP!", 36, 18, D3DXVECTOR2(0, 0));
+
 }
 
 BattleScene::~BattleScene()
@@ -73,6 +82,11 @@ BattleScene::~BattleScene()
 void BattleScene::Update(float dt)
 {
 	// đã nhận packet trước hàm Update này
+
+	if (count_TimeUp < 0)
+		return;
+
+	count_TimeUp -= dt;
 
 	// nhận keyboard
 	for (auto player : playerList)
@@ -104,8 +118,9 @@ void BattleScene::Update(float dt)
 					if (GameCollision::IsCollideInNextFrame(player, npc, dt))
 					{
 						player->ZeroVelocity();
-						player->CheckCollision(npc);
-						npc->CheckCollision(player);
+						//player->CheckCollision(npc);
+						//npc->CheckCollision(player);
+						npc->ZeroVelocity();
 					}
 				}
 			}
@@ -117,7 +132,7 @@ void BattleScene::Update(float dt)
 				{
 					if (GameCollision::IsCollideInNextFrame(player, player2, dt))
 					{
-						player->CheckCollision(player2);
+						//player->CheckCollision(player2);
 						player->ZeroVelocity();
 						player2->ZeroVelocity();
 					}
@@ -126,23 +141,23 @@ void BattleScene::Update(float dt)
 		}
 	}
 
-	// check vận tốc của npc ngay sau khi player check va chạm với bản thân mình
-	for (auto npc : npcList)
-	{
-		if (!npc->IsDelete)
-		{
-			for (auto player : playerList)
-			{
-				if (!player->IsDelete)
-				{
-					if (GameCollision::IsCollideInNextFrame(player, npc, dt))
-					{
-						npc->ZeroVelocity();
-					}
-				}
-			}
-		}
-	}
+	//// check vận tốc của npc ngay sau khi player check va chạm với bản thân mình
+	//for (auto npc : npcList)
+	//{
+	//	if (!npc->IsDelete)
+	//	{
+	//		for (auto player : playerList)
+	//		{
+	//			if (!player->IsDelete)
+	//			{
+	//				if (GameCollision::IsCollideInNextFrame(player, npc, dt))
+	//				{
+	//					npc->ZeroVelocity();
+	//				}
+	//			}
+	//		}
+	//	}
+	//}
 
 
 	for (auto player : playerList)
@@ -188,6 +203,7 @@ void BattleScene::Update(float dt)
 	}
 	protectItem->Update(dt);
 	upgradeItem->Update(dt);
+	pointed->Update(dt);
 }
 
 void BattleScene::Draw()
@@ -218,6 +234,69 @@ void BattleScene::Draw()
 	for (auto player : playerList)
 	{
 		player->DrawArrow();
+	}
+	pointed->Draw();
+
+	// vẽ các cột thông số bên phải
+	for (auto player : playerList)
+	{
+		if (player->ID == 0)
+		{
+			label_Player0.SetPosition(D3DXVECTOR2(850.0f, 100.0f));
+			if (player->IsMy)
+			{
+				label_Player0.Draw("Player 0: " + to_string(player->Score), D3DCOLOR_XRGB(255, 242, 0));
+			}
+			else
+			{
+				label_Player0.Draw("Player 0: " + to_string(player->Score));
+			}
+		}
+		else if (player->ID == 1)
+		{
+			label_Player1.SetPosition(D3DXVECTOR2(850.0f, 150.0f));
+			if (player->IsMy)
+			{
+				label_Player1.Draw("Player 1: " + to_string(player->Score), D3DCOLOR_XRGB(255, 242, 0));
+			}
+			else
+			{
+				label_Player1.Draw("Player 1: " + to_string(player->Score));
+			}
+		}
+		else if (player->ID == 2)
+		{
+			label_Player2.SetPosition(D3DXVECTOR2(850.0f, 200.0f));
+			if (player->IsMy)
+			{
+				label_Player2.Draw("Player 2: " + to_string(player->Score), D3DCOLOR_XRGB(255, 242, 0));
+			}
+			else
+			{
+				label_Player2.Draw("Player 2 " + to_string(player->Score));
+			}
+		}
+		else if (player->ID == 3)
+		{
+			label_Player3.SetPosition(D3DXVECTOR2(850.0f, 250.0f));
+			if (player->IsMy)
+			{
+				label_Player3.Draw("Player 3: " + to_string(player->Score), D3DCOLOR_XRGB(255, 242, 0));
+			}
+			else
+			{
+				label_Player3.Draw("Player 3: " + to_string(player->Score));
+			}
+		}
+
+		label_CountTime.SetPosition(D3DXVECTOR2(850.0f, 500.0f));
+		label_CountTime.Draw("Time Up In: " + to_string((int)(count_TimeUp + 0.8f)));
+	}
+
+	if (count_TimeUp < 0)
+	{
+		label_TimeUp.SetPosition(D3DXVECTOR2(400.0f, 350.0f));
+		label_TimeUp.Draw("TIME UP!");	
 	}
 }
 
@@ -253,12 +332,13 @@ void BattleScene::ReceivePacket(InputMemoryBitStream& _is, int _packetType)
 			}
 			protectItem->Read(isTest, false);
 			upgradeItem->Read(isTest, false);
+			pointed->Read(isTest, false);
 		}
 		int typeTest1 = 0;
 		isTest.Read(typeTest1, NBit_PacketType);
 
 		// không nhận các packet trễ & bị drop
-		if (lastReceivedTime >= receivedTime || nFramePrevious >= 70 || typeTest1 != PT_World)
+		if (lastReceivedTime >= receivedTime || nFramePrevious >= 70 || typeTest1 != PT_World || count_TimeUp < 0)
 		{
 			for (auto player : playerList)
 			{
@@ -279,6 +359,7 @@ void BattleScene::ReceivePacket(InputMemoryBitStream& _is, int _packetType)
 			}
 			protectItem->Read(_is, false);
 			upgradeItem->Read(_is, false);
+			pointed->Read(_is, false);
 
 			int pType = 0;
 			_is.Read(pType, NBit_PacketType);
@@ -308,6 +389,7 @@ void BattleScene::ReceivePacket(InputMemoryBitStream& _is, int _packetType)
 			}
 			protectItem->Read(_is, true);
 			upgradeItem->Read(_is, true);
+			pointed->Read(_is, true);
 
 			int pType = 0;
 			_is.Read(pType, NBit_PacketType);

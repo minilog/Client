@@ -236,7 +236,6 @@
     <ClCompile Include="MemoryBitStream.cpp" />
     <ClCompile Include="NPC.cpp" />
     <ClCompile Include="Player.cpp" />
-    <ClCompile Include="Pointed.cpp" />
     <ClCompile Include="QuadTree.cpp" />
     <ClCompile Include="RoomView.cpp" />
     <ClCompile Include="SceneManager.cpp" />

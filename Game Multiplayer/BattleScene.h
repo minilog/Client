@@ -8,6 +8,7 @@
 #include "Explosion.h"
 #include "ProtectItem.h"
 #include "UpgradeItem.h"
+#include "Pointed.h"
 
 class BattleScene : public Scene
 {
@@ -20,6 +21,15 @@ class BattleScene : public Scene
 	vector<Explosion*> bigExList;
 	ProtectItem* protectItem;
 	UpgradeItem* upgradeItem;
+	Pointed* pointed;
+
+	Label label_Player0;
+	Label label_Player1;
+	Label label_Player2;
+	Label label_Player3;
+	Label label_CountTime;
+	Label label_TimeUp;
+	float count_TimeUp = 100.0f;
 
 public:
 	BattleScene(vector<bool> _playerInRoomList);

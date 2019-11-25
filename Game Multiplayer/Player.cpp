@@ -36,7 +36,7 @@ Player::Player(int _ID)
 
 	if (_ID == GameGlobal::Socket->PlayerID)
 	{
-		isMy = true;
+		IsMy = true;
 	}
 }
 
@@ -69,6 +69,7 @@ void Player::Read(InputMemoryBitStream & _is, bool _canReceive, int receivedTime
 	bool _isDelete = false;
 	bool _isShield = false;
 	int _level = 0;
+	int _score = 0;
 
 	_is.Read(x, NBit_Position);
 	_is.Read(y, NBit_Position);
@@ -77,6 +78,7 @@ void Player::Read(InputMemoryBitStream & _is, bool _canReceive, int receivedTime
 	_is.Read(_isDelete);
 	_is.Read(_isShield);
 	_is.Read(_level, 3);
+	_is.Read(_score, NBit_Position);
 
 	if (_canReceive)
 	{
@@ -93,7 +95,7 @@ void Player::Read(InputMemoryBitStream & _is, bool _canReceive, int receivedTime
 			}
 		}
 
-		if (!isMy)
+		if (!IsMy)
 		{
 			direction = _dir;
 			SetAnimation(shootDir);
@@ -123,6 +125,7 @@ void Player::Read(InputMemoryBitStream & _is, bool _canReceive, int receivedTime
 			level = _level;
 			SetAnimation(shootDir);
 		}
+		Score = _score;
 	}
 }
 
@@ -139,7 +142,7 @@ void Player::Update(float _dt)
 
 void Player::HandleKeyboard(std::map<int, bool> keys, float _dt)
 {
-	if (IsDelete || !isMy)
+	if (IsDelete || !IsMy)
 		return;
 
 	// shoot
@@ -446,7 +449,7 @@ void Player::ApplyVelocity()
 		break;
 	}
 
-	if (!isMy)
+	if (!IsMy)
 	{
 		velocity += (receivedPosition - position) * lerpSmooth;
 	}
@@ -502,7 +505,7 @@ void Player::Draw()
 
 void Player::DrawArrow()
 {
-	if (isMy && !IsDelete)
+	if (IsMy && !IsDelete)
 	{
 		arrowAnimation->SetScale(D3DXVECTOR2(0.66f, 0.66f));
 		arrowAnimation->Draw(position + D3DXVECTOR2(0, -25.0f));

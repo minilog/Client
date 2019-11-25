@@ -281,9 +281,6 @@
     <ClCompile Include="NPC.cpp">
       <Filter>Game Objects</Filter>
     </ClCompile>
-    <ClCompile Include="Pointed.cpp">
-      <Filter>Game Objects</Filter>
-    </ClCompile>
     <ClCompile Include="Player.cpp">
       <Filter>Game Objects</Filter>
     </ClCompile>
