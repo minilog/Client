@@ -117,7 +117,7 @@ void NPC::Read(InputMemoryBitStream & is, bool _canReceive)
 
 		// nếu vị trí nhận được quá xa so với hiện tại => tốc biến
 		D3DXVECTOR2 distance = position - receivedPosition;
-		if (sqrt(distance.x * distance.x + distance.y * distance.y) >= 80.f)
+		if (sqrt(distance.x * distance.x + distance.y * distance.y) >= 60.f)
 		{
 			position = receivedPosition;
 		}
@@ -166,5 +166,10 @@ void NPC::ApplyVelocity()
 		break;
 	}
 
-	velocity += (receivedPosition - position) * 3;
+	// nếu gần đạt đến vị trí cần đến => cho bằng luôn
+	D3DXVECTOR2 distance = position - receivedPosition;
+	if (sqrt(distance.x * distance.x + distance.y * distance.y) < 2)
+		position = receivedPosition;
+	
+	velocity += (receivedPosition - position) * 5;
 }

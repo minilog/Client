@@ -2,8 +2,9 @@
 #include "GameLog.h"
 #include "TimeServer.h"
 
-BattleScene::BattleScene(vector<bool> _playerInRoomList)
+BattleScene::BattleScene(vector<bool> _playerInRoomList, float time)
 {
+	count_TimeUp = time;
 	map = new GameMap("Resource files/map.tmx");
 
 	// tạo plays
@@ -94,6 +95,7 @@ void BattleScene::Update(float dt)
 		player->HandleKeyboard(keyboard, dt);
 	}
 
+	// áp dụng vận tốc
 	for (auto player : playerList)
 	{
 		player->ApplyVelocity();
@@ -110,66 +112,36 @@ void BattleScene::Update(float dt)
 	for (auto player : playerList)
 	{
 		if (!player->IsDelete)
-		{	// players va chạm npcs
+		{	
+			// players va chạm npcs
 			for (auto npc : npcList)
 			{
-				if (!npc->IsDelete)
+				if (!npc->IsDelete &&
+					GameCollision::IsCollideInNextFrame(player, npc, dt))
 				{
-					if (GameCollision::IsCollideInNextFrame(player, npc, dt))
-					{
-						player->ZeroVelocity();
-						//player->CheckCollision(npc);
-						//npc->CheckCollision(player);
-						npc->ZeroVelocity();
-					}
+					player->ZeroVelocity();
+					npc->ZeroVelocity();
 				}
 			}
 
 			// players va chạm players
 			for (auto player2 : playerList)
 			{
-				if (!player2->IsDelete && player->ID != player2->ID)
+				if (!player2->IsDelete &&
+					player->ID != player2->ID &&
+					GameCollision::IsCollideInNextFrame(player, player2, dt))
 				{
-					if (GameCollision::IsCollideInNextFrame(player, player2, dt))
-					{
-						//player->CheckCollision(player2);
-						player->ZeroVelocity();
-						player2->ZeroVelocity();
-					}
+					player->ZeroVelocity();
+					player2->ZeroVelocity();
 				}
 			}
 		}
 	}
 
-	//// check vận tốc của npc ngay sau khi player check va chạm với bản thân mình
-	//for (auto npc : npcList)
-	//{
-	//	if (!npc->IsDelete)
-	//	{
-	//		for (auto player : playerList)
-	//		{
-	//			if (!player->IsDelete)
-	//			{
-	//				if (GameCollision::IsCollideInNextFrame(player, npc, dt))
-	//				{
-	//					npc->ZeroVelocity();
-	//				}
-	//			}
-	//		}
-	//	}
-	//}
-
-
 	for (auto player : playerList)
 	{
 		player->Update(dt);
 	}
-
-	for (auto npc : npcList)
-	{
-		npc->Update(dt);
-	}
-
 
 	for (auto brick : map->GetBrickList())
 	{
@@ -180,30 +152,88 @@ void BattleScene::Update(float dt)
 			{
 				player->CheckCollision(brick);
 			}
+		}
+	}
 
-			// npcs va chạm bricks
-			for (auto npc : npcList)
+	// diễn cái nhẹ XD
+	{
+		for (auto player : playerList)
+		{
+			player->ApplyVelocity_Compensation();
+		}
+		for (auto player : playerList)
+		{
+			if (!player->IsDelete)
 			{
-				npc->CheckCollision(brick);
+				// players va chạm npcs
+				for (auto npc : npcList)
+				{
+					if (!npc->IsDelete &&
+						GameCollision::IsCollideInNextFrame(player, npc, dt))
+					{
+						player->ZeroVelocity();
+						npc->ZeroVelocity();
+					}
+				}
+
+				// players va chạm players
+				for (auto player2 : playerList)
+				{
+					if (!player2->IsDelete &&
+						player->ID != player2->ID &&
+						GameCollision::IsCollideInNextFrame(player, player2, dt))
+					{
+						player->ZeroVelocity();
+						player2->ZeroVelocity();
+					}
+				}
+			}
+		}
+		for (auto player : playerList)
+		{
+			player->Update_Compensation(dt);
+		}
+		for (auto npc : npcList)
+		{
+			npc->Update(dt);
+		}
+		for (auto brick : map->GetBrickList())
+		{
+			if (!brick->IsDelete)
+			{
+				// players va chạm bricks
+				for (auto player : playerList)
+				{
+					player->CheckCollision(brick);
+				}
+
+				// npcs va chạm bricks
+				for (auto npc : npcList)
+				{
+					npc->CheckCollision(brick);
+				}
 			}
 		}
 	}
 
-	for (auto bullet : bulletList)
+	// update còn object còn lại
 	{
-		bullet->Update(dt);
+		for (auto bullet : bulletList)
+		{
+			bullet->Update(dt);
+		}
+		for (auto explosion : smallExList)
+		{
+			explosion->Update(dt);
+		}
+		for (auto explosion : bigExList)
+		{
+			explosion->Update(dt);
+		}
+		protectItem->Update(dt);
+		upgradeItem->Update(dt);
+		pointed->Update(dt);
 	}
-	for (auto e : smallExList)
-	{
-		e->Update(dt);
-	}
-	for (auto e : bigExList)
-	{
-		e->Update(dt);
-	}
-	protectItem->Update(dt);
-	upgradeItem->Update(dt);
-	pointed->Update(dt);
 }
 
 void BattleScene::Draw()

@@ -68,6 +68,7 @@ void RoomView::Read(InputMemoryBitStream & _is)
 	bool _player3_Ready = false;
 	bool _isPlaying = false;
 	int _startingTime = 0;
+	int timeUp = 0;
 
 	// read stream
 	_is.Read(_player0);
@@ -82,6 +83,7 @@ void RoomView::Read(InputMemoryBitStream & _is)
 	if (_isPlaying)
 	{
 		_is.Read(_startingTime, NBit_Time);
+		_is.Read(timeUp, NBit_Time);
 	}
 
 	// result
@@ -98,6 +100,7 @@ void RoomView::Read(InputMemoryBitStream & _is)
 	if (isPlaying)
 	{
 		StartingTime = _startingTime;
+		TimeUp = timeUp;
 	}
 
 	// đổi màu phòng

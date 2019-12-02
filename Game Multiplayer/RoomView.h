@@ -15,6 +15,7 @@ public:
 	vector<bool> playerReadyList;
 
 	int StartingTime = -1;
+	int TimeUp = -1;
 
 public:
 	RoomView(int _networkID);

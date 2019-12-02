@@ -54,7 +54,7 @@ void LobbyScene::Update(float _dt)
 	{
 		// go to battle
 		RoomView * room = roomViewList[GameGlobal::Socket->PlayerRoomID];
-		SceneManager::Instance()->ReplaceScene(new BattleScene(room->playerInRoomList));
+		SceneManager::Instance()->ReplaceScene(new BattleScene(room->playerInRoomList, (float)room->TimeUp));
 		return;
 	}
 
