@@ -481,10 +481,12 @@ void Player::ApplyVelocity_Compensation()
 	{
 		// nếu gần đạt đến vị trí dự đoán => cho bằng luôn :P
 		D3DXVECTOR2 distance = position - bestGuessPosition;
-		if (sqrt(distance.x * distance.x + distance.y * distance.y) < 2)
-			position = bestGuessPosition;
+		if (abs(distance.x) < 1)
+			position.x = bestGuessPosition.x;
+		if (abs(distance.y) < 1)
+			position.y = bestGuessPosition.y;
 
-		velocity = (bestGuessPosition - position) * 1.5f;
+		velocity = (bestGuessPosition - position) * 2.5f;
 	}
 }
 

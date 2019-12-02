@@ -116,33 +116,44 @@ void BattleScene::Update(float dt)
 			// players va chạm npcs
 			for (auto npc : npcList)
 			{
-				if (!npc->IsDelete &&
-					GameCollision::IsCollideInNextFrame(player, npc, dt))
+				if (!npc->IsDelete)
 				{
-					player->ZeroVelocity();
-					npc->ZeroVelocity();
+					if (GameCollision::IsCollideInNextFrame(player, npc, dt, 1))
+					{ 
+						player->ZeroVelocity();
+					}
+					if (GameCollision::IsCollideInNextFrame(npc, player, dt, 1))
+					{
+						//npc->ZeroVelocity();
+						npc->CheckCollision(player);
+					}
 				}
 			}
 
-			// players va chạm players
+			// player va chạm với các player khác, người đụng sẽ bị dừng lại
 			for (auto player2 : playerList)
 			{
 				if (!player2->IsDelete &&
-					player->ID != player2->ID &&
-					GameCollision::IsCollideInNextFrame(player, player2, dt))
+					player->ID != player->ID &&
+					GameCollision::IsCollideInNextFrame(player, player2, dt, 1))
 				{
 					player->ZeroVelocity();
-					player2->ZeroVelocity();
 				}
 			}
 		}
 	}
 
+	// sau khi check vận tốc có = 0 hay không, thay đổi tọa độ
 	for (auto player : playerList)
 	{
 		player->Update(dt);
 	}
+	for (auto npc : npcList)
+	{
+		npc->Update(dt);
+	}
 
+	// sau khi có tọa độ mới tại frame này thì check va chạm với gạch
 	for (auto brick : map->GetBrickList())
 	{
 		if (!brick->IsDelete)
@@ -151,6 +162,11 @@ void BattleScene::Update(float dt)
 			for (auto player : playerList)
 			{
 				player->CheckCollision(brick);
+			}
+			// npcs va chạm bricks
+			for (auto npc : npcList)
+			{
+				npc->CheckCollision(brick);
 			}
 		}
 	}
@@ -169,10 +185,9 @@ void BattleScene::Update(float dt)
 				for (auto npc : npcList)
 				{
 					if (!npc->IsDelete &&
-						GameCollision::IsCollideInNextFrame(player, npc, dt))
+						GameCollision::IsCollideInNextFrame(player, npc, dt, 1))
 					{
 						player->ZeroVelocity();
-						npc->ZeroVelocity();
 					}
 				}
 
@@ -181,10 +196,9 @@ void BattleScene::Update(float dt)
 				{
 					if (!player2->IsDelete &&
 						player->ID != player2->ID &&
-						GameCollision::IsCollideInNextFrame(player, player2, dt))
+						GameCollision::IsCollideInNextFrame(player, player2, dt, 1))
 					{
 						player->ZeroVelocity();
-						player2->ZeroVelocity();
 					}
 				}
 			}
@@ -193,10 +207,7 @@ void BattleScene::Update(float dt)
 		{
 			player->Update_Compensation(dt);
 		}
-		for (auto npc : npcList)
-		{
-			npc->Update(dt);
-		}
+
 		for (auto brick : map->GetBrickList())
 		{
 			if (!brick->IsDelete)
@@ -205,12 +216,6 @@ void BattleScene::Update(float dt)
 				for (auto player : playerList)
 				{
 					player->CheckCollision(brick);
-				}
-
-				// npcs va chạm bricks
-				for (auto npc : npcList)
-				{
-					npc->CheckCollision(brick);
 				}
 			}
 		}
