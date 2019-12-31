@@ -30,9 +30,9 @@ TimeServer::TimeServer()
 	}
 }
 
-void TimeServer::Update(float _dt)
+void TimeServer::Update(float dt)
 {
-	count_RequestSync += _dt;
+	count_RequestSync += dt;
 	if (count_RequestSync >= time_RequestSync)
 	{
 		// request sync time
@@ -64,7 +64,7 @@ void TimeServer::Draw()
 
 	// trong local, số âm nghĩa là servertime tính được chạy chậm hơn thực tế
 	label_TimeDistanceAverage.Draw("Time server - your time average: " + to_string(timeDistanceAverage));
-	serverTime_Label.Draw("Server time: " + to_string(GetServerTime()));
+	serverTime_Label.Draw("Server time: " + to_string(ServerTime()));
 }
 
 void TimeServer::ReceivePacket(InputMemoryBitStream& _is, int _packetType)
@@ -104,7 +104,7 @@ void TimeServer::ReceivePacket(InputMemoryBitStream& _is, int _packetType)
 	}
 }
 
-int TimeServer::GetServerTime()
+int TimeServer::ServerTime()
 {
 	if (isSync)
 	{

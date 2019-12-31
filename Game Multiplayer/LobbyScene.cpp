@@ -50,7 +50,7 @@ void LobbyScene::Update(float _dt)
 	if (!TimeServer::Instance()->GetIsSync())
 		return;
 
-	if (isPlaying && (TimeServer::Instance()->GetServerTime() - serverTimeStarting >= time_StartGame))
+	if (isPlaying && (TimeServer::Instance()->ServerTime() - serverTimeStarting >= time_StartGame))
 	{
 		// go to battle
 		RoomView * room = roomViewList[GameGlobal::Socket->PlayerRoomID];
@@ -221,7 +221,7 @@ void LobbyScene::Draw()
 		if (isPlaying)
 		{
 			label_LobbyTitle.SetPosition(D3DXVECTOR2(440.f, 260.f));
-			int remainingTime = time_StartGame - (TimeServer::Instance()->GetServerTime() - serverTimeStarting);
+			int remainingTime = time_StartGame - (TimeServer::Instance()->ServerTime() - serverTimeStarting);
 			label_LobbyTitle.Draw("Game start in " + to_string(remainingTime));
 		}
 		else

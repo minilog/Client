@@ -15,14 +15,15 @@ class Player : public Entity
 	const float speed = 150.f;
 	Direction direction = D_Stand;
 	Direction lastDirection = D_Stand;
-	Direction receiveDirection = D_Stand;
-	int level = 1;
+	Direction serverDirection = D_Stand;
 
+	D3DXVECTOR2 serverPosition;
+	D3DXVECTOR2 bestGuessPosition;
+	const float flashDistance = 40.0f;
+
+	int level = 1;
 	const float time_BetweenShoots = 0.7f; // bên client sẽ là 0.7, server sẽ là 0.6
 	float count_Shoot = 0.0f;
-	D3DXVECTOR2 receivedPosition;
-	D3DXVECTOR2 bestGuessPosition;
-	const float flashDistance = 60.0f;
 	std::vector<Explosion*> explosionList; // trỏ đến
 	bool isShield = true;
 public:
@@ -39,8 +40,6 @@ public:
 	void Read(InputMemoryBitStream& _is, bool _canReceive, int receivedTime);
 	void HandleKeyboard(std::map<int, bool> _keys, float _dt);
 	void ApplyVelocity(); // vận tốc theo direction
-	void ApplyVelocity_Compensation(); // diễn cho chính xác vị trí trên server
-	void Update_Compensation(float dt);
 	void ZeroVelocity() { velocity = D3DXVECTOR2(0, 0); }
 	void AddExplosion(Explosion* e) { explosionList.push_back(e); }
 

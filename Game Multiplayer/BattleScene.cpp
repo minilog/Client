@@ -7,7 +7,7 @@ BattleScene::BattleScene(vector<bool> _playerInRoomList, float time)
 	count_TimeUp = time;
 	map = new GameMap("Resource files/map.tmx");
 
-	// tạo plays
+	// tạo players
 	for (int i = 0; i < 4; i++)
 	{
 		if (_playerInRoomList[i] == true)
@@ -82,68 +82,66 @@ BattleScene::~BattleScene()
 
 void BattleScene::Update(float dt)
 {
-	// đã nhận packet trước hàm Update này
-
 	if (count_TimeUp < 0)
 		return;
 
+	int time1 = (int)GetTickCount();
+
 	count_TimeUp -= dt;
 
-	// nhận keyboard
-	for (auto player : playerList)
+	for (auto p : playerList) // nhận keyboard
 	{
-		player->HandleKeyboard(keyboard, dt);
+		if (p->IsMy)
+		{
+			p->HandleKeyboard(keyboard, dt);
+		}
 	}
 
-	// áp dụng vận tốc
-	for (auto player : playerList)
+	for (auto p : playerList) // set vận tốc players dựa theo direction
 	{
-		player->ApplyVelocity();
+		p->ApplyVelocity();
 	}
-	for (auto npc : npcList)
+
+	for (auto n : npcList) // set vận tốc npcs dựa theo direction 
 	{
-		npc->ApplyVelocity();
+		n->ApplyVelocity();
 	}
-	for (auto bullet : bulletList)
+	
+	for (auto b : bulletList) // set vận tốc bullets dựa theo direction
 	{
-		bullet->ApplyVelocity();
+		b->ApplyVelocity();
 	}	
 
-	for (auto player : playerList)
+	for (auto p : playerList)
 	{
-		if (!player->IsDelete)
+		if (!p->IsDelete)
 		{	
-			// players va chạm npcs
-			for (auto npc : npcList)
+			for (auto n : npcList) // players va chạm npcs
 			{
-				if (!npc->IsDelete)
+				if (!n->IsDelete)
 				{
-					if (GameCollision::IsCollideInNextFrame(player, npc, dt, 1))
+					if (GameCollision::IsCollideInNextFrame(p, n, dt, 1))
 					{ 
-						player->ZeroVelocity();
+						p->ZeroVelocity();
 					}
-					if (GameCollision::IsCollideInNextFrame(npc, player, dt, 1))
+					if (GameCollision::IsCollideInNextFrame(n, p, dt, 1))
 					{
-						//npc->ZeroVelocity();
-						npc->CheckCollision(player);
+						n->CheckCollision(p);
 					}
 				}
 			}
 
-			// player va chạm với các player khác, người đụng sẽ bị dừng lại
-			for (auto player2 : playerList)
+			for (auto p2 : playerList) // players va chạm với nhau
 			{
-				if (!player2->IsDelete &&
-					player->ID != player->ID &&
-					GameCollision::IsCollideInNextFrame(player, player2, dt, 1))
+				if (!p2->IsDelete && p->ID != p->ID && GameCollision::IsCollideInNextFrame(p, p2, dt, 1))
 				{
-					player->ZeroVelocity();
+					p->ZeroVelocity();
 				}
 			}
 		}
 	}
 
-	// sau khi check vận tốc có = 0 hay không, thay đổi tọa độ
+	// sau khi check vận tốc có = 0 hay không => update tọa độ
 	for (auto player : playerList)
 	{
 		player->Update(dt);
@@ -158,70 +156,19 @@ void BattleScene::Update(float dt)
 	{
 		if (!brick->IsDelete)
 		{
-			// players va chạm bricks
-			for (auto player : playerList)
+			for (auto player : playerList) // players va chạm bricks
 			{
 				player->CheckCollision(brick);
 			}
-			// npcs va chạm bricks
-			for (auto npc : npcList)
+
+			for (auto npc : npcList) // npcs va chạm bricks
 			{
 				npc->CheckCollision(brick);
 			}
 		}
 	}
 
-	// diễn cái nhẹ XD
-	{
-		for (auto player : playerList)
-		{
-			player->ApplyVelocity_Compensation();
-		}
-		for (auto player : playerList)
-		{
-			if (!player->IsDelete)
-			{
-				// players va chạm npcs
-				for (auto npc : npcList)
-				{
-					if (!npc->IsDelete &&
-						GameCollision::IsCollideInNextFrame(player, npc, dt, 1))
-					{
-						player->ZeroVelocity();
-					}
-				}
-
-				// players va chạm players
-				for (auto player2 : playerList)
-				{
-					if (!player2->IsDelete &&
-						player->ID != player2->ID &&
-						GameCollision::IsCollideInNextFrame(player, player2, dt, 1))
-					{
-						player->ZeroVelocity();
-					}
-				}
-			}
-		}
-		for (auto player : playerList)
-		{
-			player->Update_Compensation(dt);
-		}
-
-		for (auto brick : map->GetBrickList())
-		{
-			if (!brick->IsDelete)
-			{
-				// players va chạm bricks
-				for (auto player : playerList)
-				{
-					player->CheckCollision(brick);
-				}
-			}
-		}
-	}
-
-	// update còn object còn lại
+	// update các object còn lại
 	{
 		for (auto bullet : bulletList)
 		{
@@ -239,6 +186,9 @@ void BattleScene::Update(float dt)
 		upgradeItem->Update(dt);
 		pointed->Update(dt);
 	}
+
+	int time2 = (int)GetTickCount();
+	int a = 5;
 }
 
 void BattleScene::Draw()
@@ -342,38 +292,10 @@ void BattleScene::ReceivePacket(InputMemoryBitStream& _is, int _packetType)
 		int receivedTime = 0;
 		_is.Read(receivedTime, NBit_Time);
 
-		int nFramePrevious = (int)((TimeServer::Instance()->GetServerTime() - receivedTime) / 16.7f); // đã bao nhiêu frame trôi qua từ lúc client gửi
-		
-		// test check packet
-		InputMemoryBitStream isTest(_is);
+		int nFramePrevious = (int)((TimeServer::Instance()->ServerTime() - receivedTime) / 16.667f); // đã bao nhiêu frame trôi qua từ lúc client gửi
 
-		{
-			for (auto player : playerList)
-			{
-				player->Read(isTest, false, receivedTime);
-			}
-			for (auto bullet : bulletList)
-			{
-				bullet->Read(isTest, false);
-			}
-			for (auto npc : npcList)
-			{
-				npc->Read(isTest, false);
-			}
-			for (auto brick : map->GetBrickNorList())
-			{
-				bool _isDelete = false;
-				isTest.Read(_isDelete);
-			}
-			protectItem->Read(isTest, false);
-			upgradeItem->Read(isTest, false);
-			pointed->Read(isTest, false);
-		}
-		int typeTest1 = 0;
-		isTest.Read(typeTest1, NBit_PacketType);
-
-		// không nhận các packet trễ & bị drop
-		if (lastReceivedTime >= receivedTime || nFramePrevious >= 70 || typeTest1 != PT_World || count_TimeUp < 0)
+		// không nhận các packet trễ || bị drop
+		if (lastReceivedTime >= receivedTime || nFramePrevious >= 70 || count_TimeUp < 0)
 		{
 			for (auto player : playerList)
 			{
@@ -385,7 +307,7 @@ void BattleScene::ReceivePacket(InputMemoryBitStream& _is, int _packetType)
 			}
 			for (auto npc : npcList)
 			{
-				npc->Read(_is, false);
+				npc->Read(_is, false, receivedTime);
 			}
 			for (auto brick : map->GetBrickNorList())
 			{
@@ -395,9 +317,6 @@ void BattleScene::ReceivePacket(InputMemoryBitStream& _is, int _packetType)
 			protectItem->Read(_is, false);
 			upgradeItem->Read(_is, false);
 			pointed->Read(_is, false);
-
-			int pType = 0;
-			_is.Read(pType, NBit_PacketType);
 		}
 		// nhận packet
 		else
@@ -414,7 +333,7 @@ void BattleScene::ReceivePacket(InputMemoryBitStream& _is, int _packetType)
 			}
 			for (auto npc : npcList)
 			{
-				npc->Read(_is, true);
+				npc->Read(_is, true, receivedTime);
 			}
 			for (auto brick : map->GetBrickNorList())
 			{
@@ -425,9 +344,6 @@ void BattleScene::ReceivePacket(InputMemoryBitStream& _is, int _packetType)
 			protectItem->Read(_is, true);
 			upgradeItem->Read(_is, true);
 			pointed->Read(_is, true);
-
-			int pType = 0;
-			_is.Read(pType, NBit_PacketType);
 		}
 	}
 }

@@ -14,57 +14,53 @@ using namespace Define;
 
 Game::Game()
 {
-	CreateSocket();
+	InitSocket();
 
 	SceneManager::Instance()->ReplaceScene(new LobbyScene());
 
 	InitLoop();
 }
 
-void Game::Update(float _dt)
+void Game::Update(float dt)
 {
-	TimeServer::Instance()->Update(_dt);
-	SceneManager::Instance()->GetCurrentScene()->Update(_dt);
+	TimeServer::Instance()->Update(dt);
+	SceneManager::Instance()->GetCurrentScene()->Update(dt);
 }
 
 void Game::ReceivePacket()
 {
-	// receive packet
+	char* buff = static_cast<char*>(std::malloc(4096));
+	int receivedByteCount = GameGlobal::Socket->Receive(buff, 4096);
+
+	// nhận được data ?
+	if (receivedByteCount > 0)
 	{
-		char* buff = static_cast<char*>(std::malloc(4096));
-		int receivedByteCount = GameGlobal::Socket->Receive(buff, 4096);
+		InputMemoryBitStream is(buff,
+			static_cast<uint32_t> (receivedByteCount));
 
-		// have data to receive
-		if (receivedByteCount > 0)
+		int pType;
+		while ((int)is.GetRemainingBitCount() > NBit_PacketType)
 		{
-			InputMemoryBitStream is(buff,
-				static_cast<uint32_t> (receivedByteCount));
+			pType = 0;
+			is.Read(pType, NBit_PacketType);
 
-			int packetType;
-			while ((int)is.GetRemainingBitCount() > NBit_PacketType)
-			{
-				packetType = 0;
-				is.Read(packetType, NBit_PacketType);
+			SceneManager::Instance()->GetCurrentScene()->ReceivePacket(is, pType);
+			TimeServer::Instance()->ReceivePacket(is, pType);
 
-				TimeServer::Instance()->ReceivePacket(is, packetType);
-				SceneManager::Instance()->GetCurrentScene()->ReceivePacket(is, packetType);
-
-				// dọn dẹp byte cuối của packet (khi có nhiều packet 1 lúc)
-				{
-					int nClearBit = is.GetRemainingBitCount() % 8; // số bit cần clear
-					int k;
-					is.Read(k, nClearBit);
-				}
-			}
+			// dọn dẹp byte cuối của packet (khi có nhiều packet 1 lúc)
+			int nClearBit = is.GetRemainingBitCount() % 8;
+			int temp;
+			is.Read(temp, nClearBit);
 		}
-		free(buff);
 	}
+	free(buff);
 }
 
 void Game::Render()
 {
 	auto device = GameGlobal::Device;
 	auto scene = SceneManager::Instance()->GetCurrentScene();
+
 	device->Clear(0, NULL, D3DCLEAR_TARGET, scene->GetBackcolor(), 0.0f, 0);
 
 	{
@@ -86,7 +82,7 @@ void Game::Render()
 	device->Present(0, 0, 0, 0);
 }
 
-void Game::CreateSocket()
+void Game::InitSocket()
 {
 	FILE *fp;
 	char buff[255];
@@ -94,7 +90,7 @@ void Game::CreateSocket()
 	fopen_s(&fp, "Resource files/Config.txt", "r");
 	fgets(buff, 255, (FILE*)fp);
 
-	string ip = /*"127.0.0.1"*/buff;
+	string ip = buff;
 	if (__argv[1] != NULL)
 	{
 		ip = string(__argv[1]);
@@ -103,6 +99,7 @@ void Game::CreateSocket()
 	SocketAddress socketAddress(inet_addr(ip.c_str()), 8888);
 
 	GameGlobal::Socket = SocketUtil::CreateTCPSocket();
+
 	if (GameGlobal::Socket->Connect(socketAddress) == SOCKET_ERROR)
 	{
 		OutputDebugStringA("Connect to Server failed!");
@@ -111,19 +108,17 @@ void Game::CreateSocket()
 	{
 		OutputDebugStringA("Connect to Server successfull!");
 	}
+
 	GameGlobal::Socket->ChangetoDontWait(1);
 }
 
 void Game::InitLoop()
 {
 	MSG msg;
-	float tickPerFrame = 1.0f / 60, delta = 0;
+	float delta = 0;
 
-	int count = 0;
 	while (GameGlobal::IsGameRunning)
 	{
-		ReceivePacket();
-
 		GameTime::GetInstance()->StartCounter();
 
 		if (PeekMessage(&msg, NULL, 0, 0, PM_REMOVE))
@@ -132,22 +127,19 @@ void Game::InitLoop()
 			DispatchMessage(&msg);
 		}
 
-
 		delta += GameTime::GetInstance()->GetCouter();
 
-		if (delta >= tickPerFrame)
+		if (delta >= 1.0f / 60)
 		{
+			ReceivePacket();
 			Update(delta);
-			delta = 0;
 			Render();
+			delta = 0;
 		}
 		else
 		{
-			ReceivePacket();
-			int delta_time = (int)(tickPerFrame - delta);
-			Sleep(delta_time);
-			delta = tickPerFrame;	
+			Sleep((int)(1.0f / 60 - delta));
+			delta = 1.0f / 60;
 		}
-
 	}
 }

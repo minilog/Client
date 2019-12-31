@@ -10,13 +10,15 @@ class NPC :public Entity
 	D3DXVECTOR2 receivedPosition;
 	std::vector<Explosion*> explosionList; // trỏ đến
 
+	D3DXVECTOR2 bestGuessPos;
+
 public:
 	NPC(int _entityID);
 	~NPC();
 	void Update(float _dt) override;
 	void Draw() override;
 	void CheckCollision(Entity* e);
-	void Read(InputMemoryBitStream& is, bool _canReceive);
+	void Read(InputMemoryBitStream& is, bool _canReceive, int receivedSTime);
 	void ApplyVelocity(); // gọi trước khi gọi CheckCollision
 	void ZeroVelocity() { velocity = D3DXVECTOR2(0, 0); }
 	void AddExplosion(Explosion* e) { explosionList.push_back(e); }
@@ -31,5 +33,7 @@ private:
 	Animation *currentAnimation; // animation hiện tại
 
 	void ApplyAnimation();
+
+	D3DXVECTOR2 GetVelocityByDirection(Direction dir);
 };
 

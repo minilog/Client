@@ -32,7 +32,7 @@ Player::Player(int _ID)
 		break;
 	}
 	bestGuessPosition = position;
-	receivedPosition = position;
+	serverPosition = position;
 
 	if (_ID == GameGlobal::Socket->PlayerID)
 	{
@@ -42,7 +42,6 @@ Player::Player(int _ID)
 
 Player::~Player()
 {
-	// xóa các animation đã khởi tạo new
 	delete leftAnimationLv01;
 	delete rightAnimationLv01;
 	delete upAnimationLv01;
@@ -60,7 +59,7 @@ Player::~Player()
 	delete arrowAnimation;
 }
 
-void Player::Read(InputMemoryBitStream & _is, bool _canReceive, int receivedTime)
+void Player::Read(InputMemoryBitStream & _is, bool _canReceive, int receivedSTime)
 {
 	int x = 0;
 	int y = 0;
@@ -82,44 +81,43 @@ void Player::Read(InputMemoryBitStream & _is, bool _canReceive, int receivedTime
 
 	if (_canReceive)
 	{
-		// spawn nổ
-		if (!IsDelete && _isDelete)
+		if (!IsDelete && _isDelete) // spawn nổ
 		{
 			for (auto e : explosionList)
 			{
 				if (e->IsDelete)
 				{
 					e->Spawn(position);
-					break;
+					break; // sau khi phát nổ thì không apply thêm data nào nữa
 				}
 			}
 		}
 
-		receiveDirection = _dir;
+		serverDirection = _dir;
 		if (!IsMy)
 		{
 			direction = _dir;
 			SetAnimation(shootDir);
 		}
 
-		receivedPosition = D3DXVECTOR2(x / 10.f, y / 10.f);
+		serverPosition = D3DXVECTOR2(x / 10.f, y / 10.f);
 
 		// dự đoán vị trí gần đúng ở Server
-		int timeDistance = TimeServer::Instance()->GetServerTime() - receivedTime;
-		bestGuessPosition = receivedPosition + GetVelocityByDirection(_dir) * (timeDistance / 1000.0f);
+		int timeDistance = TimeServer::Instance()->ServerTime() - receivedSTime;
+		bestGuessPosition = serverPosition + GetVelocityByDirection(_dir) * (timeDistance / 1000.0f);
 
 		// nếu vị trí nhận được quá xa so với hiện tại => tốc biến
-		D3DXVECTOR2 distance = position - receivedPosition;
+		D3DXVECTOR2 distance = position - serverPosition;
 		if (sqrt(distance.x * distance.x + distance.y * distance.y) >= flashDistance)
 		{
-			position = receivedPosition;
+			position = serverPosition;
 			direction = _dir;
 			lastDirection = _dir;
 		}
 
 		if (IsDelete)
 		{
-			position = receivedPosition;
+			position = serverPosition;
 		}
 		IsDelete = _isDelete;
 		isShield = _isShield;
@@ -138,12 +136,9 @@ void Player::Update(float _dt)
 		return;
 
 	position += velocity * _dt;
+
 	if (isShield)
 		shieldAnimation->Update(_dt);
-	
-	count_Log--;
-	if (count_Log > 0)
-		LogPosition();
 }
 
 void Player::HandleKeyboard(std::map<int, bool> keys, float _dt)
@@ -151,29 +146,23 @@ void Player::HandleKeyboard(std::map<int, bool> keys, float _dt)
 	if (IsDelete || !IsMy)
 		return;
 
-	// check shoot
+	if (count_Shoot >= 0)
 	{
 		count_Shoot -= _dt;
-		if (count_Shoot < 0 && keys[VK_SPACE])
-		{
-			count_Shoot = time_BetweenShoots;
-			//GAMELOG("Send Shoot");
+	}
+	if (count_Shoot < 0 && keys[VK_SPACE]) // gửi data bắn đạn
+	{
+		count_Shoot += time_BetweenShoots;
 
-			// send shoot 3 times :3
-			int sTime = TimeServer::Instance()->GetServerTime();
-			for (int i = 0; i < 3; i++)
-			{
-				OutputMemoryBitStream os;
+		OutputMemoryBitStream os;
 
-				os.Write(PT_PlayerShoot, NBit_PacketType);
-				os.Write(sTime, NBit_Time);
+		os.Write(PT_PlayerShoot, NBit_PacketType);
+		os.Write(TimeServer::Instance()->ServerTime(), NBit_Time);
 
-				GameGlobal::Socket->Send(os);
-			}
-		}
+		GameGlobal::Socket->Send(os);
 	}
 
-	// bàn phím thay đổi direction
+	// set direction dựa vào keyboard
 	{
 		if (keys[VK_LEFT])
 		{
@@ -199,28 +188,27 @@ void Player::HandleKeyboard(std::map<int, bool> keys, float _dt)
 	
 	SetAnimation(direction);
 
-	// nếu direction thay đổi => gửi input
-	if (direction != lastDirection)
+	if (direction != lastDirection) // nếu direction thay đổi => gửi data thay đổi direction
 	{
-		// send input 3 times :v
-		int sTime = TimeServer::Instance()->GetServerTime();
-		for (int i = 0; i < 3; i++)
-		{
-			OutputMemoryBitStream os;
+		OutputMemoryBitStream os;
 
-			os.Write(PT_PlayerInput, NBit_PacketType);
-			os.Write(sTime, NBit_Time);
-			os.Write(direction, NBit_Direction);
+		os.Write(PT_PlayerInput, NBit_PacketType);
+		os.Write(TimeServer::Instance()->ServerTime(), NBit_Time);
+		os.Write(direction, NBit_Direction);
 
-			GameGlobal::Socket->Send(os);
-		}
+		GameGlobal::Socket->Send(os);
 
-		GAMELOG("Start log position %i", (int)GetTickCount());
-		count_Log = 5;
+		count_Log = 4;
 		LogPosition();
 	}
 
 	lastDirection = direction;
+
+	if (count_Log > 0)
+	{
+		count_Log--;
+		LogPosition();
+	}
 }
 
 void Player::SetAnimation(Direction _dir)
@@ -449,57 +437,69 @@ void Player::ApplyVelocity()
 	switch (direction)
 	{
 	case D_Stand:
-		velocity = D3DXVECTOR2(0.f, 0.f);
+		velocity = D3DXVECTOR2(0, 0);
 		break;
 	case D_Left:
-		velocity = D3DXVECTOR2(-speed, 0.f);
+		velocity = D3DXVECTOR2(-speed, 0);
 		break;
 	case D_Right:
-		velocity = D3DXVECTOR2(speed, 0.f);
-		break;	
+		velocity = D3DXVECTOR2(speed, 0);
+		break;
 	case D_Up:
-		velocity = D3DXVECTOR2(0.f, -speed);
+		velocity = D3DXVECTOR2(0, -speed);
 		break;
 	case D_Down:
-		velocity = D3DXVECTOR2(0.f, speed);
+		velocity = D3DXVECTOR2(0, speed);
 		break;
 	}
-}
 
-void Player::ApplyVelocity_Compensation()
-{
-	if (!IsMy)
+	if (IsMy)
 	{
-		// nếu gần đạt đến vị trí cần đến => cho bằng luôn
-		D3DXVECTOR2 distance = position - receivedPosition;
-		if (sqrt(distance.x * distance.x + distance.y * distance.y) < 2)
-			position = receivedPosition;
+		if (direction != D_Stand)
+		{
+			if (direction == serverDirection)
+			{
+				if (bestGuessPosition.x - position.x > 1)
+				{
+					velocity.x += 12 + (bestGuessPosition.x - position.x) * 0.5f;
+				}
+				else if (bestGuessPosition.x - position.x < -1)
+				{
+					velocity.x -= 12 - (bestGuessPosition.x - position.x) * 0.5f;
+				}
 
-		velocity = (receivedPosition - position) * 7;
+				if (bestGuessPosition.y - position.y > 1)
+				{
+					velocity.y += 12 + (bestGuessPosition.y - position.y) * 0.5f;
+				}
+				else if (bestGuessPosition.y - position.y < -1)
+				{
+					velocity.y -= 12 - (bestGuessPosition.y - position.y) * 0.5f;				
+				}
+			}
+		}
 	}
 	else
 	{
-		// nếu gần đạt đến vị trí dự đoán => cho bằng luôn :P
-		D3DXVECTOR2 distance = position - bestGuessPosition;
-		if (abs(distance.x) < 1)
-			position.x = bestGuessPosition.x;
-		if (abs(distance.y) < 1)
-			position.y = bestGuessPosition.y;
+		if (bestGuessPosition.x - position.x > 1)
+		{
+			velocity.x += 20;
+		}
+		else if (bestGuessPosition.x - position.x < -1)
+		{
+			velocity.x -= 20;
+		}
 
-		velocity = (bestGuessPosition - position) * 2.5f;
-	}
-}
+		if (bestGuessPosition.y - position.y > 1)
+		{
+			velocity.y += 20;
+		}
+		else if (bestGuessPosition.y - position.y < -1)
+		{
+			velocity.y -= 20;
+		}
 
-void Player::Update_Compensation(float dt)
-{
-	// khi hướng di chuyển của người chơi = hướng di chuyển nhận được => lerp nhanh vào vị trí dự đoán
-	if (direction != D_Stand)
-	{
-		if (direction == receiveDirection)
-			position += velocity * dt;
-		else
-			position += velocity * dt / 5.0f;
-
+		velocity += (bestGuessPosition - position) * 3.f;
 	}
 }
 
@@ -527,6 +527,7 @@ D3DXVECTOR2 Player::GetVelocityByDirection(Direction dir)
 	}
 
 	return D3DXVECTOR2(0, 0);
+	GAMELOG("Bug game: PLayer::GetVelocityByDirection();");
 }
 
 void Player::Draw()

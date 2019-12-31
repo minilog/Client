@@ -15,6 +15,7 @@ class TimeServer
 	const int maxPingToSync = 100; // ping < 100 => Sync time
 	const float time_RequestSync = 2.0f; // time between sync requests
 	bool isSync = false;
+	float frameTime;
 
 private:
 	TimeServer();
@@ -25,7 +26,7 @@ public:
 	void Update(float _dt);
 	void Draw();
 	void ReceivePacket(InputMemoryBitStream& _is, int _typePacket);
-	int GetServerTime();
+	int ServerTime();
 	int GetIsSync() { return isSync; }
 
 protected:

@@ -1,6 +1,7 @@
 ﻿#include "NPC.h"
 #include "SpriteList.h"
 #include "GameCollision.h"
+#include "TimeServer.h"
 
 NPC::NPC(int _ID)
 {
@@ -26,6 +27,8 @@ NPC::NPC(int _ID)
 
 	// mặc định animation ban đầu
 	currentAnimation = leftAnimation;
+
+	bestGuessPos = position;
 }
 
 NPC::~NPC()
@@ -80,7 +83,7 @@ void NPC::CheckCollision(Entity * e)
 	}
 }
 
-void NPC::Read(InputMemoryBitStream & is, bool _canReceive)
+void NPC::Read(InputMemoryBitStream & is, bool _canReceive, int receivedSTime)
 {
 	int x = 0;
 	int y = 0;
@@ -111,13 +114,18 @@ void NPC::Read(InputMemoryBitStream & is, bool _canReceive)
 			position = D3DXVECTOR2(x / 10.0f, y / 10.0f);
 
 		receivedPosition = D3DXVECTOR2(x / 10.0f, y / 10.0f);
+
+		// dự đoán vị trí gần đúng ở Server
+		int timeDistance = TimeServer::Instance()->ServerTime() - receivedSTime;
+		bestGuessPos = receivedPosition + GetVelocityByDirection(dir) * (timeDistance / 1000.0f);
+
 		IsDelete = _isDelete;
 		direction = dir;
 		ApplyAnimation();
 
 		// nếu vị trí nhận được quá xa so với hiện tại => tốc biến
 		D3DXVECTOR2 distance = position - receivedPosition;
-		if (sqrt(distance.x * distance.x + distance.y * distance.y) >= 60.f)
+		if (sqrt(distance.x * distance.x + distance.y * distance.y) >= 40.f)
 		{
 			position = receivedPosition;
 		}
@@ -145,6 +153,33 @@ void NPC::ApplyAnimation()
 	}
 }
 
+D3DXVECTOR2 NPC::GetVelocityByDirection(Direction dir)
+{
+	if (dir == D_Stand)
+	{
+		return D3DXVECTOR2(0, 0);
+	}
+	else if (dir == D_Left)
+	{
+		return D3DXVECTOR2(-speed, 0);
+	}
+	else if (dir == D_Right)
+	{
+		return D3DXVECTOR2(speed, 0);
+	}
+	else if (dir == D_Up)
+	{
+		return D3DXVECTOR2(0, -speed);
+	}
+	else if (dir == D_Down)
+	{
+		return D3DXVECTOR2(0, speed);
+	}
+
+	return D3DXVECTOR2(0, 0);
+	GAMELOG("Bug game: PLayer::GetVelocityByDirection();");
+}
+
 void NPC::ApplyVelocity()
 {
 	switch (direction)
@@ -165,11 +200,24 @@ void NPC::ApplyVelocity()
 		velocity = D3DXVECTOR2(0.f, speed);
 		break;
 	}
-
-	// nếu gần đạt đến vị trí cần đến => cho bằng luôn
-	D3DXVECTOR2 distance = position - receivedPosition;
-	if (sqrt(distance.x * distance.x + distance.y * distance.y) < 2)
-		position = receivedPosition;
 	
-	velocity += (receivedPosition - position) * 5;
+	if (bestGuessPos.x - position.x > 1)
+	{
+		velocity.x += 15;
+	}
+	else if (bestGuessPos.x - position.x < -1)
+	{
+		velocity.x -= 15;
+	}
+
+	if (bestGuessPos.y - position.y > 1)
+	{
+		velocity.y += 15;
+	}
+	else if (bestGuessPos.y - position.y < -1)
+	{
+		velocity.y -= 15;
+	}
+
+	velocity += (bestGuessPos - position) * 3.f;
 }

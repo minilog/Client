@@ -29,7 +29,7 @@ class BattleScene : public Scene
 	Label label_Player3;
 	Label label_CountTime;
 	Label label_TimeUp;
-	float count_TimeUp = 100.0f;;
+	float count_TimeUp = 100.0f;
 
 public:
 	BattleScene(vector<bool> _playerInRoomList, float time);
