@@ -4,6 +4,8 @@
 
 BattleScene::BattleScene(vector<bool> _playerInRoomList, float time)
 {
+	lastReceivedTime = TimeServer::Instance()->ServerTime();
+
 	count_TimeUp = time;
 	map = new GameMap("Resource files/map.tmx");
 
