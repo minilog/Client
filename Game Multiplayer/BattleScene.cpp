@@ -118,30 +118,30 @@ void BattleScene::Update(float dt)
 		b->ApplyVelocity();
 	}	
 
-	for (auto p : playerList)
+	for (auto player : playerList)
 	{
-		if (!p->IsDelete)
+		if (!player->IsDelete)
 		{	
 			for (auto n : npcList) // players va chạm npcs
 			{
 				if (!n->IsDelete)
 				{
-					if (GameCollision::IsCollideInNextFrame(p, n, dt, 1))
+					if (GameCollision::IsCollideInNextFrame(player, n, dt, 1))
 					{ 
-						p->ZeroVelocity();
+						player->ZeroVelocity();
 					}
-					if (GameCollision::IsCollideInNextFrame(n, p, dt, 1))
+					if (GameCollision::IsCollideInNextFrame(n, player, dt, 1))
 					{
-						n->CheckCollision(p);
+						n->CheckCollision(player);
 					}
 				}
 			}
 
-			for (auto p2 : playerList) // players va chạm với nhau
+			for (auto player2 : playerList) // players va chạm với nhau
 			{
-				if (!p2->IsDelete && p->ID != p->ID && GameCollision::IsCollideInNextFrame(p, p2, dt, 1))
+				if (!player2->IsDelete && player->ID != player2->ID && GameCollision::IsCollideInNextFrame(player, player2, dt, 1))
 				{
-					p->ZeroVelocity();
+					player->ZeroVelocity();
 				}
 			}
 		}
@@ -353,7 +353,9 @@ void BattleScene::ReceivePacket(InputMemoryBitStream& _is, int _packetType)
 
 			int temp;
 			_is.Read(temp, NBit_Time);
-			count_TimeUp = temp / 10.f - (TimeServer::Instance()->ServerTime() - receivedTime) / 1000.f;
+			temp = temp / 10.f - (TimeServer::Instance()->ServerTime() - receivedTime) / 1000.f;
+			if (count_TimeUp > temp)
+				count_TimeUp = temp;
 		}
 	}
 }
