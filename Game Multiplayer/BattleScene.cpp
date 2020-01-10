@@ -93,7 +93,7 @@ void BattleScene::Update(float dt)
 
 	int time1 = (int)GetTickCount();
 
-	count_TimeUp -= dt;
+	//count_TimeUp -= dt;
 
 	for (auto p : playerList) // nhận keyboard
 	{
@@ -320,6 +320,9 @@ void BattleScene::ReceivePacket(InputMemoryBitStream& _is, int _packetType)
 			protectItem->Read(_is, false);
 			upgradeItem->Read(_is, false);
 			pointed->Read(_is, false);
+
+			int temp;
+			_is.Read(temp, NBit_Time);
 		}
 		// nhận packet
 		else
@@ -347,6 +350,10 @@ void BattleScene::ReceivePacket(InputMemoryBitStream& _is, int _packetType)
 			protectItem->Read(_is, true);
 			upgradeItem->Read(_is, true);
 			pointed->Read(_is, true);
+
+			int temp;
+			_is.Read(temp, NBit_Time);
+			count_TimeUp = temp / 10.f - (TimeServer::Instance()->ServerTime() - receivedTime) / 1000.f;
 		}
 	}
 }
