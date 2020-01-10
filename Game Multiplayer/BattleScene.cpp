@@ -31,6 +31,10 @@ BattleScene::BattleScene(vector<bool> _playerInRoomList, float time)
 	{
 		NPC* npc = new NPC(i);
 		npcList.push_back(npc);
+
+		// tạo 1 BULLET cho mỗi NPC
+		Bullet* bullet = new Bullet(i, 4);
+		bulletList.push_back(bullet);
 	}
 
 	// tạo 10 small explosion
@@ -188,9 +192,6 @@ void BattleScene::Update(float dt)
 		upgradeItem->Update(dt);
 		pointed->Update(dt);
 	}
-
-	int time2 = (int)GetTickCount();
-	int a = 5;
 }
 
 void BattleScene::Draw()

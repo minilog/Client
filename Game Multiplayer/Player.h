@@ -12,7 +12,7 @@ using namespace std;
 
 class Player : public Entity
 {
-	const float speed = 150.f;
+	const float speed = 130.f;
 	Direction direction = D_Stand;
 	Direction lastDirection = D_Stand;
 	Direction serverDirection = D_Stand;

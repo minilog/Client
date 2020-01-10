@@ -483,23 +483,23 @@ void Player::ApplyVelocity()
 	{
 		if (bestGuessPosition.x - position.x > 1)
 		{
-			velocity.x += 20;
+			velocity.x += 12;
 		}
 		else if (bestGuessPosition.x - position.x < -1)
 		{
-			velocity.x -= 20;
+			velocity.x -= 12;
 		}
 
 		if (bestGuessPosition.y - position.y > 1)
 		{
-			velocity.y += 20;
+			velocity.y += 12;
 		}
 		else if (bestGuessPosition.y - position.y < -1)
 		{
-			velocity.y -= 20;
+			velocity.y -= 12;
 		}
 
-		velocity += (bestGuessPosition - position) * 3.f;
+		velocity += (bestGuessPosition - position) * 2.f;
 	}
 }
 

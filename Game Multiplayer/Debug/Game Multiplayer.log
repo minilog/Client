@@ -1,10 +1,6 @@
 ﻿  BattleScene.cpp
-  Game.cpp
-  c:\program files (x86)\microsoft directx sdk (june 2010)\include\dinput.h: DIRECTINPUT_VERSION undefined. Defaulting to version 0x0800
   LobbyScene.cpp
   NPC.cpp
   Player.cpp
-  TimeServer.cpp
   Generating Code...
-  LINK : C:\Users\Minh\Desktop\Client\Debug\Client.exe not found or not built by the last incremental link; performing full link
   Game Multiplayer.vcxproj -> C:\Users\Minh\Desktop\Client\Debug\Client.exe

@@ -117,6 +117,8 @@ void Game::InitLoop()
 	MSG msg;
 	float delta = 0;
 
+	int count = 0;
+
 	while (GameGlobal::IsGameRunning)
 	{
 		GameTime::GetInstance()->StartCounter();
@@ -129,8 +131,15 @@ void Game::InitLoop()
 
 		delta += GameTime::GetInstance()->GetCouter();
 
-		if (delta >= 1.0f / 60)
+		if (delta >= 1 / 60.f)
 		{
+			count++;
+			if (count == 60)
+			{
+				count = 0;
+				GAMELOG("%i, %f", (int)GetTickCount(), delta);
+			}
+
 			ReceivePacket();
 			Update(delta);
 			Render();
@@ -138,8 +147,8 @@ void Game::InitLoop()
 		}
 		else
 		{
-			Sleep((int)(1.0f / 60 - delta));
-			delta = 1.0f / 60;
+			Sleep((DWORD)(1 / 60.f - delta));
+			delta = 1 / 60.f;
 		}
 	}
 }

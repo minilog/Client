@@ -5,7 +5,7 @@
 
 class NPC :public Entity
 {
-	const float speed = 150.f;
+	const float speed = 130.f;
 	Direction direction; // hướng di chuyển
 	D3DXVECTOR2 receivedPosition;
 	std::vector<Explosion*> explosionList; // trỏ đến
